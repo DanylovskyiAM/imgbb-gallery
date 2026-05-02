@@ -20,12 +20,10 @@ body {
 }
 
 .card img {
-  box-sizing: border-box;
   width: 100%;
   height: 160px;
   object-fit: cover;
   border-radius: 10px;
-  border: 1px solid #cccce0;
   cursor: pointer;
   transition: transform 0.25s ease;
 }
@@ -259,10 +257,9 @@ body {
 }
 
 .contact-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #52525c;
+  display: inline-flex;      /* 🔥 головне */
+  align-items: center;       /* 🔥 вертикальне вирівнювання */
+  gap: 6px;                  /* відступ між іконкою і текстом */
 }
 
 .contact-item svg {
@@ -281,12 +278,6 @@ body {
 .copyright a {
   color: #9f9fa9;
   opacity: 0.8;
-}
-
-a[x-apple-data-detectors],
-.contact-item a {
-  color: inherit !important;
-  text-decoration: none !important;
 }
 
 /* MODAL FIX (from previous step) */
@@ -371,94 +362,17 @@ a[x-apple-data-detectors],
 }
 
 @media (max-width: 768px) {
-  .header-inner {
-    height: auto;
-    min-height: 72px;
-    padding-top: 12px;
-    padding-bottom: 12px;
-    gap: 12px;
-  }
-
-  .logo {
-    width: auto;
-    flex: 1;
-    min-width: 0;
-    text-align: left;
-    font-size: 26px;
-    line-height: 1.1;
-  }
-
-  #downloadAll {
-    position: static;
-    flex-shrink: 0;
-    min-height: 38px;
-    padding: 8px 12px;
-    font-size: 13px;
-    white-space: nowrap;
-  }
-
-  .footer {
-    margin-top: 28px;
-    padding: 24px 16px;
-  }
-
   .footer-top {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 22px;
-  }
-
-  .footer-apps {
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .footer-apps img {
-    height: 42px;
   }
 
   .footer-contact {
     text-align: center;
-    width: 100%;
-    font-size: 16px;
-    line-height: 1.45;
   }
 
   .contact-row {
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    gap: 12px;
-    margin-bottom: 18px;
-  }
-
-  .contact-item {
-    width: 100%;
-    max-width: 280px;
-    justify-content: center;
-    font-size: 17px;
-    font-weight: 500;
-    color: #3f3f46;
-  }
-
-  .contact-item svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .contact-item svg path {
-    fill: #3f3f46;
-  }
-
-  .copyright {
-    max-width: 320px;
-    margin: 0 auto;
-    font-size: 14px;
-  }
-
-  .copyright a {
-    color: #71717b;
   }
 }
