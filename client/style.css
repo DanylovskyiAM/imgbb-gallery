@@ -17,15 +17,18 @@ body {
 .card {
   position: relative;
   overflow: hidden;
+  border-radius: 10px;
 }
 
 .card img {
+  box-sizing: border-box;
   width: 100%;
   height: 160px;
   object-fit: cover;
   border-radius: 10px;
+  border: 1px solid #cccce0;
   cursor: pointer;
-  transition: transform 0.25s ease;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 
 .card:hover img {
@@ -362,6 +365,32 @@ body {
 }
 
 @media (max-width: 768px) {
+  .header-inner {
+    height: auto;
+    min-height: 72px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    gap: 12px;
+  }
+
+  .logo {
+    width: auto;
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    font-size: 26px;
+    line-height: 1.1;
+  }
+
+  #downloadAll {
+    position: static;
+    flex-shrink: 0;
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
   .footer-top {
     flex-direction: column;
     align-items: center;
