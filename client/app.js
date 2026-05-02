@@ -14,6 +14,7 @@ const apiHost = window.location.hostname || "127.0.0.1";
 
 let images = [];
 let currentIndex = 0;
+let imageObserver = null;
 
 function normalizeImage(image) {
   if (typeof image === "string") {
@@ -35,6 +36,46 @@ function normalizeImage(image) {
   };
 }
 
+function loadThumbnail(img) {
+  const src = img.dataset.src;
+
+  if (!src) {
+    return;
+  }
+
+  img.onload = () => {
+    img.closest(".card")?.classList.add("is-loaded");
+  };
+  img.src = src;
+  img.removeAttribute("data-src");
+}
+
+function setupLazyLoading() {
+  if (!("IntersectionObserver" in window)) {
+    document.querySelectorAll(".lazy-image").forEach(loadThumbnail);
+    return;
+  }
+
+  imageObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) {
+        return;
+      }
+
+      loadThumbnail(entry.target);
+      observer.unobserve(entry.target);
+    });
+  }, {
+    root: null,
+    rootMargin: "0px",
+    threshold: 0.01
+  });
+
+  document.querySelectorAll(".lazy-image").forEach(img => {
+    imageObserver.observe(img);
+  });
+}
+
 // LOAD IMAGES
 fetch(`http://${apiHost}:3000/api/album/${albumId}`)
   .then(res => res.json())
@@ -46,9 +87,9 @@ fetch(`http://${apiHost}:3000/api/album/${albumId}`)
       card.className = "card";
 
       const img = document.createElement("img");
-      img.src = image.thumbnail;
+      img.className = "lazy-image";
+      img.dataset.src = image.thumbnail;
       img.alt = image.title || image.filename || `Gallery image ${index + 1}`;
-      img.loading = "lazy";
       img.onclick = () => openModal(index);
 
       const btn = document.createElement("button");
@@ -63,6 +104,8 @@ fetch(`http://${apiHost}:3000/api/album/${albumId}`)
       card.appendChild(btn);
       gallery.appendChild(card);
     });
+
+    setupLazyLoading();
   });
 
 // MODAL

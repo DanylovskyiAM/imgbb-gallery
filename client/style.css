@@ -18,17 +18,26 @@ body {
   position: relative;
   overflow: hidden;
   border-radius: 10px;
+  background: linear-gradient(135deg, #f7fbff, #e4eef8);
+  border: 1px solid #cccce0;
+  box-shadow: 0 4px 12px rgba(24, 24, 27, 0.14);
+  min-height: 160px;
 }
 
 .card img {
   box-sizing: border-box;
+  display: block;
   width: 100%;
   height: 160px;
   object-fit: cover;
   border-radius: 10px;
-  border: 1px solid #cccce0;
   cursor: pointer;
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.25s ease;
+}
+
+.card.is-loaded img {
+  opacity: 1;
 }
 
 .card:hover img {
@@ -122,11 +131,9 @@ body {
 }
 
 #downloadAll {
-  position: absolute;
+  flex-shrink: 0;
   min-height: 34px;
   padding: 5px 10px;
-  top:23px;
-  right: 40px;
   background: white;
   font-size: 14px;
   color: #3aa4fc;
@@ -166,6 +173,7 @@ body {
   justify-content: space-between;
   align-items: center;
   height: 80px;
+  gap: 20px;
 }
 
 .logo {
@@ -188,8 +196,9 @@ body {
 
 /* PAGE HEADER (under top nav) */
 .page-header {
-  width: 100%;
-  text-align: center;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
 }
 
 .page-header h2 {
@@ -200,7 +209,7 @@ body {
 }
 
 .page-header h3 {
-  margin-top: 10px;
+  margin: 6px 0 0;
   font-size: 16px;
   color: #71717b;
   font-weight: 400;
@@ -365,30 +374,52 @@ body {
 }
 
 @media (max-width: 768px) {
+  .main {
+    padding: 10px 8px 14px;
+  }
+
+  #gallery {
+    gap: 12px;
+    padding: 10px 4px;
+  }
+
   .header-inner {
     height: auto;
-    min-height: 72px;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    min-height: 62px;
+    padding-top: 8px;
+    padding-bottom: 8px;
     gap: 12px;
   }
 
-  .logo {
-    width: auto;
+  .page-header {
     flex: 1;
     min-width: 0;
     text-align: left;
-    font-size: 26px;
-    line-height: 1.1;
+  }
+
+  .page-header h2 {
+    font-size: 17px;
+    line-height: 1.2;
+  }
+
+  .page-header h3 {
+    margin-top: 4px;
+    font-size: 11px;
+    line-height: 1.25;
   }
 
   #downloadAll {
-    position: static;
     flex-shrink: 0;
-    min-height: 38px;
-    padding: 8px 12px;
+    min-height: 34px;
+    padding: 6px 10px;
     font-size: 13px;
     white-space: nowrap;
+  }
+
+  .footer {
+    margin-top: 18px;
+    padding-top: 18px;
+    padding-bottom: 18px;
   }
 
   .footer-top {
