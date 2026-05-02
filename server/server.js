@@ -14,11 +14,10 @@ const CACHE_TTL_MS = 5 * 60 * 1000;
 const cache = {};
 
 function mapImageObject(item) {
-  const thumbnail = item.thumb?.url;
   const medium = item.medium?.url || item.display_url;
   const original = item.image?.url || item.url;
 
-  if (!thumbnail || !medium || !original) {
+  if (!medium || !original) {
     return null;
   }
 
@@ -28,7 +27,6 @@ function mapImageObject(item) {
     filename: item.filename || item.image?.filename || "",
     width: Number(item.width) || null,
     height: Number(item.height) || null,
-    thumbnail,
     medium,
     original
   };

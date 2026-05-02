@@ -44,18 +44,39 @@ body {
   transform: scale(1.05);
 }
 
-/* DOWNLOAD ICON */
+.photo-number {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.78);
+  color: #18181b;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 28px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* DOWNLOAD BUTTON */
 .download-btn {
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(0,0,0,0.6);
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  background: #3aa4fc;
+  border-radius: 4px;
+  min-width: 86px;
+  min-height: 32px;
+  padding: 6px 10px;
   color: white;
   border: none;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(24, 24, 27, 0.18);
+  font-size: 13px;
+  line-height: 1;
 
   display: flex;
   align-items: center;
@@ -67,6 +88,10 @@ body {
 
 .card:hover .download-btn {
   opacity: 1;
+}
+
+.download-btn:hover {
+  background: #238de6;
 }
 
 /* MODAL */
@@ -213,6 +238,13 @@ body {
   font-size: 16px;
   color: #71717b;
   font-weight: 400;
+}
+
+.photo-count {
+  flex-shrink: 0;
+  color: #52525c;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 /* MAIN */
@@ -414,6 +446,10 @@ body {
     padding: 6px 10px;
     font-size: 13px;
     white-space: nowrap;
+  }
+
+  .photo-count {
+    font-size: 12px;
   }
 
   .footer {

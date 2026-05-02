@@ -9,6 +9,7 @@ const nextBtn = document.getElementById("next");
 const counter = document.getElementById("counter");
 const headerTitle = document.querySelector(".page-header h2");
 const headerSubtitle = document.querySelector(".page-header h3");
+const photoCount = document.getElementById("photoCount");
 
 const params = new URLSearchParams(window.location.search);
 const albumId = params.get("id");
@@ -24,7 +25,6 @@ function normalizeImage(image) {
     return {
       title: "",
       filename: "",
-      thumbnail: image,
       medium: image,
       original: image
     };
@@ -33,9 +33,8 @@ function normalizeImage(image) {
   return {
     title: image.title || "",
     filename: image.filename || "",
-    thumbnail: image.thumbnail || image.medium || image.original,
-    medium: image.medium || image.original || image.thumbnail,
-    original: image.original || image.medium || image.thumbnail
+    medium: image.medium || image.original,
+    original: image.original || image.medium
   };
 }
 
@@ -98,6 +97,7 @@ fetch(albumApiUrl)
     }
 
     images = data.images.map(normalizeImage);
+    photoCount.textContent = `${data.count || images.length} photos`;
 
     images.forEach((image, index) => {
       const card = document.createElement("div");
@@ -105,19 +105,24 @@ fetch(albumApiUrl)
 
       const img = document.createElement("img");
       img.className = "lazy-image";
-      img.dataset.src = image.thumbnail;
+      img.dataset.src = image.medium;
       img.alt = image.title || image.filename || `Gallery image ${index + 1}`;
       img.onclick = () => openModal(index);
 
       const btn = document.createElement("button");
-      btn.innerHTML = "↓";
+      btn.textContent = "Download";
       btn.className = "download-btn";
       btn.onclick = (e) => {
         e.stopPropagation();
         downloadImage(image.original, index, image.filename);
       };
 
+      const number = document.createElement("span");
+      number.className = "photo-number";
+      number.textContent = index + 1;
+
       card.appendChild(img);
+      card.appendChild(number);
       card.appendChild(btn);
       gallery.appendChild(card);
     });
