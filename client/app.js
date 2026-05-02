@@ -7,9 +7,12 @@ const downloadAllBtn = document.getElementById("downloadAll");
 const prevBtn = document.getElementById("prev");
 const nextBtn = document.getElementById("next");
 const counter = document.getElementById("counter");
+const headerTitle = document.querySelector(".page-header h2");
+const headerSubtitle = document.querySelector(".page-header h3");
 
 const params = new URLSearchParams(window.location.search);
 const albumId = params.get("id");
+const refreshAlbum = params.get("refresh");
 const apiHost = window.location.hostname || "127.0.0.1";
 
 let images = [];
@@ -77,9 +80,23 @@ function setupLazyLoading() {
 }
 
 // LOAD IMAGES
-fetch(`http://${apiHost}:3000/api/album/${albumId}`)
+const albumApiUrl = new URL(`http://${apiHost}:3000/api/album/${albumId}`);
+
+if (refreshAlbum) {
+  albumApiUrl.searchParams.set("refresh", refreshAlbum);
+}
+
+fetch(albumApiUrl)
   .then(res => res.json())
   .then(data => {
+    if (data.title) {
+      headerTitle.textContent = data.title;
+    }
+
+    if (data.subtitle) {
+      headerSubtitle.textContent = data.subtitle;
+    }
+
     images = data.images.map(normalizeImage);
 
     images.forEach((image, index) => {

@@ -134,9 +134,9 @@ body {
   flex-shrink: 0;
   min-height: 34px;
   padding: 5px 10px;
-  background: white;
+  background: #3aa4fc;
   font-size: 14px;
-  color: #3aa4fc;
+  color: white;
   text-decoration: none;
   border-radius: 4px;
   border: none;

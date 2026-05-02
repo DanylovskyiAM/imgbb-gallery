@@ -9,8 +9,8 @@ app.use(cors());
 const BASE = "https://ibb.co";
 const MAX_PAGES = 25;
 const PORT = process.env.PORT || 3000;
+const CACHE_TTL_MS = 5 * 60 * 1000;
 
-// simple in-memory cache
 const cache = {};
 
 function mapImageObject(item) {
@@ -60,6 +60,27 @@ function extractImages(html) {
   return images;
 }
 
+function extractAlbumMetadata(html) {
+  const $ = cheerio.load(html);
+  const title = (
+    $('meta[property="og:title"]').attr("content") ||
+    $('[data-text="album-name"]').first().text() ||
+    $("h1").first().text() ||
+    ""
+  ).trim();
+  const subtitle = (
+    $('meta[property="og:description"]').attr("content") ||
+    $('[data-text="album-description"]').first().text() ||
+    $('meta[name="description"]').attr("content") ||
+    ""
+  ).trim();
+
+  return {
+    title,
+    subtitle
+  };
+}
+
 function getNextPageUrl(html) {
   const $ = cheerio.load(html);
   const nextUrl = $(".pagination-next:not(.pagination-disabled) a[href]").attr("href");
@@ -84,12 +105,20 @@ async function fetchAlbumPage(url) {
 async function fetchAlbumImages(id) {
   const images = [];
   const seen = new Set();
+  let metadata = {
+    title: "",
+    subtitle: ""
+  };
   let url = `${BASE}/album/${id}`;
   let page = 0;
 
   while (url && page < MAX_PAGES) {
     page += 1;
     const html = await fetchAlbumPage(url);
+
+    if (page === 1) {
+      metadata = extractAlbumMetadata(html);
+    }
 
     for (const image of extractImages(html)) {
       const key = image.id || image.original;
@@ -103,18 +132,29 @@ async function fetchAlbumImages(id) {
     url = getNextPageUrl(html);
   }
 
-  return images;
+  return {
+    ...metadata,
+    images
+  };
 }
 
 app.get("/api/album/:id", async (req, res) => {
   const { id } = req.params;
+  const forceRefresh = req.query.refresh === "1" || req.query.refresh === "true";
 
   try {
-    if (!cache[id]) {
-      cache[id] = await fetchAlbumImages(id);
+    const cached = cache[id];
+    const isCacheFresh = cached && Date.now() - cached.updatedAt < CACHE_TTL_MS;
+
+    if (forceRefresh || !isCacheFresh) {
+      cache[id] = {
+        data: await fetchAlbumImages(id),
+        updatedAt: Date.now()
+      };
     }
 
-    const images = cache[id];
+    const album = cache[id].data;
+    const images = album.images;
 
     if (images.length === 0) {
       return res.status(500).json({
@@ -124,6 +164,8 @@ app.get("/api/album/:id", async (req, res) => {
 
     res.json({
       id,
+      title: album.title,
+      subtitle: album.subtitle,
       count: images.length,
       images
     });
