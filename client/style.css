@@ -1,0 +1,464 @@
+body {
+  font-family: Arial;
+  background-color: #eff8fe;
+  color: white;
+  text-align: center;
+  margin: 0;
+}
+
+/* GRID */
+#gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  padding: 20px;
+}
+
+.card {
+  position: relative;
+  overflow: hidden;
+}
+
+.card img {
+  box-sizing: border-box;
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #cccce0;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.card:hover img {
+  transform: scale(1.05);
+}
+
+/* DOWNLOAD ICON */
+.download-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  color: white;
+  border: none;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  transition: 0.2s;
+}
+
+.card:hover .download-btn {
+  opacity: 1;
+}
+
+/* MODAL */
+#modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.95);
+
+  display: none; /* 👈 important */
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#modal.active {
+  display: flex; /* 👈 show modal */
+}
+
+#modal img {
+  max-width: 90%;
+  max-height: 80%;
+}
+
+#close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+/* NAVIGATION */
+.nav {
+  position: absolute;
+  top: 50%;
+  font-size: 40px;
+  cursor: pointer;
+  user-select: none;
+  padding: 10px;
+}
+
+#prev { left: 20px; }
+#next { right: 20px; }
+
+/* COUNTER */
+#counter {
+  position: absolute;
+  bottom: 20px;
+  font-size: 16px;
+}
+
+/* DOWNLOAD BUTTON */
+#downloadBtn {
+  margin-top: 10px;
+  padding: 10px 15px;
+  background: white;
+  color: black;
+  text-decoration: none;
+}
+
+#downloadAll {
+  position: absolute;
+  min-height: 34px;
+  padding: 5px 10px;
+  top:23px;
+  right: 40px;
+  background: white;
+  font-size: 14px;
+  color: #3aa4fc;
+  text-decoration: none;
+  border-radius: 4px;
+  border: none;
+}
+
+.hidden {
+  display: none;
+}
+
+/* GLOBAL */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* HEADER
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+*/
+.header {
+  box-shadow: 0 2px 5px rgba(255,255,255,0.3);
+}
+
+.header {
+  background: linear-gradient(90deg, #d0eafe, #d0eaff);
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+}
+
+.logo {
+  font-size: 36px;
+  font-weight: medium;
+  color: #3aa4fc;
+  width: 100%;
+}
+
+.nav a {
+  margin-left: 20px;
+  color: white;
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+.nav a:hover {
+  opacity: 1;
+}
+
+/* PAGE HEADER (under top nav) */
+.page-header {
+  width: 100%;
+  text-align: center;
+}
+
+.page-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 400;
+  color: #18181b;
+}
+
+.page-header h3 {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #71717b;
+  font-weight: 400;
+}
+
+/* MAIN */
+.main {
+  padding: 20px;
+}
+
+/* FOOTER LAYOUT */
+.footer {
+  background: #fff;
+  margin-top: 40px;
+  padding: 20px;
+}
+
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+/* LEFT SIDE (APP BUTTONS) */
+.footer-apps {
+  display: flex;
+  gap: 15px;
+}
+
+.store-btn {
+  padding: 20px 15px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: white;
+  font-size: 14px;
+  background: #333;
+  transition: 0.2s;
+}
+
+.store-btn:hover {
+  background: #444;
+}
+
+/* RIGHT SIDE (CONTACT) */
+.footer-contact {
+  text-align: right;
+  font-size: 14px;
+  color: #52525c;
+}
+
+.contact-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+.contact-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #52525c;
+}
+
+.contact-item svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  transform: translateY(1px);
+}
+
+.copyright {
+  color: #9f9fa9;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.copyright a {
+  color: #9f9fa9;
+  opacity: 0.8;
+}
+
+a[x-apple-data-detectors],
+.contact-item a {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+/* MODAL FIX (from previous step) */
+#modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.95);
+
+  align-items: center;
+  justify-content: center;
+}
+
+#modal.active {
+  display: flex;
+}
+
+#modal img {
+  max-width: 90%;
+  max-height: 85%;
+  z-index: 1;
+}
+
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 50px;
+  cursor: pointer;
+  user-select: none;
+  padding: 10px;
+  color: white;
+  z-index: 2;
+}
+
+.nav-arrow {
+  opacity: 0.5;
+  transition: 0.2s;
+}
+
+.nav-arrow:hover {
+  opacity: 1;
+}
+
+#prev {
+  left: 20px;
+}
+
+#next {
+  right: 20px;
+}
+
+#close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 3;
+}
+
+#counter {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+}
+
+#downloadBtn {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 15px;
+  background: white;
+  color: black;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .header-inner {
+    height: auto;
+    min-height: 72px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    gap: 12px;
+  }
+
+  .logo {
+    width: auto;
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    font-size: 26px;
+    line-height: 1.1;
+  }
+
+  #downloadAll {
+    position: static;
+    flex-shrink: 0;
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .footer {
+    margin-top: 28px;
+    padding: 24px 16px;
+  }
+
+  .footer-top {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 22px;
+  }
+
+  .footer-apps {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .footer-apps img {
+    height: 42px;
+  }
+
+  .footer-contact {
+    text-align: center;
+    width: 100%;
+    font-size: 16px;
+    line-height: 1.45;
+  }
+
+  .contact-row {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .contact-item {
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 500;
+    color: #3f3f46;
+  }
+
+  .contact-item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .contact-item svg path {
+    fill: #3f3f46;
+  }
+
+  .copyright {
+    max-width: 320px;
+    margin: 0 auto;
+    font-size: 14px;
+  }
+
+  .copyright a {
+    color: #71717b;
+  }
+}
