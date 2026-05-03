@@ -185,9 +185,6 @@ modal.addEventListener("touchend", e => {
 
 // CLOSE
 closeBtn.onclick = () => modal.classList.remove("active");
-modal.onclick = (e) => {
-  if (e.target === modal) modal.classList.remove("active");
-};
 
 // DOWNLOAD SINGLE
 function downloadImage(url, index, filename) {
