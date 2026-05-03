@@ -90,6 +90,16 @@ function getNextPageUrl(html) {
   return new URL(nextUrl, BASE).toString();
 }
 
+function isAllowedImageUrl(url) {
+  try {
+    const parsed = new URL(url);
+
+    return parsed.protocol === "https:" && parsed.hostname === "i.ibb.co";
+  } catch (err) {
+    return false;
+  }
+}
+
 async function fetchAlbumPage(url) {
   const { data: html } = await axios.get(url, {
     headers: {
@@ -170,6 +180,31 @@ app.get("/api/album/:id", async (req, res) => {
 
   } catch (err) {
     res.status(500).json({ error: "Failed to load album" });
+  }
+});
+
+app.get("/api/download", async (req, res) => {
+  const { url, filename } = req.query;
+
+  if (!url || !isAllowedImageUrl(url)) {
+    return res.status(400).json({ error: "Invalid image URL" });
+  }
+
+  try {
+    const image = await axios.get(url, {
+      responseType: "stream",
+      headers: {
+        "User-Agent": "Mozilla/5.0"
+      }
+    });
+    const safeFilename = (filename || url.split("/").pop() || "image").replace(/["\r\n]/g, "");
+
+    res.setHeader("Content-Type", image.headers["content-type"] || "application/octet-stream");
+    res.setHeader("Content-Disposition", `attachment; filename="${safeFilename}"`);
+
+    image.data.pipe(res);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to download image" });
   }
 });
 

@@ -85,6 +85,17 @@ if (refreshAlbum) {
   albumApiUrl.searchParams.set("refresh", refreshAlbum);
 }
 
+function getDownloadUrl(url, filename) {
+  const downloadUrl = new URL(`http://${apiHost}:3000/api/download`);
+  downloadUrl.searchParams.set("url", url);
+
+  if (filename) {
+    downloadUrl.searchParams.set("filename", filename);
+  }
+
+  return downloadUrl.toString();
+}
+
 fetch(albumApiUrl)
   .then(res => res.json())
   .then(data => {
@@ -141,7 +152,7 @@ function updateModal() {
   const image = images[currentIndex];
   modalImg.src = image.medium;
   modalImg.alt = image.title || image.filename || `Gallery image ${currentIndex + 1}`;
-  downloadBtn.href = image.original;
+  downloadBtn.href = getDownloadUrl(image.original, image.filename);
   downloadBtn.download = image.filename || `image_${currentIndex + 1}.jpg`;
   counter.innerText = `${currentIndex + 1} / ${images.length}`;
 }
@@ -171,16 +182,26 @@ document.addEventListener("keydown", (e) => {
 
 // TOUCH SWIPE
 let startX = 0;
+let startY = 0;
 
 modal.addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
 });
 
 modal.addEventListener("touchend", e => {
-  let endX = e.changedTouches[0].clientX;
+  const endX = e.changedTouches[0].clientX;
+  const endY = e.changedTouches[0].clientY;
+  const deltaX = endX - startX;
+  const deltaY = endY - startY;
 
-  if (startX - endX > 50) next();
-  if (endX - startX > 50) prev();
+  if (deltaY > 80 && Math.abs(deltaY) > Math.abs(deltaX)) {
+    modal.classList.remove("active");
+    return;
+  }
+
+  if (deltaX < -50) next();
+  if (deltaX > 50) prev();
 });
 
 // CLOSE
@@ -189,7 +210,7 @@ closeBtn.onclick = () => modal.classList.remove("active");
 // DOWNLOAD SINGLE
 function downloadImage(url, index, filename) {
   const a = document.createElement("a");
-  a.href = url;
+  a.href = getDownloadUrl(url, filename);
   a.download = filename || `image_${index + 1}.jpg`;
   a.click();
 }
