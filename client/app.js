@@ -20,6 +20,7 @@ const apiHost = window.location.hostname || "127.0.0.1";
 let images = [];
 let currentIndex = 0;
 let imageObserver = null;
+let lockedScrollY = 0;
 
 function normalizeImage(image) {
   if (typeof image === "string") {
@@ -109,7 +110,7 @@ fetch(albumApiUrl)
     }
 
     images = data.images.map(normalizeImage);
-    photoCount.textContent = `${data.count || images.length} photos`;
+    photoCount.textContent = `${data.count || images.length} files`;
 
     images.forEach((image, index) => {
       const card = document.createElement("div");
@@ -146,7 +147,17 @@ fetch(albumApiUrl)
 function openModal(index) {
   currentIndex = index;
   updateModal();
+  lockedScrollY = window.scrollY;
+  document.body.style.top = `-${lockedScrollY}px`;
   modal.classList.add("active");
+  document.body.classList.add("modal-open");
+}
+
+function closeModal() {
+  modal.classList.remove("active");
+  document.body.classList.remove("modal-open");
+  document.body.style.top = "";
+  window.scrollTo(0, lockedScrollY);
 }
 
 function updateModal() {
@@ -178,7 +189,7 @@ document.addEventListener("keydown", (e) => {
 
   if (e.key === "ArrowRight") next();
   if (e.key === "ArrowLeft") prev();
-  if (e.key === "Escape") modal.classList.remove("active");
+  if (e.key === "Escape") closeModal();
 });
 
 // TOUCH SWIPE
@@ -197,7 +208,7 @@ modal.addEventListener("touchend", e => {
   const deltaY = endY - startY;
 
   if (deltaY > 80 && Math.abs(deltaY) > Math.abs(deltaX)) {
-    modal.classList.remove("active");
+    closeModal();
     return;
   }
 
@@ -206,7 +217,7 @@ modal.addEventListener("touchend", e => {
 });
 
 // CLOSE
-closeBtn.onclick = () => modal.classList.remove("active");
+closeBtn.onclick = closeModal;
 
 // SCROLL TO TOP
 function updateToTopButton() {
