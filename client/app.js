@@ -28,6 +28,10 @@ let images = [];
 let currentIndex = 0;
 let imageObserver = null;
 let lockedScrollY = 0;
+let zoomScale = 1;
+let pinchStartDistance = 0;
+let pinchStartScale = 1;
+let isPinching = false;
 
 if (!albumId) {
   showStartPage();
@@ -217,11 +221,35 @@ function closeModal() {
 
 function updateModal() {
   const image = images[currentIndex];
+  resetModalZoom();
   modalImg.src = image.medium;
   modalImg.alt = image.title || image.filename || `Gallery image ${currentIndex + 1}`;
   downloadBtn.href = getDownloadUrl(image.original, image.filename);
   downloadBtn.download = image.filename || `image_${currentIndex + 1}.jpg`;
   counter.innerText = `${currentIndex + 1} / ${images.length}`;
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function getTouchDistance(touches) {
+  const deltaX = touches[0].clientX - touches[1].clientX;
+  const deltaY = touches[0].clientY - touches[1].clientY;
+
+  return Math.hypot(deltaX, deltaY);
+}
+
+function applyModalZoom() {
+  modalImg.style.transform = `scale(${zoomScale})`;
+}
+
+function resetModalZoom() {
+  zoomScale = 1;
+  pinchStartDistance = 0;
+  pinchStartScale = 1;
+  isPinching = false;
+  applyModalZoom();
 }
 
 // NAVIGATION
@@ -252,11 +280,43 @@ let startX = 0;
 let startY = 0;
 
 modal.addEventListener("touchstart", e => {
+  if (e.touches.length === 2) {
+    isPinching = true;
+    pinchStartDistance = getTouchDistance(e.touches);
+    pinchStartScale = zoomScale;
+    return;
+  }
+
   startX = e.touches[0].clientX;
   startY = e.touches[0].clientY;
 });
 
+modal.addEventListener("touchmove", e => {
+  if (e.touches.length !== 2 || !pinchStartDistance) {
+    return;
+  }
+
+  e.preventDefault();
+  const distance = getTouchDistance(e.touches);
+  zoomScale = clamp(pinchStartScale * (distance / pinchStartDistance), 1, 4);
+  applyModalZoom();
+}, { passive: false });
+
 modal.addEventListener("touchend", e => {
+  if (isPinching) {
+    if (e.touches.length < 2) {
+      pinchStartDistance = 0;
+      pinchStartScale = zoomScale;
+      isPinching = false;
+    }
+
+    return;
+  }
+
+  if (zoomScale > 1.05) {
+    return;
+  }
+
   const endX = e.changedTouches[0].clientX;
   const endY = e.changedTouches[0].clientY;
   const deltaX = endX - startX;
