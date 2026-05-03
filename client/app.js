@@ -11,6 +11,11 @@ const headerTitle = document.querySelector(".page-header h2");
 const headerSubtitle = document.querySelector(".page-header h3");
 const photoCount = document.getElementById("photoCount");
 const toTopBtn = document.getElementById("toTopBtn");
+const startPage = document.getElementById("startPage");
+const albumForm = document.getElementById("albumForm");
+const albumInput = document.getElementById("albumInput");
+const albumError = document.getElementById("albumError");
+const headerActions = document.querySelector(".header-actions");
 
 const params = new URLSearchParams(window.location.search);
 const albumId = params.get("id");
@@ -21,6 +26,24 @@ let images = [];
 let currentIndex = 0;
 let imageObserver = null;
 let lockedScrollY = 0;
+
+if (!albumId) {
+  showStartPage();
+} else {
+  loadAlbum();
+}
+
+function showStartPage(message = "") {
+  document.body.classList.add("start-mode");
+  headerTitle.textContent = "Gallery";
+  headerSubtitle.textContent = "Enter an ImgBB album ID";
+  headerActions.classList.add("hidden");
+  gallery.classList.add("hidden");
+  startPage.classList.remove("hidden");
+  albumInput.value = albumId || "";
+  albumError.textContent = message;
+  albumError.classList.toggle("hidden", !message);
+}
 
 function normalizeImage(image) {
   if (typeof image === "string") {
@@ -80,13 +103,6 @@ function setupLazyLoading() {
   });
 }
 
-// LOAD IMAGES
-const albumApiUrl = new URL(`http://${apiHost}:3000/api/album/${albumId}`);
-
-if (refreshAlbum) {
-  albumApiUrl.searchParams.set("refresh", refreshAlbum);
-}
-
 function getDownloadUrl(url, filename) {
   const downloadUrl = new URL(`http://${apiHost}:3000/api/download`);
   downloadUrl.searchParams.set("url", url);
@@ -98,50 +114,87 @@ function getDownloadUrl(url, filename) {
   return downloadUrl.toString();
 }
 
-fetch(albumApiUrl)
-  .then(res => res.json())
-  .then(data => {
-    if (data.title) {
-      headerTitle.textContent = data.title;
-    }
+function loadAlbum() {
+  const albumApiUrl = new URL(`http://${apiHost}:3000/api/album/${albumId}`);
 
-    if (data.subtitle) {
-      headerSubtitle.textContent = data.subtitle;
-    }
+  if (refreshAlbum) {
+    albumApiUrl.searchParams.set("refresh", refreshAlbum);
+  }
 
-    images = data.images.map(normalizeImage);
-    photoCount.textContent = `${data.count || images.length} files`;
+  fetch(albumApiUrl)
+    .then(async res => {
+      const data = await res.json();
 
-    images.forEach((image, index) => {
-      const card = document.createElement("div");
-      card.className = "card";
+      if (!res.ok) {
+        throw new Error(data.error || "Gallery was not found. Check the ID and try again.");
+      }
 
-      const img = document.createElement("img");
-      img.className = "lazy-image";
-      img.dataset.src = image.medium;
-      img.alt = image.title || image.filename || `Gallery image ${index + 1}`;
-      img.onclick = () => openModal(index);
+      return data;
+    })
+    .then(data => {
+      if (!Array.isArray(data.images) || data.images.length === 0) {
+        showStartPage("Gallery was not found. Check the ID and try again.");
+        return;
+      }
 
-      const btn = document.createElement("button");
-      btn.textContent = "Download";
-      btn.className = "download-btn";
-      btn.onclick = (e) => {
-        e.stopPropagation();
-        downloadImage(image.original, index, image.filename);
-      };
+      if (data.title) {
+        headerTitle.textContent = data.title;
+      }
 
-      const number = document.createElement("span");
-      number.className = "photo-number";
-      number.textContent = index + 1;
+      if (data.subtitle) {
+        headerSubtitle.textContent = data.subtitle;
+      }
 
-      card.appendChild(img);
-      card.appendChild(number);
-      card.appendChild(btn);
-      gallery.appendChild(card);
+      images = data.images.map(normalizeImage);
+      const filesCount = data.count || images.length || 0;
+      photoCount.textContent = `${filesCount} files`;
+      downloadAllBtn.classList.toggle("hidden", !filesCount);
+
+      images.forEach((image, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        const img = document.createElement("img");
+        img.className = "lazy-image";
+        img.dataset.src = image.medium;
+        img.alt = image.title || image.filename || `Gallery image ${index + 1}`;
+        img.onclick = () => openModal(index);
+
+        const btn = document.createElement("button");
+        btn.textContent = "Download";
+        btn.className = "download-btn";
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          downloadImage(image.original, index, image.filename);
+        };
+
+        const number = document.createElement("span");
+        number.className = "photo-number";
+        number.textContent = index + 1;
+
+        card.appendChild(img);
+        card.appendChild(number);
+        card.appendChild(btn);
+        gallery.appendChild(card);
+      });
+
+      setupLazyLoading();
+    })
+    .catch(() => {
+      showStartPage("Gallery was not found. Check the ID and try again.");
     });
+}
 
-    setupLazyLoading();
-  });
+albumForm.onsubmit = (e) => {
+  e.preventDefault();
+  const nextAlbumId = albumInput.value.trim();
+
+  if (!nextAlbumId) {
+    return;
+  }
+
+  window.location.href = `${window.location.pathname}?id=${encodeURIComponent(nextAlbumId)}`;
+};
 
 // MODAL
 function openModal(index) {

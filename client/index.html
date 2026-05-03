@@ -16,7 +16,7 @@
     </section>
     <div class="header-actions">
       <span id="photoCount" class="photo-count"></span>
-      <button id="downloadAll">Download All</button>
+      <button id="downloadAll" class="hidden">Download All</button>
     </div>
   </div>
 </header>
@@ -24,6 +24,17 @@
 
 <!-- MAIN -->
 <main class="main">
+    <section id="startPage" class="start-page hidden">
+      <form id="albumForm" class="album-form">
+        <label for="albumInput">Gallery ID</label>
+        <div class="album-form-row">
+          <input id="albumInput" type="text" name="id" placeholder="TMrN4x" autocomplete="off" />
+          <button type="submit">Open Gallery</button>
+        </div>
+        <p id="albumError" class="album-error hidden"></p>
+      </form>
+    </section>
+
     <div id="gallery"></div>
 </main>
 

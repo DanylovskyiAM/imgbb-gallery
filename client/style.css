@@ -1,9 +1,12 @@
 body {
   font-family: Arial;
+  min-height: 100vh;
   background-color: #eff8fe;
   color: white;
   text-align: center;
   margin: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 body.modal-open {
@@ -184,6 +187,76 @@ body.modal-open {
   display: none;
 }
 
+.start-page {
+  width: 100%;
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.start-page.hidden {
+  display: none;
+}
+
+.album-form {
+  width: 420px;
+  max-width: calc(100vw - 40px);
+  margin: 0 auto;
+  text-align: left;
+  color: #18181b;
+}
+
+.album-form label {
+  display: block;
+  margin-bottom: 8px;
+  color: #52525c;
+  font-size: 14px;
+}
+
+.album-form-row {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+}
+
+.album-form input {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid #cccce0;
+  border-radius: 4px;
+  color: #18181b;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.album-form button {
+  box-sizing: border-box;
+  min-height: 34px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 4px;
+  background: #3aa4fc;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.album-form button:hover {
+  background: #238de6;
+}
+
+.album-error {
+  margin: 10px 0 0;
+  color: #b42318;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+}
+
 /* GLOBAL */
 .container {
   max-width: 1200px;
@@ -268,7 +341,28 @@ body.modal-open {
 
 /* MAIN */
 .main {
+  flex: 1;
   padding: 20px;
+}
+
+body.start-mode .main {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+body.start-mode .start-page {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+body.start-mode .album-form {
+  width: 420px;
+  max-width: calc(100vw - 40px);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* FOOTER LAYOUT */
@@ -608,5 +702,27 @@ body.modal-open {
 
   .to-top-btn:hover {
     background: #238de6;
+  }
+
+  .start-page {
+    min-height: 100%;
+  }
+
+  .album-form-row {
+    flex-direction: column;
+  }
+
+  .start-page .album-form input {
+    width: 100%;
+    height: 34px;
+    min-height: 34px;
+    line-height: 34px;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .start-page .album-form button {
+    width: 100%;
+    min-height: 34px;
   }
 }
