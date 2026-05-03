@@ -10,6 +10,7 @@ const counter = document.getElementById("counter");
 const headerTitle = document.querySelector(".page-header h2");
 const headerSubtitle = document.querySelector(".page-header h3");
 const photoCount = document.getElementById("photoCount");
+const toTopBtn = document.getElementById("toTopBtn");
 
 const params = new URLSearchParams(window.location.search);
 const albumId = params.get("id");
@@ -206,6 +207,15 @@ modal.addEventListener("touchend", e => {
 
 // CLOSE
 closeBtn.onclick = () => modal.classList.remove("active");
+
+// SCROLL TO TOP
+function updateToTopButton() {
+  toTopBtn.classList.toggle("is-visible", window.scrollY > 320);
+}
+
+window.addEventListener("scroll", updateToTopButton, { passive: true });
+toTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+updateToTopButton();
 
 // DOWNLOAD SINGLE
 function downloadImage(url, index, filename) {
