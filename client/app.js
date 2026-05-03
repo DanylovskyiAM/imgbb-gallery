@@ -21,6 +21,8 @@ const params = new URLSearchParams(window.location.search);
 const albumId = params.get("id");
 const refreshAlbum = params.get("refresh");
 const apiHost = window.location.hostname || "127.0.0.1";
+const isLocalClient = ["localhost", "127.0.0.1"].includes(apiHost) && window.location.port === "5500";
+const apiBase = isLocalClient ? `http://${apiHost}:3000` : window.location.origin;
 
 let images = [];
 let currentIndex = 0;
@@ -104,7 +106,7 @@ function setupLazyLoading() {
 }
 
 function getDownloadUrl(url, filename) {
-  const downloadUrl = new URL(`http://${apiHost}:3000/api/download`);
+  const downloadUrl = new URL("/api/download", apiBase);
   downloadUrl.searchParams.set("url", url);
 
   if (filename) {
@@ -115,7 +117,7 @@ function getDownloadUrl(url, filename) {
 }
 
 function loadAlbum() {
-  const albumApiUrl = new URL(`http://${apiHost}:3000/api/album/${albumId}`);
+  const albumApiUrl = new URL(`/api/album/${albumId}`, apiBase);
 
   if (refreshAlbum) {
     albumApiUrl.searchParams.set("refresh", refreshAlbum);

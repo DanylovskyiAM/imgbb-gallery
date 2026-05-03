@@ -2,6 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const cheerio = require("cheerio");
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 app.use(cors());
@@ -207,6 +208,8 @@ app.get("/api/download", async (req, res) => {
     res.status(500).json({ error: "Failed to download image" });
   }
 });
+
+app.use(express.static(path.join(__dirname, "../client")));
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

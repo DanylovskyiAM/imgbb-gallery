@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: imgbb-gallery
+    runtime: node
+    buildCommand: npm install --prefix server
+    startCommand: npm start --prefix server
