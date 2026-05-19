@@ -183,6 +183,24 @@ body.modal-open {
   background: #238de6;
 }
 
+.header-link {
+  flex-shrink: 0;
+  min-height: 34px;
+  padding: 5px 10px;
+  background: #3aa4fc;
+  color: white;
+  font-size: 14px;
+  line-height: 24px;
+  text-decoration: none;
+  border-radius: 4px;
+  box-sizing: border-box;
+  transition: background 0.2s ease;
+}
+
+.header-link:hover {
+  background: #238de6;
+}
+
 .hidden {
   display: none;
 }
@@ -255,6 +273,120 @@ body.modal-open {
   font-size: 14px;
   line-height: 1.4;
   text-align: center;
+}
+
+.upload-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-panel {
+  width: min(100%, 560px);
+  color: #18181b;
+  text-align: left;
+}
+
+.upload-form {
+  display: grid;
+  gap: 16px;
+}
+
+.upload-form label {
+  color: #52525c;
+  font-size: 14px;
+}
+
+.upload-form input,
+.upload-form select {
+  padding: 10px;
+  border: 1px solid #cccce0;
+  border-radius: 4px;
+  background: white;
+  color: #18181b;
+  box-sizing: border-box;
+}
+
+.expiration-field {
+  display: grid;
+  width: 180px;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.expiration-field label {
+  margin: 0;
+  font-size: 13px;
+}
+
+.expiration-field select {
+  min-height: 34px;
+  padding: 5px 32px 5px 10px;
+  font-size: 14px;
+}
+
+.upload-form button {
+  min-height: 34px;
+  border: none;
+  border-radius: 4px;
+  background: #3aa4fc;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.upload-form button:hover {
+  background: #238de6;
+}
+
+.upload-form button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.upload-status {
+  min-height: 20px;
+  margin: 12px 0 0;
+  color: #52525c;
+  font-size: 14px;
+  text-align: center;
+}
+
+.upload-status.is-error {
+  color: #b42318;
+}
+
+.upload-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.upload-result {
+  color: #18181b;
+  text-decoration: none;
+}
+
+.upload-result img {
+  display: block;
+  width: 100%;
+  height: 92px;
+  object-fit: cover;
+  border: 1px solid #cccce0;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.upload-result span {
+  display: block;
+  margin-top: 6px;
+  overflow: hidden;
+  color: #52525c;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* GLOBAL */

@@ -3,14 +3,39 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
+
+function loadLocalEnv() {
+  const envPath = path.join(__dirname, "../.env");
+
+  if (!fs.existsSync(envPath)) {
+    return;
+  }
+
+  const lines = fs.readFileSync(envPath, "utf8").split(/\r?\n/);
+
+  lines.forEach((line) => {
+    const match = line.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
+
+    if (!match || process.env[match[1]]) {
+      return;
+    }
+
+    process.env[match[1]] = match[2];
+  });
+}
+
+loadLocalEnv();
 
 const app = express();
 app.use(cors());
+app.use(express.json({ limit: "64mb" }));
 
 const BASE = "https://ibb.co";
 const MAX_PAGES = 25;
 const PORT = process.env.PORT || 3000;
 const CACHE_TTL_MS = 5 * 60 * 1000;
+const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
 
 const cache = {};
 
@@ -206,6 +231,60 @@ app.get("/api/download", async (req, res) => {
     image.data.pipe(res);
   } catch (err) {
     res.status(500).json({ error: "Failed to download image" });
+  }
+});
+
+app.post("/api/upload", async (req, res) => {
+  const { images, expiration } = req.body;
+
+  if (!IMGBB_API_KEY) {
+    return res.status(500).json({ error: "IMGBB_API_KEY is not configured on the server" });
+  }
+
+  if (!Array.isArray(images) || images.length === 0) {
+    return res.status(400).json({ error: "No images provided" });
+  }
+
+  try {
+    const expirationSeconds = Number(expiration) || null;
+    const uploaded = await Promise.all(images.map(async (image) => {
+      const base64 = String(image.data || "").replace(/^data:image\/[a-zA-Z0-9.+-]+;base64,/, "");
+      const body = new URLSearchParams();
+      body.set("image", base64);
+
+      if (image.name) {
+        body.set("name", image.name.replace(/\.[^.]+$/, ""));
+      }
+
+      const uploadUrl = new URL("https://api.imgbb.com/1/upload");
+      uploadUrl.searchParams.set("key", IMGBB_API_KEY);
+
+      if (expirationSeconds) {
+        uploadUrl.searchParams.set("expiration", String(expirationSeconds));
+      }
+
+      const response = await axios.post(uploadUrl.toString(), body, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        maxBodyLength: Infinity
+      });
+
+      return {
+        id: response.data.data.id,
+        title: response.data.data.title,
+        url: response.data.data.url,
+        displayUrl: response.data.data.display_url,
+        deleteUrl: response.data.data.delete_url
+      };
+    }));
+
+    res.json({
+      count: uploaded.length,
+      images: uploaded
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to upload images" });
   }
 });
 
