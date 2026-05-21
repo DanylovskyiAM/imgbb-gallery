@@ -616,7 +616,9 @@ function renderFolderOverview(parentFolder = null) {
   const scopedFolders = parentFolder
     ? folders.filter(folder => isFolderDescendantOf(folder, parentFolder.id))
     : folders;
-  const overviewFolders = parentFolder?.children || folders;
+  const overviewFolders = parentFolder
+    ? folders.filter(folder => folder.parentId === parentFolder.id)
+    : folders;
   const overviewItems = overviewFolders
     .map(folder => ({
       folder,
@@ -654,6 +656,10 @@ function renderFolderOverview(parentFolder = null) {
       api(`/api/folders/${folder.id}/files/approve-all`, { method: "POST" })
     )));
     await loadFolders();
+
+    if (selectedFolder && hasChildFolders(selectedFolder)) {
+      renderFolderOverview(selectedFolder);
+    }
   }, { disabled: totalPending === 0 });
 
   header.append(title, approveAllWaiting);
