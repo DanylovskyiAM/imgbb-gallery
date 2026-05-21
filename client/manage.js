@@ -32,6 +32,9 @@ const importDbForm = document.getElementById("importDbForm");
 const importDbFile = document.getElementById("importDbFile");
 const importDbStatus = document.getElementById("importDbStatus");
 const cancelImportDb = document.getElementById("cancelImportDb");
+const importDbActions = document.getElementById("importDbActions");
+const importDbCloseActions = document.getElementById("importDbCloseActions");
+const closeImportDb = document.getElementById("closeImportDb");
 const editFolderModal = document.getElementById("editFolderModal");
 const editFolderForm = document.getElementById("editFolderForm");
 const editFolderName = document.getElementById("editFolderName");
@@ -150,6 +153,8 @@ function openImportDbModal() {
   importDbStatus.textContent = "";
   importDbStatus.classList.remove("is-error");
   importDbFile.value = "";
+  importDbActions.classList.remove("hidden");
+  importDbCloseActions.classList.add("hidden");
   importDbModal.classList.remove("hidden");
 }
 
@@ -158,6 +163,13 @@ function closeImportDbModal() {
   importDbForm.reset();
   importDbStatus.textContent = "";
   importDbStatus.classList.remove("is-error");
+  importDbActions.classList.remove("hidden");
+  importDbCloseActions.classList.add("hidden");
+}
+
+function showImportCloseAction() {
+  importDbActions.classList.add("hidden");
+  importDbCloseActions.classList.remove("hidden");
 }
 
 function readFileAsBase64(file) {
@@ -835,6 +847,7 @@ exportExcelBtn.onclick = () => {
 
 openImportDbBtn.onclick = openImportDbModal;
 cancelImportDb.onclick = closeImportDbModal;
+closeImportDb.onclick = closeImportDbModal;
 
 importDbForm.onsubmit = async (e) => {
   e.preventDefault();
@@ -869,9 +882,11 @@ importDbForm.onsubmit = async (e) => {
     currentFiles = [];
     await loadFolders();
     renderImportSummary(response.summary);
+    showImportCloseAction();
   } catch (err) {
     importDbStatus.textContent = err.message || "Import failed.";
     importDbStatus.classList.add("is-error");
+    showImportCloseAction();
   }
 };
 

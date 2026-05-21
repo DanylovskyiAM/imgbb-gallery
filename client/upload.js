@@ -77,6 +77,28 @@ function renderResults(images) {
   });
 }
 
+async function uploadImage(image, expiration) {
+  const response = await fetch(`${apiBase}/api/upload`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      images: [image],
+      expiration,
+      folderId: folderParam,
+      folderSlug: folderParam
+    })
+  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Upload failed.");
+  }
+
+  return data.images[0];
+}
+
 uploadForm.onsubmit = async (e) => {
   e.preventDefault();
 
@@ -93,29 +115,19 @@ uploadForm.onsubmit = async (e) => {
     setStatus(`Preparing ${files.length} image(s)...`);
     uploadResults.innerHTML = "";
 
-    const images = await Promise.all(files.map(readFileAsDataUrl));
-    setStatus("Uploading to ImgBB...");
+    const uploadedImages = [];
 
-    const response = await fetch(`${apiBase}/api/upload`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        images,
-        expiration,
-        folderId: folderParam,
-        folderSlug: folderParam
-      })
-    });
-    const data = await response.json();
+    for (const [index, file] of files.entries()) {
+      setStatus(`Preparing ${index + 1} of ${files.length}: ${file.name}`);
+      const image = await readFileAsDataUrl(file);
 
-    if (!response.ok) {
-      throw new Error(data.error || "Upload failed.");
+      setStatus(`Uploading ${index + 1} of ${files.length}: ${file.name}`);
+      const uploadedImage = await uploadImage(image, expiration);
+      uploadedImages.push(uploadedImage);
+      renderResults(uploadedImages);
     }
 
-    setStatus(`Uploaded ${data.count} image(s).`);
-    renderResults(data.images);
+    setStatus(`Uploaded ${uploadedImages.length} image(s).`);
     uploadInput.value = "";
   } catch (err) {
     setStatus(err.message || "Upload failed.", true);
