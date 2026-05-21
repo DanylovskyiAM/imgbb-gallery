@@ -4,6 +4,8 @@ const cheerio = require("cheerio");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
+const db = require("./lib/db");
+const imgbbStorage = require("./storage/imgbbStorage");
 
 function loadLocalEnv() {
   const envPath = path.join(__dirname, "../.env");
@@ -234,8 +236,151 @@ app.get("/api/download", async (req, res) => {
   }
 });
 
+app.get("/api/folders", (req, res) => {
+  res.json({ folders: db.listFolders() });
+});
+
+app.post("/api/folders", (req, res) => {
+  try {
+    const folder = db.createFolder(req.body.name, req.body.parentId || null, req.body.description || "");
+    res.status(201).json({ folder });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.patch("/api/folders/:id", (req, res) => {
+  try {
+    const updates = {};
+
+    if (Object.prototype.hasOwnProperty.call(req.body, "name")) {
+      updates.name = req.body.name;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(req.body, "parentId")) {
+      updates.parentId = req.body.parentId;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(req.body, "description")) {
+      updates.description = req.body.description;
+    }
+
+    const folder = db.updateFolder(req.params.id, {
+      ...updates
+    });
+    res.json({ folder });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post("/api/folders/:id/order", (req, res) => {
+  try {
+    const folder = db.reorderFolder(req.params.id, req.body.direction);
+    res.json({ folder });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.delete("/api/folders/:id", (req, res) => {
+  db.deleteFolder(req.params.id);
+  res.json({ ok: true });
+});
+
+app.get("/api/folders/:id/files", (req, res) => {
+  const folder = db.findFolder(req.params.id);
+
+  if (!folder) {
+    return res.status(404).json({ error: "Folder not found" });
+  }
+
+  res.json({
+    folder,
+    files: db.listFiles(folder.id, req.query.status || "all")
+  });
+});
+
+app.post("/api/folders/:id/files/approve-all", (req, res) => {
+  const folder = db.findFolder(req.params.id);
+
+  if (!folder) {
+    return res.status(404).json({ error: "Folder not found" });
+  }
+
+  res.json({
+    ok: true,
+    count: db.approveFolderFiles(folder.id)
+  });
+});
+
+app.delete("/api/folders/:id/files", (req, res) => {
+  const folder = db.findFolder(req.params.id);
+
+  if (!folder) {
+    return res.status(404).json({ error: "Folder not found" });
+  }
+
+  res.json({
+    ok: true,
+    count: db.deleteFolderFiles(folder.id)
+  });
+});
+
+app.get("/api/gallery/folders/:id", (req, res) => {
+  const folder = db.findFolder(req.params.id);
+
+  if (!folder) {
+    return res.status(404).json({ error: "Folder not found" });
+  }
+
+  const files = db.listFiles(folder.id, "approved");
+
+  res.json({
+    id: folder.id,
+    title: folder.name,
+    subtitle: folder.path,
+    count: files.length,
+    images: files.map(file => ({
+      id: file.id,
+      title: file.title,
+      filename: file.filename,
+      width: file.width || null,
+      height: file.height || null,
+      medium: file.mediumUrl,
+      original: file.originalUrl
+    }))
+  });
+});
+
+app.patch("/api/files/:id", (req, res) => {
+  try {
+    const file = db.updateFile(req.params.id, req.body);
+    res.json({ file });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post("/api/files/:id/approve", (req, res) => {
+  try {
+    const file = db.updateFile(req.params.id, {
+      status: "approved",
+      approvedBy: "admin"
+    });
+    res.json({ file });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.delete("/api/files/:id", (req, res) => {
+  db.deleteFile(req.params.id);
+  res.json({ ok: true });
+});
+
 app.post("/api/upload", async (req, res) => {
-  const { images, expiration } = req.body;
+  const { images, expiration, folderId, folderSlug } = req.body;
 
   if (!IMGBB_API_KEY) {
     return res.status(500).json({ error: "IMGBB_API_KEY is not configured on the server" });
@@ -247,39 +392,36 @@ app.post("/api/upload", async (req, res) => {
 
   try {
     const expirationSeconds = Number(expiration) || null;
+    const folder = folderId || folderSlug
+      ? db.findFolder(folderId || folderSlug)
+      : db.getOrCreateDefaultFolder();
+
+    if (!folder) {
+      return res.status(404).json({ error: "Folder not found" });
+    }
+
     const uploaded = await Promise.all(images.map(async (image) => {
-      const base64 = String(image.data || "").replace(/^data:image\/[a-zA-Z0-9.+-]+;base64,/, "");
-      const body = new URLSearchParams();
-      body.set("image", base64);
-
-      if (image.name) {
-        body.set("name", image.name.replace(/\.[^.]+$/, ""));
-      }
-
-      const uploadUrl = new URL("https://api.imgbb.com/1/upload");
-      uploadUrl.searchParams.set("key", IMGBB_API_KEY);
-
-      if (expirationSeconds) {
-        uploadUrl.searchParams.set("expiration", String(expirationSeconds));
-      }
-
-      const response = await axios.post(uploadUrl.toString(), body, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        maxBodyLength: Infinity
+      const stored = await imgbbStorage.uploadImage({
+        apiKey: IMGBB_API_KEY,
+        image,
+        expiration: expirationSeconds
       });
 
-      return {
-        id: response.data.data.id,
-        title: response.data.data.title,
-        url: response.data.data.url,
-        displayUrl: response.data.data.display_url,
-        deleteUrl: response.data.data.delete_url
-      };
+      return db.createFile({
+        folderId: folder.id,
+        provider: stored.provider,
+        providerFileId: stored.providerFileId,
+        filename: stored.filename,
+        title: stored.title,
+        mediumUrl: stored.mediumUrl,
+        originalUrl: stored.originalUrl,
+        deleteUrl: stored.deleteUrl,
+        uploadedBy: "manager"
+      });
     }));
 
     res.json({
+      folder,
       count: uploaded.length,
       images: uploaded
     });

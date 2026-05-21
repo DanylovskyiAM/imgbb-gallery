@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Folders</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="header">
+  <div class="container header-inner">
+    <section class="page-header">
+      <h2>Manage Folders</h2>
+      <h3>Create folders and approve uploaded files</h3>
+    </section>
+  </div>
+</header>
+
+<main class="main manage-main">
+  <section class="manage-panel">
+    <form id="folderForm" class="manage-form">
+      <select id="parentFolder"></select>
+      <input id="folderName" type="text" placeholder="Folder name" />
+      <textarea id="folderDescription" rows="1" placeholder="Description"></textarea>
+      <button type="submit">Create Folder</button>
+    </form>
+
+    <div class="manage-grid">
+      <div class="folders-column">
+        <div class="files-panel-header">
+          <h3>Folders</h3>
+        </div>
+        <div id="folderList" class="folder-tree"></div>
+      </div>
+      <div class="files-column">
+        <div class="files-panel-header">
+          <div class="files-title-block">
+            <h3 id="filesTitle">Files</h3>
+            <span id="filesSubtitle"></span>
+          </div>
+          <div id="bulkFileActions" class="manage-actions hidden">
+            <button id="approveAllBtn" type="button">Approve all</button>
+            <button id="deleteAllBtn" type="button">Delete all</button>
+          </div>
+        </div>
+        <div id="fileList" class="manage-file-grid"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="modal">
+  <span id="close">&times;</span>
+
+  <div id="prev" class="nav-arrow">&#10094;</div>
+  <img id="modal-img" />
+  <div id="next" class="nav-arrow">&#10095;</div>
+
+  <div class="modal-actions manage-modal-actions">
+    <div id="counter"></div>
+    <a id="downloadBtn">Download</a>
+    <button id="modalApproveBtn" type="button">Approve</button>
+    <button id="modalDeleteBtn" type="button">Delete</button>
+  </div>
+</div>
+
+<div id="editFolderModal" class="edit-folder-modal hidden">
+  <form id="editFolderForm" class="edit-folder-dialog">
+    <h3>Edit folder</h3>
+    <label>
+      Name
+      <input id="editFolderName" type="text" />
+    </label>
+    <label>
+      Description
+      <textarea id="editFolderDescription" rows="4"></textarea>
+    </label>
+    <div class="edit-folder-actions">
+      <button id="cancelEditFolder" type="button">Cancel</button>
+      <button type="submit">Save</button>
+    </div>
+  </form>
+</div>
+
+<script src="manage.js"></script>
+</body>
+</html>

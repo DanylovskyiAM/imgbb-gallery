@@ -19,6 +19,7 @@ const headerActions = document.querySelector(".header-actions");
 
 const params = new URLSearchParams(window.location.search);
 const albumId = params.get("id");
+const folderId = params.get("folder");
 const refreshAlbum = params.get("refresh");
 const apiHost = window.location.hostname || "127.0.0.1";
 const isLocalClient = ["localhost", "127.0.0.1"].includes(apiHost) && window.location.port === "5500";
@@ -33,7 +34,9 @@ let pinchStartDistance = 0;
 let pinchStartScale = 1;
 let isPinching = false;
 
-if (!albumId) {
+if (folderId) {
+  loadFolderGallery();
+} else if (!albumId) {
   showStartPage();
 } else {
   loadAlbum();
@@ -120,6 +123,68 @@ function getDownloadUrl(url, filename) {
   return downloadUrl.toString();
 }
 
+function renderGallery(data) {
+  if (data.title) {
+    headerTitle.textContent = data.title;
+  }
+
+  if (data.subtitle) {
+    headerSubtitle.textContent = data.subtitle;
+  }
+
+  images = data.images.map(normalizeImage);
+  const filesCount = data.count || images.length || 0;
+  photoCount.textContent = `${filesCount} files`;
+  downloadAllBtn.classList.toggle("hidden", !filesCount);
+
+  images.forEach((image, index) => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const img = document.createElement("img");
+    img.className = "lazy-image";
+    img.dataset.src = image.medium;
+    img.alt = image.title || image.filename || `Gallery image ${index + 1}`;
+    img.onclick = () => openModal(index);
+
+    const btn = document.createElement("button");
+    btn.textContent = "Download";
+    btn.className = "download-btn";
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      downloadImage(image.original, index, image.filename);
+    };
+
+    const number = document.createElement("span");
+    number.className = "photo-number";
+    number.textContent = index + 1;
+
+    card.appendChild(img);
+    card.appendChild(number);
+    card.appendChild(btn);
+    gallery.appendChild(card);
+  });
+
+  setupLazyLoading();
+}
+
+function loadFolderGallery() {
+  fetch(new URL(`/api/gallery/folders/${folderId}`, apiBase))
+    .then(async res => {
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Folder was not found.");
+      }
+
+      return data;
+    })
+    .then(renderGallery)
+    .catch(() => {
+      showStartPage("Folder was not found or has no approved files yet.");
+    });
+}
+
 function loadAlbum() {
   const albumApiUrl = new URL(`/api/album/${albumId}`, apiBase);
 
@@ -143,48 +208,7 @@ function loadAlbum() {
         return;
       }
 
-      if (data.title) {
-        headerTitle.textContent = data.title;
-      }
-
-      if (data.subtitle) {
-        headerSubtitle.textContent = data.subtitle;
-      }
-
-      images = data.images.map(normalizeImage);
-      const filesCount = data.count || images.length || 0;
-      photoCount.textContent = `${filesCount} files`;
-      downloadAllBtn.classList.toggle("hidden", !filesCount);
-
-      images.forEach((image, index) => {
-        const card = document.createElement("div");
-        card.className = "card";
-
-        const img = document.createElement("img");
-        img.className = "lazy-image";
-        img.dataset.src = image.medium;
-        img.alt = image.title || image.filename || `Gallery image ${index + 1}`;
-        img.onclick = () => openModal(index);
-
-        const btn = document.createElement("button");
-        btn.textContent = "Download";
-        btn.className = "download-btn";
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          downloadImage(image.original, index, image.filename);
-        };
-
-        const number = document.createElement("span");
-        number.className = "photo-number";
-        number.textContent = index + 1;
-
-        card.appendChild(img);
-        card.appendChild(number);
-        card.appendChild(btn);
-        gallery.appendChild(card);
-      });
-
-      setupLazyLoading();
+      renderGallery(data);
     })
     .catch(() => {
       showStartPage("Gallery was not found. Check the ID and try again.");
