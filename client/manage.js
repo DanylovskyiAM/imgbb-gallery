@@ -616,6 +616,18 @@ function renderFolderOverview(parentFolder = null) {
   const scopedFolders = parentFolder
     ? folders.filter(folder => isFolderDescendantOf(folder, parentFolder.id))
     : folders;
+  const overviewFolders = parentFolder?.children || folders;
+  const overviewItems = overviewFolders
+    .map(folder => ({
+      folder,
+      stats: parentFolder
+        ? getCombinedFolderStats(folder)
+        : {
+          pendingCount: Number(folder.pendingCount) || 0,
+          lastPendingUploadedAt: folder.lastPendingUploadedAt || null
+        }
+    }))
+    .filter(item => item.stats.pendingCount > 0);
 
   filesTitle.textContent = "Folder overview";
   filesSubtitle.textContent = parentFolder?.path || "";
@@ -624,8 +636,7 @@ function renderFolderOverview(parentFolder = null) {
   fileList.classList.add("folder-overview-list");
   fileList.classList.remove("manage-file-grid");
 
-  const totalPending = scopedFolders.reduce((sum, folder) => sum + (Number(folder.pendingCount) || 0), 0);
-  const foldersWithPending = scopedFolders.filter(folder => folder.pendingCount > 0);
+  const totalPending = overviewItems.reduce((sum, item) => sum + item.stats.pendingCount, 0);
   const panel = document.createElement("section");
   panel.className = "folder-overview";
 
@@ -633,7 +644,7 @@ function renderFolderOverview(parentFolder = null) {
   header.className = "folder-overview-header";
 
   const title = document.createElement("div");
-  title.innerHTML = `<strong>${foldersWithPending.length} folders</strong><span>${totalPending} waiting files</span>`;
+  title.innerHTML = `<strong>${overviewItems.length} folders</strong><span>${totalPending} waiting files</span>`;
 
   const approveAllWaiting = createActionButton("Approve all waiting", async () => {
     const foldersWithPending = scopedFolders.filter(folder => folder.pendingCount > 0);
@@ -651,11 +662,11 @@ function renderFolderOverview(parentFolder = null) {
   const list = document.createElement("div");
   list.className = "folder-overview-items";
 
-  if (!foldersWithPending.length) {
+  if (!overviewItems.length) {
     list.innerHTML = '<p class="empty-state">No folders with waiting files.</p>';
   }
 
-  foldersWithPending.forEach(folder => {
+  overviewItems.forEach(({ folder, stats }) => {
     const item = document.createElement("div");
     item.className = "folder-overview-item";
 
@@ -674,7 +685,7 @@ function renderFolderOverview(parentFolder = null) {
 
     const pending = document.createElement("span");
     pending.className = "folder-overview-pending";
-    pending.textContent = `${folder.pendingCount} waiting (${formatRelativeTime(folder.lastPendingUploadedAt)})`;
+    pending.textContent = `${stats.pendingCount} waiting (${formatRelativeTime(stats.lastPendingUploadedAt)})`;
 
     item.append(info, pending);
     list.appendChild(item);
