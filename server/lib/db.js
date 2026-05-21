@@ -111,6 +111,16 @@ function getNextSortOrder(db, parentId) {
   return siblingOrders.length ? Math.max(...siblingOrders) + 1 : 1;
 }
 
+function hasDuplicateFolderName(db, name, parentId, currentId = null) {
+  const normalizedName = String(name || "").trim().toLowerCase();
+
+  return db.folders.some(folder => (
+    folder.id !== currentId &&
+    folder.parentId === parentId &&
+    String(folder.name || "").trim().toLowerCase() === normalizedName
+  ));
+}
+
 function createFolder(name, parentId = null, description = "") {
   const db = readDb();
 
@@ -133,6 +143,10 @@ function createFolder(name, parentId = null, description = "") {
 
   if (!folder.name) {
     throw new Error("Folder name is required");
+  }
+
+  if (hasDuplicateFolderName(db, folder.name, parentId)) {
+    throw new Error("A folder with this name already exists in the selected parent folder");
   }
 
   db.folders.push(folder);
@@ -267,12 +281,16 @@ function listFolders() {
     const lastPendingFile = pendingFiles
       .slice()
       .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))[0];
+    const lastFile = files
+      .slice()
+      .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))[0];
 
     return {
       ...folder,
       filesCount: files.length,
       pendingCount: pendingFiles.length,
       approvedCount: files.filter(file => file.status === "approved").length,
+      lastUploadedAt: lastFile?.createdAt || null,
       lastPendingUploadedAt: lastPendingFile?.createdAt || null
     };
   });
@@ -367,6 +385,107 @@ function deleteFolderFiles(folderId) {
   return before - db.files.length;
 }
 
+function exportDb() {
+  return readDb();
+}
+
+function validateImportedDb(importedDb) {
+  if (!importedDb || !Array.isArray(importedDb.folders) || !Array.isArray(importedDb.files)) {
+    throw new Error("Imported file is not a valid database backup");
+  }
+
+  normalizeDb(importedDb);
+  refreshFolderPaths(importedDb);
+
+  return importedDb;
+}
+
+function replaceDb(importedDb) {
+  const nextDb = validateImportedDb(importedDb);
+  writeDb(nextDb);
+
+  return {
+    mode: "replace",
+    foldersAdded: nextDb.folders.length,
+    foldersUpdated: 0,
+    foldersSkipped: 0,
+    filesAdded: nextDb.files.length,
+    filesUpdated: 0,
+    filesSkipped: 0
+  };
+}
+
+function isImportedRecordNewer(importedRecord, existingRecord) {
+  const importedTime = new Date(importedRecord.updatedAt || importedRecord.createdAt || 0).getTime();
+  const existingTime = new Date(existingRecord.updatedAt || existingRecord.createdAt || 0).getTime();
+
+  return Number.isFinite(importedTime) && importedTime >= existingTime;
+}
+
+function mergeDb(importedDb) {
+  const currentDb = readDb();
+  const nextDb = validateImportedDb(importedDb);
+  const summary = {
+    mode: "update",
+    foldersAdded: 0,
+    foldersUpdated: 0,
+    foldersSkipped: 0,
+    filesAdded: 0,
+    filesUpdated: 0,
+    filesSkipped: 0
+  };
+
+  nextDb.folders.forEach(importedFolder => {
+    const existingFolder = currentDb.folders.find(folder => folder.id === importedFolder.id);
+
+    if (!existingFolder) {
+      if (hasDuplicateFolderName(currentDb, importedFolder.name, importedFolder.parentId)) {
+        summary.foldersSkipped += 1;
+        return;
+      }
+
+      currentDb.folders.push(importedFolder);
+      summary.foldersAdded += 1;
+      return;
+    }
+
+    if (isImportedRecordNewer(importedFolder, existingFolder)) {
+      Object.assign(existingFolder, importedFolder);
+      summary.foldersUpdated += 1;
+    } else {
+      summary.foldersSkipped += 1;
+    }
+  });
+
+  nextDb.files.forEach(importedFile => {
+    const existingFile = currentDb.files.find(file => file.id === importedFile.id);
+
+    if (!currentDb.folders.some(folder => folder.id === importedFile.folderId)) {
+      summary.filesSkipped += 1;
+      return;
+    }
+
+    if (!existingFile) {
+      currentDb.files.push(importedFile);
+      summary.filesAdded += 1;
+      return;
+    }
+
+    if (isImportedRecordNewer(importedFile, existingFile)) {
+      Object.assign(existingFile, importedFile);
+      summary.filesUpdated += 1;
+    } else {
+      summary.filesSkipped += 1;
+    }
+  });
+
+  normalizeDb(currentDb);
+  refreshFolderPaths(currentDb);
+  writeDb(currentDb);
+
+  return summary;
+}
+
 function getOrCreateDefaultFolder() {
   const db = readDb();
   const existing = db.folders.find(folder => folder.slug === "uploads" && folder.parentId === null);
@@ -383,13 +502,16 @@ module.exports = {
   createFolder,
   deleteFile,
   deleteFolder,
+  exportDb,
   findFolder,
   getOrCreateDefaultFolder,
   listFiles,
   listFolders,
   approveFolderFiles,
   deleteFolderFiles,
+  mergeDb,
   reorderFolder,
+  replaceDb,
   updateFile,
   updateFolder
 };

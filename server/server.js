@@ -4,6 +4,7 @@ const cheerio = require("cheerio");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
+const zlib = require("zlib");
 const db = require("./lib/db");
 const imgbbStorage = require("./storage/imgbbStorage");
 
@@ -128,6 +129,125 @@ function isAllowedImageUrl(url) {
   }
 }
 
+function crc32(buffer) {
+  let crc = 0 ^ -1;
+
+  for (let index = 0; index < buffer.length; index += 1) {
+    crc = (crc >>> 8) ^ CRC_TABLE[(crc ^ buffer[index]) & 0xff];
+  }
+
+  return (crc ^ -1) >>> 0;
+}
+
+const CRC_TABLE = Array.from({ length: 256 }, (_, index) => {
+  let value = index;
+
+  for (let bit = 0; bit < 8; bit += 1) {
+    value = value & 1 ? 0xedb88320 ^ (value >>> 1) : value >>> 1;
+  }
+
+  return value >>> 0;
+});
+
+function createZip(filename, content) {
+  const nameBuffer = Buffer.from(filename);
+  const contentBuffer = Buffer.from(content);
+  const checksum = crc32(contentBuffer);
+  const localHeader = Buffer.alloc(30);
+
+  localHeader.writeUInt32LE(0x04034b50, 0);
+  localHeader.writeUInt16LE(20, 4);
+  localHeader.writeUInt16LE(0, 6);
+  localHeader.writeUInt16LE(0, 8);
+  localHeader.writeUInt16LE(0, 10);
+  localHeader.writeUInt16LE(0, 12);
+  localHeader.writeUInt32LE(checksum, 14);
+  localHeader.writeUInt32LE(contentBuffer.length, 18);
+  localHeader.writeUInt32LE(contentBuffer.length, 22);
+  localHeader.writeUInt16LE(nameBuffer.length, 26);
+  localHeader.writeUInt16LE(0, 28);
+
+  const centralHeader = Buffer.alloc(46);
+  centralHeader.writeUInt32LE(0x02014b50, 0);
+  centralHeader.writeUInt16LE(20, 4);
+  centralHeader.writeUInt16LE(20, 6);
+  centralHeader.writeUInt16LE(0, 8);
+  centralHeader.writeUInt16LE(0, 10);
+  centralHeader.writeUInt16LE(0, 12);
+  centralHeader.writeUInt16LE(0, 14);
+  centralHeader.writeUInt32LE(checksum, 16);
+  centralHeader.writeUInt32LE(contentBuffer.length, 20);
+  centralHeader.writeUInt32LE(contentBuffer.length, 24);
+  centralHeader.writeUInt16LE(nameBuffer.length, 28);
+  centralHeader.writeUInt16LE(0, 30);
+  centralHeader.writeUInt16LE(0, 32);
+  centralHeader.writeUInt16LE(0, 34);
+  centralHeader.writeUInt16LE(0, 36);
+  centralHeader.writeUInt32LE(0, 38);
+  centralHeader.writeUInt32LE(0, 42);
+
+  const centralDirectoryOffset = localHeader.length + nameBuffer.length + contentBuffer.length;
+  const centralDirectorySize = centralHeader.length + nameBuffer.length;
+  const endRecord = Buffer.alloc(22);
+
+  endRecord.writeUInt32LE(0x06054b50, 0);
+  endRecord.writeUInt16LE(0, 4);
+  endRecord.writeUInt16LE(0, 6);
+  endRecord.writeUInt16LE(1, 8);
+  endRecord.writeUInt16LE(1, 10);
+  endRecord.writeUInt32LE(centralDirectorySize, 12);
+  endRecord.writeUInt32LE(centralDirectoryOffset, 16);
+  endRecord.writeUInt16LE(0, 20);
+
+  return Buffer.concat([
+    localHeader,
+    nameBuffer,
+    contentBuffer,
+    centralHeader,
+    nameBuffer,
+    endRecord
+  ]);
+}
+
+function extractJsonFromZip(zipBuffer) {
+  const localHeaderOffset = zipBuffer.indexOf(Buffer.from([0x50, 0x4b, 0x03, 0x04]));
+
+  if (localHeaderOffset < 0) {
+    throw new Error("ZIP backup does not contain a readable database file");
+  }
+
+  const compressionMethod = zipBuffer.readUInt16LE(localHeaderOffset + 8);
+  const compressedSize = zipBuffer.readUInt32LE(localHeaderOffset + 18);
+  const filenameLength = zipBuffer.readUInt16LE(localHeaderOffset + 26);
+  const extraLength = zipBuffer.readUInt16LE(localHeaderOffset + 28);
+  const dataOffset = localHeaderOffset + 30 + filenameLength + extraLength;
+  const compressedData = zipBuffer.subarray(dataOffset, dataOffset + compressedSize);
+
+  if (compressionMethod === 0) {
+    return compressedData.toString("utf8");
+  }
+
+  if (compressionMethod === 8) {
+    return zlib.inflateRawSync(compressedData).toString("utf8");
+  }
+
+  throw new Error("Unsupported ZIP compression method");
+}
+
+function parseImportedBackup(data) {
+  const buffer = Buffer.from(String(data || ""), "base64");
+
+  if (buffer.length < 2) {
+    throw new Error("Import file is empty");
+  }
+
+  const content = buffer[0] === 0x50 && buffer[1] === 0x4b
+    ? extractJsonFromZip(buffer)
+    : buffer.toString("utf8");
+
+  return JSON.parse(content);
+}
+
 async function fetchAlbumPage(url) {
   const { data: html } = await axios.get(url, {
     headers: {
@@ -240,6 +360,34 @@ app.get("/api/folders", (req, res) => {
   res.json({ folders: db.listFolders() });
 });
 
+app.get("/api/db/export", (req, res) => {
+  const exportedDb = db.exportDb();
+  const filename = `imgbb-gallery-db-${new Date().toISOString().slice(0, 10)}.zip`;
+  const zip = createZip("db.json", JSON.stringify(exportedDb, null, 2));
+
+  res.setHeader("Content-Type", "application/zip");
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  res.send(zip);
+});
+
+app.post("/api/db/import", (req, res) => {
+  const mode = req.body.mode === "replace" ? "replace" : "update";
+
+  try {
+    const importedDb = parseImportedBackup(req.body.data);
+    const summary = mode === "replace"
+      ? db.replaceDb(importedDb)
+      : db.mergeDb(importedDb);
+
+    res.json({
+      ok: true,
+      summary
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message || "Failed to import database" });
+  }
+});
+
 app.post("/api/folders", (req, res) => {
   try {
     const folder = db.createFolder(req.body.name, req.body.parentId || null, req.body.description || "");
@@ -335,12 +483,24 @@ app.get("/api/gallery/folders/:id", (req, res) => {
   }
 
   const files = db.listFiles(folder.id, "approved");
+  const folders = db.listFolders()
+    .filter(item => item.parentId === folder.id)
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
 
   res.json({
     id: folder.id,
     title: folder.name,
     subtitle: folder.path,
     count: files.length,
+    folders: folders.map(item => ({
+      id: item.id,
+      name: item.name,
+      path: item.path,
+      description: item.description,
+      filesCount: item.filesCount,
+      approvedCount: item.approvedCount,
+      pendingCount: item.pendingCount
+    })),
     images: files.map(file => ({
       id: file.id,
       title: file.title,

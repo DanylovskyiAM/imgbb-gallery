@@ -13,22 +13,22 @@
       <h2>Manage Folders</h2>
       <h3>Create folders and approve uploaded files</h3>
     </section>
+    <div class="header-actions manage-header-actions">
+      <button id="exportDbBtn" type="button">Export</button>
+      <button id="openImportDbBtn" type="button">Import</button>
+    </div>
   </div>
 </header>
 
 <main class="main manage-main">
   <section class="manage-panel">
-    <form id="folderForm" class="manage-form">
-      <select id="parentFolder"></select>
-      <input id="folderName" type="text" placeholder="Folder name" />
-      <textarea id="folderDescription" rows="1" placeholder="Description"></textarea>
-      <button type="submit">Create Folder</button>
-    </form>
-
     <div class="manage-grid">
       <div class="folders-column">
         <div class="files-panel-header">
           <h3>Folders</h3>
+          <div class="manage-actions">
+            <button id="addRootFolderBtn" type="button">+ Folder</button>
+          </div>
         </div>
         <div id="folderList" class="folder-tree"></div>
       </div>
@@ -62,6 +62,68 @@
     <button id="modalApproveBtn" type="button">Approve</button>
     <button id="modalDeleteBtn" type="button">Delete</button>
   </div>
+</div>
+
+<div id="addFolderModal" class="edit-folder-modal hidden">
+  <form id="addFolderForm" class="edit-folder-dialog">
+    <h3>Add folder</h3>
+    <label>
+      Parent folder
+      <select id="addParentFolder"></select>
+    </label>
+    <label>
+      Name
+      <input id="addFolderName" type="text" />
+    </label>
+    <label>
+      Description
+      <textarea id="addFolderDescription" rows="4"></textarea>
+    </label>
+    <div class="edit-folder-actions">
+      <button id="cancelAddFolder" type="button">Cancel</button>
+      <button type="submit">Create</button>
+    </div>
+  </form>
+</div>
+
+<div id="exportModal" class="edit-folder-modal hidden">
+  <div class="edit-folder-dialog">
+    <h3>Export</h3>
+    <div class="export-options">
+      <button id="exportBackupBtn" type="button">Export DB backup</button>
+      <button id="exportExcelBtn" type="button">Export to Excel</button>
+    </div>
+    <p class="import-status">Excel export includes only folders without child folders.</p>
+    <div class="edit-folder-actions">
+      <button id="cancelExport" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="importDbModal" class="edit-folder-modal hidden">
+  <form id="importDbForm" class="edit-folder-dialog">
+    <h3>Import database</h3>
+    <label>
+      Backup file
+      <input id="importDbFile" type="file" accept=".zip,.json,application/zip,application/json" />
+    </label>
+    <fieldset class="import-mode-options">
+      <legend>Import mode</legend>
+      <label>
+        <input type="radio" name="importMode" value="update" checked />
+        Update existing database
+      </label>
+      <label>
+        <input type="radio" name="importMode" value="replace" />
+        Replace database
+      </label>
+    </fieldset>
+    <p id="importDbStatus" class="import-status"></p>
+    <div class="edit-folder-actions">
+      <button id="cancelImportDb" type="button">Cancel</button>
+      <button type="submit">Import</button>
+    </div>
+  </form>
 </div>
 
 <div id="editFolderModal" class="edit-folder-modal hidden">

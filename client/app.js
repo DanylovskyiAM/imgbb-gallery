@@ -124,6 +124,8 @@ function getDownloadUrl(url, filename) {
 }
 
 function renderGallery(data) {
+  gallery.innerHTML = "";
+
   if (data.title) {
     headerTitle.textContent = data.title;
   }
@@ -133,9 +135,39 @@ function renderGallery(data) {
   }
 
   images = data.images.map(normalizeImage);
+  const folders = Array.isArray(data.folders) ? data.folders : [];
   const filesCount = data.count || images.length || 0;
-  photoCount.textContent = `${filesCount} files`;
+  photoCount.textContent = folders.length
+    ? `${folders.length} folders · ${filesCount} files`
+    : `${filesCount} files`;
   downloadAllBtn.classList.toggle("hidden", !filesCount);
+
+  folders.forEach((folder) => {
+    const card = document.createElement("a");
+    card.className = "folder-card";
+    card.href = `${window.location.pathname}?folder=${encodeURIComponent(folder.id)}`;
+
+    const icon = document.createElement("span");
+    icon.className = "folder-card-icon";
+    icon.textContent = "▾";
+    icon.setAttribute("aria-hidden", "true");
+
+    const content = document.createElement("span");
+    content.className = "folder-card-content";
+
+    const title = document.createElement("strong");
+    title.textContent = folder.name;
+
+    const description = document.createElement("small");
+    description.textContent = folder.description || folder.path;
+
+    const meta = document.createElement("span");
+    meta.textContent = `${folder.approvedCount || 0} approved files`;
+
+    content.append(title, description, meta);
+    card.append(icon, content);
+    gallery.appendChild(card);
+  });
 
   images.forEach((image, index) => {
     const card = document.createElement("div");

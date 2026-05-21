@@ -1,7 +1,10 @@
-const folderForm = document.getElementById("folderForm");
-const folderName = document.getElementById("folderName");
-const folderDescription = document.getElementById("folderDescription");
-const parentFolder = document.getElementById("parentFolder");
+const addRootFolderBtn = document.getElementById("addRootFolderBtn");
+const addFolderModal = document.getElementById("addFolderModal");
+const addFolderForm = document.getElementById("addFolderForm");
+const addParentFolder = document.getElementById("addParentFolder");
+const addFolderName = document.getElementById("addFolderName");
+const addFolderDescription = document.getElementById("addFolderDescription");
+const cancelAddFolder = document.getElementById("cancelAddFolder");
 const folderList = document.getElementById("folderList");
 const fileList = document.getElementById("fileList");
 const filesTitle = document.getElementById("filesTitle");
@@ -18,6 +21,17 @@ const counter = document.getElementById("counter");
 const downloadBtn = document.getElementById("downloadBtn");
 const modalApproveBtn = document.getElementById("modalApproveBtn");
 const modalDeleteBtn = document.getElementById("modalDeleteBtn");
+const exportDbBtn = document.getElementById("exportDbBtn");
+const exportModal = document.getElementById("exportModal");
+const exportBackupBtn = document.getElementById("exportBackupBtn");
+const exportExcelBtn = document.getElementById("exportExcelBtn");
+const cancelExport = document.getElementById("cancelExport");
+const openImportDbBtn = document.getElementById("openImportDbBtn");
+const importDbModal = document.getElementById("importDbModal");
+const importDbForm = document.getElementById("importDbForm");
+const importDbFile = document.getElementById("importDbFile");
+const importDbStatus = document.getElementById("importDbStatus");
+const cancelImportDb = document.getElementById("cancelImportDb");
 const editFolderModal = document.getElementById("editFolderModal");
 const editFolderForm = document.getElementById("editFolderForm");
 const editFolderName = document.getElementById("editFolderName");
@@ -34,11 +48,19 @@ let currentFiles = [];
 let currentFileIndex = 0;
 let lockedScrollY = 0;
 let editingFolder = null;
+let addingParentId = null;
+const collapsedFolderIds = new Set();
+let didApplyDefaultCollapse = false;
 
 function setBulkActionsVisible(isVisible) {
   bulkFileActions.classList.toggle("hidden", !isVisible);
   approveAllBtn.disabled = !isVisible;
   deleteAllBtn.disabled = !isVisible;
+}
+
+function setBulkActionsEnabled(isEnabled) {
+  approveAllBtn.disabled = !isEnabled;
+  deleteAllBtn.disabled = !isEnabled;
 }
 
 async function api(path, options = {}) {
@@ -60,15 +82,15 @@ async function api(path, options = {}) {
 function buildFolderTree(parentId = null) {
   return folders
     .filter(folder => (folder.parentId || null) === parentId)
-    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0) || a.name.localeCompare(b.name))
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
     .map(folder => ({
       ...folder,
       children: buildFolderTree(folder.id)
     }));
 }
 
-function renderParentOptions() {
-  parentFolder.innerHTML = '<option value="">Root folder</option>';
+function renderParentOptions(selectedParentId = "") {
+  addParentFolder.innerHTML = '<option value="">Root folder</option>';
   folders
     .slice()
     .sort((a, b) => (a.path || a.name).localeCompare(b.path || b.name))
@@ -76,8 +98,9 @@ function renderParentOptions() {
       const option = document.createElement("option");
       option.value = folder.id;
       option.textContent = folder.path || folder.name;
-      parentFolder.appendChild(option);
+      addParentFolder.appendChild(option);
     });
+  addParentFolder.value = selectedParentId || "";
 }
 
 function createActionButton(text, onClick, options = {}) {
@@ -99,6 +122,237 @@ function getDownloadUrl(url, filename) {
   }
 
   return downloadUrl.toString();
+}
+
+function hasDuplicateFolderName(name, parentId) {
+  return folders.some(folder => (
+    (folder.parentId || null) === (parentId || null) &&
+    folder.name.localeCompare(name, undefined, { sensitivity: "base" }) === 0
+  ));
+}
+
+function openAddFolderModal(parentId = null) {
+  addingParentId = parentId || null;
+  renderParentOptions(addingParentId);
+  addFolderName.value = "";
+  addFolderDescription.value = "";
+  addFolderModal.classList.remove("hidden");
+  addFolderName.focus();
+}
+
+function closeAddFolderModal() {
+  addingParentId = null;
+  addFolderModal.classList.add("hidden");
+  addFolderForm.reset();
+}
+
+function openImportDbModal() {
+  importDbStatus.textContent = "";
+  importDbStatus.classList.remove("is-error");
+  importDbFile.value = "";
+  importDbModal.classList.remove("hidden");
+}
+
+function closeImportDbModal() {
+  importDbModal.classList.add("hidden");
+  importDbForm.reset();
+  importDbStatus.textContent = "";
+  importDbStatus.classList.remove("is-error");
+}
+
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || "");
+      resolve(result.includes(",") ? result.split(",").pop() : result);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function openExportModal() {
+  exportModal.classList.remove("hidden");
+}
+
+function closeExportModal() {
+  exportModal.classList.add("hidden");
+}
+
+function getLeafFolders() {
+  const parentIds = new Set(folders.map(folder => folder.parentId).filter(Boolean));
+
+  return folders
+    .filter(folder => !parentIds.has(folder.id))
+    .sort((a, b) => (a.path || a.name).localeCompare(b.path || b.name));
+}
+
+function getFolderParentPath(folder) {
+  if (!folder.parentId) {
+    return "Root";
+  }
+
+  const parent = folders.find(item => item.id === folder.parentId);
+
+  return parent?.path || "Root";
+}
+
+function getFolderStatus(folder) {
+  const lastPendingText = folder.lastPendingUploadedAt
+    ? formatRelativeTime(folder.lastPendingUploadedAt)
+    : "";
+  const lastUpload = folder.lastUploadedAt
+    ? new Date(folder.lastUploadedAt).toLocaleString()
+    : "";
+
+  if (folder.pendingCount > 0) {
+    return lastPendingText
+      ? `${folder.pendingCount} pending (${lastPendingText})`
+      : `${folder.pendingCount} pending`;
+  }
+
+  return lastUpload ? `No pending, last upload ${lastUpload}` : "No pending";
+}
+
+function getLatestDateValue(currentValue, nextValue) {
+  if (!currentValue) {
+    return nextValue || null;
+  }
+
+  if (!nextValue) {
+    return currentValue;
+  }
+
+  return new Date(nextValue) > new Date(currentValue) ? nextValue : currentValue;
+}
+
+function getCombinedFolderStats(folder) {
+  return folder.children.reduce((stats, child) => {
+    const childStats = getCombinedFolderStats(child);
+
+    return {
+      filesCount: stats.filesCount + childStats.filesCount,
+      approvedCount: stats.approvedCount + childStats.approvedCount,
+      pendingCount: stats.pendingCount + childStats.pendingCount,
+      lastUploadedAt: getLatestDateValue(stats.lastUploadedAt, childStats.lastUploadedAt),
+      lastPendingUploadedAt: getLatestDateValue(stats.lastPendingUploadedAt, childStats.lastPendingUploadedAt)
+    };
+  }, {
+    filesCount: Number(folder.filesCount) || 0,
+    approvedCount: Number(folder.approvedCount) || 0,
+    pendingCount: Number(folder.pendingCount) || 0,
+    lastUploadedAt: folder.lastUploadedAt || null,
+    lastPendingUploadedAt: folder.lastPendingUploadedAt || null
+  });
+}
+
+function isFolderDescendantOf(folder, parentId) {
+  let currentParentId = folder.parentId;
+
+  while (currentParentId) {
+    if (currentParentId === parentId) {
+      return true;
+    }
+
+    currentParentId = folders.find(item => item.id === currentParentId)?.parentId || null;
+  }
+
+  return false;
+}
+
+function hasChildFolders(folder) {
+  return folders.some(item => item.parentId === folder.id);
+}
+
+function csvCell(value) {
+  return `"${String(value ?? "").replace(/"/g, '""')}"`;
+}
+
+function exportFoldersToExcel() {
+  const origin = window.location.origin;
+  const rows = [
+    [
+      "Path",
+      "Folder",
+      "Files Count",
+      "Status",
+      "Uploading",
+      "Viewing"
+    ],
+    ...getLeafFolders().map(folder => [
+      getFolderParentPath(folder),
+      folder.name,
+      folder.filesCount,
+      getFolderStatus(folder),
+      `${origin}/upload.html?folder=${encodeURIComponent(folder.id)}`,
+      `${origin}/?folder=${encodeURIComponent(folder.id)}`
+    ])
+  ];
+  const csv = rows.map(row => row.map(csvCell).join(",")).join("\r\n");
+  const blob = new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `folders-export-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function renderImportSummary(summary) {
+  if (!summary) {
+    importDbStatus.textContent = "Import completed.";
+    return;
+  }
+
+  importDbStatus.innerHTML = "";
+
+  if (summary.mode === "replace") {
+    importDbStatus.appendChild(createImportSummaryLine("Database replaced", [
+      ["added", `${summary.foldersAdded} folders`],
+      ["added", `${summary.filesAdded} files`]
+    ]));
+    return;
+  }
+
+  const title = document.createElement("span");
+  title.className = "import-summary-title";
+  title.textContent = "Import updated database.";
+  importDbStatus.appendChild(title);
+  importDbStatus.appendChild(createImportSummaryLine("Folders", [
+    ["added", `${summary.foldersAdded} added`],
+    ["updated", `${summary.foldersUpdated} updated`],
+    ["skipped", `${summary.foldersSkipped} skipped`]
+  ]));
+  importDbStatus.appendChild(createImportSummaryLine("Files", [
+    ["added", `${summary.filesAdded} added`],
+    ["updated", `${summary.filesUpdated} updated`],
+    ["skipped", `${summary.filesSkipped} skipped`]
+  ]));
+}
+
+function createImportSummaryLine(label, parts) {
+  const line = document.createElement("span");
+  line.className = "import-summary-line";
+
+  const labelNode = document.createElement("strong");
+  labelNode.textContent = `${label}: `;
+  line.appendChild(labelNode);
+
+  parts.forEach(([type, text], index) => {
+    const part = document.createElement("span");
+    part.className = `import-count import-count-${type}`;
+    part.textContent = text;
+    line.appendChild(part);
+
+    if (index < parts.length - 1) {
+      line.appendChild(document.createTextNode(", "));
+    }
+  });
+
+  return line;
 }
 
 function formatRelativeTime(dateValue) {
@@ -146,6 +400,55 @@ function closeEditFolderModal() {
   editFolderForm.reset();
 }
 
+function toggleFolderCollapse(folder) {
+  if (!folder.children.length) {
+    return;
+  }
+
+  if (collapsedFolderIds.has(folder.id)) {
+    if (!folder.parentId) {
+      folders
+        .filter(item => !item.parentId && item.id !== folder.id)
+        .forEach(item => collapsedFolderIds.add(item.id));
+    }
+
+    collapsedFolderIds.delete(folder.id);
+  } else {
+    collapsedFolderIds.add(folder.id);
+  }
+}
+
+function expandFolder(folder) {
+  if (!folder.children.length) {
+    return;
+  }
+
+  if (!folder.parentId) {
+    folders
+      .filter(item => !item.parentId && item.id !== folder.id)
+      .forEach(item => collapsedFolderIds.add(item.id));
+  }
+
+  collapsedFolderIds.delete(folder.id);
+}
+
+async function handleFolderSelection(folder) {
+  if (selectedFolder?.id === folder.id) {
+    if (folder.children.length) {
+      collapsedFolderIds.add(folder.id);
+    }
+
+    selectedFolder = null;
+    currentFiles = [];
+    renderFolders();
+    renderFolderOverview();
+    return;
+  }
+
+  expandFolder(folder);
+  await loadFiles(folder);
+}
+
 function renderFolderNode(folder, depth = 0) {
   const wrapper = document.createElement("div");
   wrapper.className = "folder-node";
@@ -155,9 +458,10 @@ function renderFolderNode(folder, depth = 0) {
   item.dataset.folderId = folder.id;
   item.dataset.parentId = folder.parentId || "";
   item.style.setProperty("--folder-depth", depth);
+  item.style.setProperty("--folder-level-color", `rgba(58, 164, 252, ${Math.min(0.34, 0.04 + depth * 0.05)})`);
   item.style.setProperty("--folder-branch-offset", `${Math.max(0, depth - 1) * 24}px`);
   item.style.setProperty("--folder-description-offset", `${depth ? 48 + Math.max(0, depth - 1) * 24 : 24}px`);
-  item.onclick = () => loadFiles(folder);
+  item.onclick = () => handleFolderSelection(folder);
 
   if (selectedFolder?.id === folder.id) {
     item.classList.add("is-selected");
@@ -166,15 +470,25 @@ function renderFolderNode(folder, depth = 0) {
   const info = document.createElement("button");
   info.type = "button";
   info.className = "folder-info";
-  info.onclick = () => loadFiles(folder);
 
   const folderLabel = document.createElement("span");
   folderLabel.className = "folder-label";
 
   const icon = document.createElement("span");
   icon.className = "folder-icon";
-  icon.textContent = folder.children.length ? "▾" : "•";
+  icon.textContent = folder.children.length
+    ? (collapsedFolderIds.has(folder.id) ? "▸" : "▾")
+    : "•";
   icon.setAttribute("aria-hidden", "true");
+
+  if (folder.children.length) {
+    icon.classList.add("is-toggle");
+    icon.onclick = (e) => {
+      e.stopPropagation();
+      toggleFolderCollapse(folder);
+      renderFolders();
+    };
+  }
 
   const title = document.createElement("strong");
   title.textContent = folder.name;
@@ -195,20 +509,21 @@ function renderFolderNode(folder, depth = 0) {
 
   info.append(folderLabel, description);
 
+  const combinedStats = getCombinedFolderStats(folder);
   const meta = document.createElement("span");
   meta.className = "folder-meta";
-  const lastPendingText = folder.pendingCount
-    ? ` (${formatRelativeTime(folder.lastPendingUploadedAt)})`
+  const lastPendingText = combinedStats.pendingCount
+    ? ` (${formatRelativeTime(combinedStats.lastPendingUploadedAt)})`
     : "";
   const approvedText = document.createElement("span");
-  approvedText.textContent = `${folder.approvedCount} approved`;
+  approvedText.textContent = `${combinedStats.approvedCount} approved`;
 
   const separator = document.createElement("span");
   separator.textContent = " · ";
 
   const pendingText = document.createElement("span");
-  pendingText.className = folder.pendingCount ? "folder-pending is-active" : "folder-pending";
-  pendingText.textContent = `${folder.pendingCount} pending${lastPendingText}`;
+  pendingText.className = combinedStats.pendingCount ? "folder-pending is-active" : "folder-pending";
+  pendingText.textContent = `${combinedStats.pendingCount} pending${lastPendingText}`;
 
   meta.append(approvedText, separator, pendingText);
 
@@ -223,6 +538,10 @@ function renderFolderNode(folder, depth = 0) {
   const viewLink = document.createElement("a");
   viewLink.textContent = "View";
   viewLink.href = `/?folder=${encodeURIComponent(folder.id)}`;
+
+  const addBtn = createActionButton("+ Folder", () => openAddFolderModal(folder.id));
+  addBtn.disabled = folder.filesCount > 0;
+  addBtn.title = folder.filesCount > 0 ? "Folders with files cannot have child folders" : "";
 
   const renameBtn = createActionButton("Edit", () => openEditFolderModal(folder));
 
@@ -244,11 +563,19 @@ function renderFolderNode(folder, depth = 0) {
     await loadFolders();
   });
 
-  actions.append(uploadLink, viewLink, renameBtn, deleteBtn);
+  actions.append(addBtn, renameBtn, deleteBtn, uploadLink, viewLink);
+
+  if (folder.children.length) {
+    uploadLink.classList.add("is-disabled");
+    uploadLink.setAttribute("aria-disabled", "true");
+    uploadLink.removeAttribute("href");
+    uploadLink.title = "Parent folders cannot be uploaded to directly";
+  }
+
   item.append(info, meta, actions);
   wrapper.appendChild(item);
 
-  if (folder.children.length) {
+  if (folder.children.length && !collapsedFolderIds.has(folder.id)) {
     const children = document.createElement("div");
     children.className = "folder-children";
     folder.children.forEach(child => children.appendChild(renderFolderNode(child, depth + 1)));
@@ -273,16 +600,20 @@ function renderFolders() {
   });
 }
 
-function renderFolderOverview() {
+function renderFolderOverview(parentFolder = null) {
+  const scopedFolders = parentFolder
+    ? folders.filter(folder => isFolderDescendantOf(folder, parentFolder.id))
+    : folders;
+
   filesTitle.textContent = "Folder overview";
-  filesSubtitle.textContent = "";
+  filesSubtitle.textContent = parentFolder?.path || "";
   setBulkActionsVisible(false);
   fileList.innerHTML = "";
   fileList.classList.add("folder-overview-list");
   fileList.classList.remove("manage-file-grid");
 
-  const totalPending = folders.reduce((sum, folder) => sum + (Number(folder.pendingCount) || 0), 0);
-  const foldersWithPending = folders.filter(folder => folder.pendingCount > 0);
+  const totalPending = scopedFolders.reduce((sum, folder) => sum + (Number(folder.pendingCount) || 0), 0);
+  const foldersWithPending = scopedFolders.filter(folder => folder.pendingCount > 0);
   const panel = document.createElement("section");
   panel.className = "folder-overview";
 
@@ -293,7 +624,7 @@ function renderFolderOverview() {
   title.innerHTML = `<strong>${foldersWithPending.length} folders</strong><span>${totalPending} waiting files</span>`;
 
   const approveAllWaiting = createActionButton("Approve all waiting", async () => {
-    const foldersWithPending = folders.filter(folder => folder.pendingCount > 0);
+    const foldersWithPending = scopedFolders.filter(folder => folder.pendingCount > 0);
     approveAllWaiting.disabled = true;
 
     await Promise.all(foldersWithPending.map(folder => (
@@ -420,7 +751,14 @@ function prevFile() {
 async function loadFolders() {
   const data = await api("/api/folders");
   folders = data.folders;
-  renderParentOptions();
+  renderParentOptions(addingParentId);
+
+  if (!didApplyDefaultCollapse) {
+    folders
+      .filter(folder => !folder.parentId)
+      .forEach(folder => collapsedFolderIds.add(folder.id));
+    didApplyDefaultCollapse = true;
+  }
 
   if (selectedFolder) {
     selectedFolder = folders.find(folder => folder.id === selectedFolder.id) || selectedFolder;
@@ -435,37 +773,110 @@ async function loadFolders() {
 
 async function loadFiles(folder) {
   selectedFolder = folder;
+  renderFolders();
+
+  if (hasChildFolders(folder)) {
+    renderFolderOverview(folder);
+    return;
+  }
+
   filesTitle.textContent = "Files:";
   filesSubtitle.textContent = folder.path;
   setBulkActionsVisible(true);
-  renderFolders();
+  setBulkActionsEnabled(false);
 
   const data = await api(`/api/folders/${folder.id}/files?status=all`);
   renderFiles(data.files);
+  setBulkActionsEnabled(data.files.length > 0);
 }
 
-folderForm.onsubmit = async (e) => {
+addFolderForm.onsubmit = async (e) => {
   e.preventDefault();
 
-  if (!folderName.value.trim()) {
+  const name = addFolderName.value.trim();
+  const parentId = addParentFolder.value || null;
+
+  if (!name) {
+    return;
+  }
+
+  if (hasDuplicateFolderName(name, parentId)) {
+    window.alert("A folder with this name already exists in the selected parent folder.");
     return;
   }
 
   await api("/api/folders", {
     method: "POST",
     body: JSON.stringify({
-      name: folderName.value.trim(),
-      description: folderDescription.value.trim(),
-      parentId: parentFolder.value || null
+      name,
+      description: addFolderDescription.value.trim(),
+      parentId
     })
   });
-  folderName.value = "";
-  folderDescription.value = "";
+  closeAddFolderModal();
   await loadFolders();
 };
 
+addRootFolderBtn.onclick = () => openAddFolderModal(null);
+cancelAddFolder.onclick = closeAddFolderModal;
+
+exportDbBtn.onclick = openExportModal;
+cancelExport.onclick = closeExportModal;
+
+exportBackupBtn.onclick = () => {
+  window.location.href = `${apiBase}/api/db/export`;
+  closeExportModal();
+};
+
+exportExcelBtn.onclick = () => {
+  exportFoldersToExcel();
+  closeExportModal();
+};
+
+openImportDbBtn.onclick = openImportDbModal;
+cancelImportDb.onclick = closeImportDbModal;
+
+importDbForm.onsubmit = async (e) => {
+  e.preventDefault();
+
+  const file = importDbFile.files?.[0];
+  const mode = new FormData(importDbForm).get("importMode") || "update";
+
+  if (!file) {
+    importDbStatus.textContent = "Choose a backup file first.";
+    importDbStatus.classList.add("is-error");
+    return;
+  }
+
+  if (mode === "replace" && !window.confirm("Replace the current database with this backup?")) {
+    return;
+  }
+
+  importDbStatus.textContent = "Importing backup...";
+  importDbStatus.classList.remove("is-error");
+
+  try {
+    const data = await readFileAsBase64(file);
+    const response = await api("/api/db/import", {
+      method: "POST",
+      body: JSON.stringify({
+        mode,
+        data
+      })
+    });
+
+    selectedFolder = null;
+    currentFiles = [];
+    await loadFolders();
+    renderImportSummary(response.summary);
+  } catch (err) {
+    importDbStatus.textContent = err.message || "Import failed.";
+    importDbStatus.classList.add("is-error");
+  }
+};
+
 approveAllBtn.onclick = async () => {
-  if (!selectedFolder) {
+  if (!selectedFolder || !currentFiles.length) {
     return;
   }
 
@@ -483,7 +894,7 @@ approveAllBtn.onclick = async () => {
 };
 
 deleteAllBtn.onclick = async () => {
-  if (!selectedFolder || !window.confirm(`Delete all files in ${selectedFolder.path}?`)) {
+  if (!selectedFolder || !currentFiles.length || !window.confirm(`Delete all files in ${selectedFolder.path}?`)) {
     return;
   }
 

@@ -60,6 +60,24 @@ Open the upload page:
 http://127.0.0.1:3000/upload.html
 ```
 
+## Create Folder Structure
+
+The project includes a helper script that creates the predefined camp folder tree in bulk.
+
+Start the local server first:
+
+```bash
+npm run server
+```
+
+Then, in another terminal, run:
+
+```bash
+npm run seed:folders
+```
+
+The script creates root folders, `Summer - Week 1` through `Summer - Week 7`, and the activity folders inside each week. It skips folders that already exist in the same parent folder, so it is safe to run again.
+
 ## API
 
 Get album data:
