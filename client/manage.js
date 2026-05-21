@@ -240,7 +240,9 @@ function getLatestDateValue(currentValue, nextValue) {
 }
 
 function getCombinedFolderStats(folder) {
-  return folder.children.reduce((stats, child) => {
+  const children = folder.children || folders.filter(item => item.parentId === folder.id);
+
+  return children.reduce((stats, child) => {
     const childStats = getCombinedFolderStats(child);
 
     return {
