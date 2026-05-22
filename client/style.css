@@ -335,14 +335,25 @@ body.modal-open {
 
 .upload-main {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 
 .upload-panel {
-  width: min(100%, 560px);
+  width: 100%;
   color: #18181b;
   text-align: left;
+}
+
+.upload-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(360px, 1.2fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.upload-column {
+  min-width: 0;
 }
 
 .upload-form {
@@ -362,14 +373,39 @@ body.modal-open {
   border-radius: 4px;
   background: white;
   color: #18181b;
+  font-size: 14px;
   box-sizing: border-box;
+}
+
+.upload-form input[type="file"] {
+  min-height: 48px;
+  padding: 10px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.upload-form input[type="file"]::file-selector-button {
+  min-height: 34px;
+  margin-right: 12px;
+  padding: 5px 12px;
+  border: none;
+  border-radius: 4px;
+  background: #3aa4fc;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.upload-form input[type="file"]::file-selector-button:hover {
+  background: #238de6;
 }
 
 .expiration-field {
   display: grid;
-  width: 180px;
-  gap: 8px;
-  margin-bottom: 8px;
+  width: 150px;
+  gap: 6px;
+  margin: 4px 0 10px;
 }
 
 .expiration-field label {
@@ -378,9 +414,21 @@ body.modal-open {
 }
 
 .expiration-field select {
+  appearance: none;
+  width: 100%;
   min-height: 34px;
-  padding: 5px 32px 5px 10px;
+  padding: 5px 34px 5px 10px;
+  border: 1px solid #3aa4fc;
+  border-radius: 4px;
+  background:
+    linear-gradient(45deg, transparent 50%, #3aa4fc 50%) calc(100% - 16px) 50% / 6px 6px no-repeat,
+    linear-gradient(135deg, #3aa4fc 50%, transparent 50%) calc(100% - 10px) 50% / 6px 6px no-repeat,
+    white;
+  color: #18181b;
   font-size: 14px;
+  line-height: 22px;
+  box-shadow: 0 0 0 3px rgba(58, 164, 252, 0.12);
+  cursor: pointer;
 }
 
 .upload-form button {
@@ -417,14 +465,14 @@ body.modal-open {
 
 .upload-results {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 12px;
-  margin-top: 16px;
 }
 
 .upload-result {
+  display: grid;
+  gap: 6px;
   color: #18181b;
-  text-decoration: none;
 }
 
 .upload-result img {
@@ -437,14 +485,44 @@ body.modal-open {
   box-sizing: border-box;
 }
 
+.upload-preview-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
 .upload-result span {
   display: block;
-  margin-top: 6px;
   overflow: hidden;
   color: #52525c;
   font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.upload-result > button:not(.upload-preview-btn) {
+  height: 28px;
+  min-height: 28px;
+  padding: 3px 8px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(24, 24, 27, 0.72);
+  color: white;
+  font-size: 12px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.upload-result > button:not(.upload-preview-btn):hover {
+  background: rgba(24, 24, 27, 0.88);
+}
+
+.upload-result > button:not(.upload-preview-btn):disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .manage-main {
@@ -506,6 +584,17 @@ body.modal-open {
   cursor: default;
 }
 
+.danger-action {
+  border: 1px solid rgba(190, 18, 60, 0.28) !important;
+  background: rgba(254, 242, 242, 0.96) !important;
+  color: #be123c !important;
+}
+
+.danger-action:hover:not(:disabled) {
+  background: rgba(254, 226, 226, 0.96) !important;
+  color: #9f1239 !important;
+}
+
 .manage-actions a.is-disabled {
   opacity: 0.5;
   pointer-events: none;
@@ -517,6 +606,15 @@ body.modal-open {
   grid-template-columns: minmax(300px, 0.9fr) minmax(420px, 1.1fr);
   gap: 20px;
   align-items: start;
+}
+
+@media (min-width: 769px) {
+  .files-column {
+    position: sticky;
+    top: 12px;
+    max-height: calc(100vh - 24px);
+    overflow: auto;
+  }
 }
 
 .manage-list {
@@ -704,7 +802,7 @@ body.modal-open {
   min-width: 0;
 }
 
-.files-title-block span {
+.files-title-block > span {
   display: block;
   margin-top: 4px;
   overflow: hidden;
@@ -713,6 +811,34 @@ body.modal-open {
   line-height: 1.25;
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.breadcrumb-link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #238de6;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.25;
+  cursor: pointer;
+}
+
+.breadcrumb-link:hover {
+  color: #e50c7d;
+  text-decoration: underline;
+}
+
+.breadcrumb-current,
+.breadcrumb-separator {
+  display: inline;
+  color: #52525c;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.breadcrumb-separator {
+  margin: 0 6px;
 }
 
 .files-panel-header .manage-actions {
@@ -1598,11 +1724,20 @@ body.start-mode .album-form {
   }
 
   .files-title-block,
-  .files-title-block span {
+  .files-title-block > span {
     max-width: 100%;
   }
 
   .manage-file-grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .upload-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .upload-results {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   }
 }

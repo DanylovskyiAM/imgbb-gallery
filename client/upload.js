@@ -4,12 +4,25 @@ const expirationSelect = document.getElementById("expirationSelect");
 const uploadStatus = document.getElementById("uploadStatus");
 const uploadResults = document.getElementById("uploadResults");
 const uploadSubtitle = document.getElementById("uploadSubtitle");
+const deleteAllUploadsBtn = document.getElementById("deleteAllUploadsBtn");
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modal-img");
+const closeBtn = document.getElementById("close");
+const prevBtn = document.getElementById("prev");
+const nextBtn = document.getElementById("next");
+const counter = document.getElementById("counter");
+const downloadBtn = document.getElementById("downloadBtn");
+const modalDeleteBtn = document.getElementById("modalDeleteBtn");
+const toTopBtn = document.getElementById("toTopBtn");
 
 const apiHost = window.location.hostname || "127.0.0.1";
 const isLocalClient = ["localhost", "127.0.0.1"].includes(apiHost) && window.location.port === "5500";
 const apiBase = isLocalClient ? `http://${apiHost}:3000` : window.location.origin;
 const params = new URLSearchParams(window.location.search);
 const folderParam = params.get("folder");
+let uploadedImages = [];
+let currentPreviewIndex = 0;
+let lockedScrollY = 0;
 
 if (folderParam) {
   uploadSubtitle.textContent = `Upload to folder: ${folderParam}`;
@@ -30,11 +43,29 @@ async function loadFolderTitle(folderId) {
     ));
 
     if (folder) {
-      uploadSubtitle.textContent = `Upload to folder: ${folder.path || folder.name}`;
+      uploadSubtitle.textContent = `Upload to folder: ${getFolderDisplayPath(folder, data.folders)}`;
     }
   } catch (err) {
     uploadSubtitle.textContent = `Upload to folder: ${folderId}`;
   }
+}
+
+function getFolderDisplayPath(folder, folders) {
+  const segments = [folder.name];
+  let parentId = folder.parentId;
+
+  while (parentId) {
+    const parent = folders.find(item => item.id === parentId);
+
+    if (!parent) {
+      break;
+    }
+
+    segments.unshift(parent.name);
+    parentId = parent.parentId;
+  }
+
+  return segments.join(" / ");
 }
 
 function readFileAsDataUrl(file) {
@@ -56,25 +87,144 @@ function setStatus(message, isError = false) {
 
 function renderResults(images) {
   uploadResults.innerHTML = "";
+  deleteAllUploadsBtn.disabled = !images.length;
 
-  images.forEach((image) => {
-    const item = document.createElement("a");
+  if (!images.length) {
+    uploadResults.innerHTML = '<p class="empty-state">Uploaded files will appear here.</p>';
+    return;
+  }
+
+  images.forEach((image, index) => {
+    const item = document.createElement("article");
     item.className = "upload-result";
-    item.href = image.originalUrl || image.url;
-    item.target = "_blank";
-    item.rel = "noopener noreferrer";
+
+    const previewBtn = document.createElement("button");
+    previewBtn.type = "button";
+    previewBtn.className = "upload-preview-btn";
+    previewBtn.onclick = () => openModal(index);
 
     const img = document.createElement("img");
     img.src = image.mediumUrl || image.displayUrl || image.originalUrl || image.url;
     img.alt = image.title || "Uploaded image";
+    previewBtn.appendChild(img);
 
     const text = document.createElement("span");
     text.textContent = `${image.title || image.filename || "Uploaded image"} · ${image.status || "pending"}`;
 
-    item.appendChild(img);
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "danger-action";
+    removeBtn.textContent = "Delete";
+    removeBtn.onclick = () => removeUploadedImage(image, removeBtn);
+
+    item.appendChild(previewBtn);
     item.appendChild(text);
+    item.appendChild(removeBtn);
     uploadResults.appendChild(item);
   });
+}
+
+function getPreviewUrl(image) {
+  return image.originalUrl || image.url || image.mediumUrl || image.displayUrl;
+}
+
+function updateModal() {
+  const image = uploadedImages[currentPreviewIndex];
+
+  if (!image) {
+    closeModal();
+    return;
+  }
+
+  modalImg.src = getPreviewUrl(image);
+  modalImg.alt = image.title || image.filename || `Uploaded image ${currentPreviewIndex + 1}`;
+  counter.textContent = `${currentPreviewIndex + 1} / ${uploadedImages.length}`;
+  downloadBtn.href = image.originalUrl || image.url;
+  downloadBtn.download = image.filename || image.title || `uploaded-image-${currentPreviewIndex + 1}.jpg`;
+  modalDeleteBtn.disabled = false;
+}
+
+function openModal(index) {
+  currentPreviewIndex = index;
+  updateModal();
+  lockedScrollY = window.scrollY;
+  document.body.style.top = `-${lockedScrollY}px`;
+  modal.classList.add("active");
+  document.body.classList.add("modal-open");
+}
+
+function closeModal() {
+  modal.classList.remove("active");
+  document.body.classList.remove("modal-open");
+  document.body.style.top = "";
+  window.scrollTo(0, lockedScrollY);
+}
+
+function nextPreview() {
+  currentPreviewIndex = (currentPreviewIndex + 1) % uploadedImages.length;
+  updateModal();
+}
+
+function prevPreview() {
+  currentPreviewIndex = (currentPreviewIndex - 1 + uploadedImages.length) % uploadedImages.length;
+  updateModal();
+}
+
+async function removeUploadedImage(image, button) {
+  if (!image.id) {
+    return;
+  }
+
+  button.disabled = true;
+
+  try {
+    const response = await fetch(`${apiBase}/api/files/${encodeURIComponent(image.id)}`, {
+      method: "DELETE"
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to remove uploaded file.");
+    }
+
+    uploadedImages = uploadedImages.filter(item => item.id !== image.id);
+    renderResults(uploadedImages);
+    if (modal.classList.contains("active")) {
+      currentPreviewIndex = Math.min(currentPreviewIndex, uploadedImages.length - 1);
+      updateModal();
+    }
+    setStatus(uploadedImages.length ? `${uploadedImages.length} uploaded image(s).` : "Uploaded file removed.");
+  } catch (err) {
+    button.disabled = false;
+    setStatus(err.message || "Failed to remove uploaded file.", true);
+  }
+}
+
+async function deleteAllUploadedImages() {
+  if (!uploadedImages.length || !window.confirm("Delete all uploaded files from this list?")) {
+    return;
+  }
+
+  deleteAllUploadsBtn.disabled = true;
+  const imagesToDelete = [...uploadedImages];
+
+  try {
+    await Promise.all(imagesToDelete.map(image => (
+      fetch(`${apiBase}/api/files/${encodeURIComponent(image.id)}`, { method: "DELETE" })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to remove uploaded files.");
+          }
+        })
+    )));
+
+    uploadedImages = [];
+    renderResults(uploadedImages);
+    closeModal();
+    setStatus("Uploaded files removed.");
+  } catch (err) {
+    deleteAllUploadsBtn.disabled = false;
+    setStatus(err.message || "Failed to remove uploaded files.", true);
+  }
 }
 
 async function uploadImage(image, expiration) {
@@ -90,9 +240,16 @@ async function uploadImage(image, expiration) {
       folderSlug: folderParam
     })
   });
-  const data = await response.json();
+  const contentType = response.headers.get("content-type") || "";
+  const data = contentType.includes("application/json")
+    ? await response.json()
+    : { error: await response.text() };
 
   if (!response.ok) {
+    if (response.status === 413) {
+      throw new Error("Upload is too large for the cloud server. Increase Nginx client_max_body_size.");
+    }
+
     throw new Error(data.error || "Upload failed.");
   }
 
@@ -115,7 +272,8 @@ uploadForm.onsubmit = async (e) => {
     setStatus(`Preparing ${files.length} image(s)...`);
     uploadResults.innerHTML = "";
 
-    const uploadedImages = [];
+    uploadedImages = [];
+    renderResults(uploadedImages);
 
     for (const [index, file] of files.entries()) {
       setStatus(`Preparing ${index + 1} of ${files.length}: ${file.name}`);
@@ -135,3 +293,39 @@ uploadForm.onsubmit = async (e) => {
     uploadForm.querySelector("button").disabled = false;
   }
 };
+
+closeBtn.onclick = closeModal;
+nextBtn.onclick = nextPreview;
+prevBtn.onclick = prevPreview;
+modalDeleteBtn.onclick = () => {
+  const image = uploadedImages[currentPreviewIndex];
+
+  if (!image) {
+    return;
+  }
+
+  removeUploadedImage(image, modalDeleteBtn);
+};
+deleteAllUploadsBtn.onclick = deleteAllUploadedImages;
+
+document.addEventListener("keydown", (e) => {
+  if (!modal.classList.contains("active")) {
+    return;
+  }
+
+  if (e.key === "Escape") {
+    closeModal();
+  } else if (e.key === "ArrowRight") {
+    nextPreview();
+  } else if (e.key === "ArrowLeft") {
+    prevPreview();
+  }
+});
+
+function updateToTopButton() {
+  toTopBtn.classList.toggle("is-visible", window.scrollY > 320);
+}
+
+window.addEventListener("scroll", updateToTopButton, { passive: true });
+toTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+updateToTopButton();

@@ -21,6 +21,7 @@ const counter = document.getElementById("counter");
 const downloadBtn = document.getElementById("downloadBtn");
 const modalApproveBtn = document.getElementById("modalApproveBtn");
 const modalDeleteBtn = document.getElementById("modalDeleteBtn");
+const toTopBtn = document.getElementById("toTopBtn");
 const exportDbBtn = document.getElementById("exportDbBtn");
 const exportModal = document.getElementById("exportModal");
 const exportBackupBtn = document.getElementById("exportBackupBtn");
@@ -96,11 +97,11 @@ function renderParentOptions(selectedParentId = "") {
   addParentFolder.innerHTML = '<option value="">Root folder</option>';
   folders
     .slice()
-    .sort((a, b) => (a.path || a.name).localeCompare(b.path || b.name))
+    .sort((a, b) => getFolderDisplayPath(a).localeCompare(getFolderDisplayPath(b)))
     .forEach(folder => {
       const option = document.createElement("option");
       option.value = folder.id;
-      option.textContent = folder.path || folder.name;
+      option.textContent = getFolderDisplayPath(folder);
       addParentFolder.appendChild(option);
     });
   addParentFolder.value = selectedParentId || "";
@@ -207,7 +208,7 @@ function getFolderParentPath(folder) {
 
   const parent = folders.find(item => item.id === folder.parentId);
 
-  return parent?.path || "Root";
+  return parent ? getFolderDisplayPath(parent) : "Root";
 }
 
 function getFolderStatus(folder) {
@@ -277,6 +278,96 @@ function isFolderDescendantOf(folder, parentId) {
 
 function hasChildFolders(folder) {
   return folders.some(item => item.parentId === folder.id);
+}
+
+function getFolderDisplayPath(folder) {
+  const segments = [folder.name];
+  let parentId = folder.parentId;
+
+  while (parentId) {
+    const parent = folders.find(item => item.id === parentId);
+
+    if (!parent) {
+      break;
+    }
+
+    segments.unshift(parent.name);
+    parentId = parent.parentId;
+  }
+
+  return segments.join(" / ");
+}
+
+function getFolderBreadcrumb(folder) {
+  const items = [folder];
+  let parentId = folder.parentId;
+
+  while (parentId) {
+    const parent = folders.find(item => item.id === parentId);
+
+    if (!parent) {
+      break;
+    }
+
+    items.unshift(parent);
+    parentId = parent.parentId;
+  }
+
+  return items;
+}
+
+function clearFilesSubtitle() {
+  filesSubtitle.innerHTML = "";
+}
+
+function renderFilesBreadcrumb(folder) {
+  filesSubtitle.innerHTML = "";
+
+  const rootSegment = document.createElement(folder ? "button" : "span");
+  rootSegment.className = folder ? "breadcrumb-link" : "breadcrumb-current";
+  rootSegment.textContent = "All";
+
+  if (folder) {
+    rootSegment.type = "button";
+    rootSegment.onclick = () => {
+      selectedFolder = null;
+      currentFiles = [];
+      renderFolders();
+      renderFolderOverview();
+    };
+  }
+
+  filesSubtitle.appendChild(rootSegment);
+
+  if (!folder) {
+    return;
+  }
+
+  const rootSeparator = document.createElement("span");
+  rootSeparator.className = "breadcrumb-separator";
+  rootSeparator.textContent = "/";
+  filesSubtitle.appendChild(rootSeparator);
+
+  getFolderBreadcrumb(folder).forEach((item, index, items) => {
+    const isLast = index === items.length - 1;
+    const segment = document.createElement(isLast ? "span" : "button");
+    segment.className = isLast ? "breadcrumb-current" : "breadcrumb-link";
+    segment.textContent = item.name;
+
+    if (!isLast) {
+      segment.type = "button";
+      segment.onclick = () => loadFiles(item);
+    }
+
+    filesSubtitle.appendChild(segment);
+
+    if (!isLast) {
+      const separator = document.createElement("span");
+      separator.className = "breadcrumb-separator";
+      separator.textContent = "/";
+      filesSubtitle.appendChild(separator);
+    }
+  });
 }
 
 function csvCell(value) {
@@ -570,12 +661,13 @@ function renderFolderNode(folder, depth = 0) {
       selectedFolder = null;
       fileList.innerHTML = "";
       filesTitle.textContent = "Files";
-      filesSubtitle.textContent = "";
+      clearFilesSubtitle();
       setBulkActionsVisible(false);
     }
 
     await loadFolders();
   });
+  deleteBtn.classList.add("danger-action");
 
   actions.append(addBtn, renameBtn, deleteBtn, uploadLink, viewLink);
 
@@ -634,7 +726,7 @@ function renderFolderOverview(parentFolder = null) {
     .filter(item => item.stats.pendingCount > 0);
 
   filesTitle.textContent = "Folder overview";
-  filesSubtitle.textContent = parentFolder?.path || "";
+  renderFilesBreadcrumb(parentFolder);
   setBulkActionsVisible(false);
   fileList.innerHTML = "";
   fileList.classList.add("folder-overview-list");
@@ -684,7 +776,7 @@ function renderFolderOverview(parentFolder = null) {
     info.onclick = () => loadFiles(folder);
 
     const name = document.createElement("strong");
-    name.textContent = folder.path || folder.name;
+    name.textContent = getFolderDisplayPath(folder);
 
     const description = document.createElement("span");
     description.textContent = folder.description || "-";
@@ -812,7 +904,7 @@ async function loadFiles(folder) {
   }
 
   filesTitle.textContent = "Files:";
-  filesSubtitle.textContent = folder.path;
+  renderFilesBreadcrumb(folder);
   setBulkActionsVisible(true);
   setBulkActionsEnabled(false);
 
@@ -1040,6 +1132,14 @@ document.addEventListener("keydown", (e) => {
     closeModal();
   }
 });
+
+function updateToTopButton() {
+  toTopBtn.classList.toggle("is-visible", window.scrollY > 320);
+}
+
+window.addEventListener("scroll", updateToTopButton, { passive: true });
+toTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
+updateToTopButton();
 
 setBulkActionsVisible(false);
 loadFolders();

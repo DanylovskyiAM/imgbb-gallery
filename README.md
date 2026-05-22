@@ -42,6 +42,18 @@ Run the single Express server:
 npm run server
 ```
 
+Run the server with automatic restart after file changes:
+
+```bash
+npm run server:watch
+```
+
+Run server watch mode and the local client together:
+
+```bash
+npm run dev
+```
+
 Open:
 
 ```text
@@ -162,3 +174,34 @@ npm start --prefix server
 ```
 
 The repository also includes a `Dockerfile` for Docker-based hosts.
+
+### Oracle VM with Nginx
+
+If uploads work locally but fail on the Oracle cloud VM for files around `1 MB` or larger, Nginx may be rejecting the request before it reaches Node. Base64 upload JSON is larger than the original image file.
+
+Edit your Nginx site config:
+
+```bash
+sudo nano /etc/nginx/sites-available/imgbb-gallery
+```
+
+Add this inside the `server { ... }` block:
+
+```nginx
+client_max_body_size 25M;
+```
+
+Then test and reload Nginx:
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+After pulling app updates on the VM, restart PM2:
+
+```bash
+git pull
+npm install
+pm2 restart imgbb-gallery
+```

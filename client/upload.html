@@ -18,28 +18,73 @@
 
 <main class="main upload-main">
   <section class="upload-panel">
-    <form id="uploadForm" class="upload-form">
-      <label for="uploadInput">Choose photos</label>
-      <input id="uploadInput" type="file" accept="image/*" multiple />
+    <div class="upload-grid">
+      <div class="upload-column">
+        <div class="files-panel-header">
+          <div class="files-title-block">
+            <h3>Upload</h3>
+            <span>Choose files and expiration</span>
+          </div>
+        </div>
 
-      <div class="expiration-field">
-        <label for="expirationSelect">Expiration</label>
-        <select id="expirationSelect" name="expiration">
-          <option value="">Never</option>
-          <option value="3600">Hourly</option>
-          <option value="86400">Daily</option>
-          <option value="604800" selected>Weekly</option>
-          <option value="2592000">Monthly</option>
-        </select>
+        <form id="uploadForm" class="upload-form">
+          <label for="uploadInput">Choose photos</label>
+          <input id="uploadInput" type="file" accept="image/*" multiple />
+
+          <div class="expiration-field">
+            <label for="expirationSelect">Expiration</label>
+            <select id="expirationSelect" name="expiration">
+              <option value="">Never</option>
+              <option value="3600">Hourly</option>
+              <option value="86400">Daily</option>
+              <option value="604800" selected>Weekly</option>
+              <option value="1209600">2 weeks</option>
+              <option value="2592000">Monthly</option>
+            </select>
+          </div>
+
+          <button type="submit">Upload</button>
+        </form>
+
+        <p id="uploadStatus" class="upload-status"></p>
       </div>
 
-      <button type="submit">Upload</button>
-    </form>
-
-    <p id="uploadStatus" class="upload-status"></p>
-    <div id="uploadResults" class="upload-results"></div>
+      <div class="upload-column">
+        <div class="files-panel-header">
+          <div class="files-title-block">
+            <h3>Uploaded files</h3>
+            <span>Preview or delete uploaded items</span>
+          </div>
+          <div class="manage-actions">
+            <button id="deleteAllUploadsBtn" class="danger-action" type="button" disabled>Delete all</button>
+          </div>
+        </div>
+        <div id="uploadResults" class="upload-results"></div>
+      </div>
+    </div>
   </section>
 </main>
+
+<div id="modal">
+  <span id="close">&times;</span>
+
+  <div id="prev" class="nav-arrow">&#10094;</div>
+  <img id="modal-img" />
+  <div id="next" class="nav-arrow">&#10095;</div>
+
+  <div class="modal-actions manage-modal-actions">
+    <div id="counter"></div>
+    <a id="downloadBtn">Download</a>
+    <button id="modalDeleteBtn" class="danger-action" type="button">Delete</button>
+  </div>
+</div>
+
+<button type="button" id="toTopBtn" class="to-top-btn" aria-label="Scroll to top">
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="m5 12 7-7 7 7"></path>
+    <path d="M12 19V5"></path>
+  </svg>
+</button>
 
 <script src="upload.js"></script>
 </body>

@@ -159,7 +159,7 @@ function renderGallery(data) {
     title.textContent = folder.name;
 
     const description = document.createElement("small");
-    description.textContent = folder.description || folder.path;
+    description.textContent = folder.description || folder.parentDisplayPath || folder.displayPath || folder.path;
 
     const meta = document.createElement("span");
     meta.textContent = `${folder.approvedCount || 0} approved files`;

@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "server": "node server/server.js",
+    "server:watch": "npm run dev --prefix server",
     "client": "live-server client --port=5500",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run server:watch\" \"npm run client\"",
     "seed:folders": "node scripts/create-folder-structure.js"
   },
   "devDependencies": {

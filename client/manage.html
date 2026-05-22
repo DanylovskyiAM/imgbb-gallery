@@ -40,7 +40,7 @@
           </div>
           <div id="bulkFileActions" class="manage-actions hidden">
             <button id="approveAllBtn" type="button">Approve all</button>
-            <button id="deleteAllBtn" type="button">Delete all</button>
+            <button id="deleteAllBtn" class="danger-action" type="button">Delete all</button>
           </div>
         </div>
         <div id="fileList" class="manage-file-grid"></div>
@@ -60,7 +60,7 @@
     <div id="counter"></div>
     <a id="downloadBtn">Download</a>
     <button id="modalApproveBtn" type="button">Approve</button>
-    <button id="modalDeleteBtn" type="button">Delete</button>
+    <button id="modalDeleteBtn" class="danger-action" type="button">Delete</button>
   </div>
 </div>
 
@@ -146,6 +146,13 @@
     </div>
   </form>
 </div>
+
+<button type="button" id="toTopBtn" class="to-top-btn" aria-label="Scroll to top">
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="m5 12 7-7 7 7"></path>
+    <path d="M12 19V5"></path>
+  </svg>
+</button>
 
 <script src="manage.js"></script>
 </body>

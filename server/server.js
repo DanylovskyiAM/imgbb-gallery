@@ -475,6 +475,34 @@ app.delete("/api/folders/:id/files", (req, res) => {
   });
 });
 
+function getFolderDisplayPath(folder, folders) {
+  const segments = [folder.name];
+  let parentId = folder.parentId;
+
+  while (parentId) {
+    const parent = folders.find(item => item.id === parentId);
+
+    if (!parent) {
+      break;
+    }
+
+    segments.unshift(parent.name);
+    parentId = parent.parentId;
+  }
+
+  return segments.join(" / ");
+}
+
+function getFolderParentDisplayPath(folder, folders) {
+  if (!folder.parentId) {
+    return "";
+  }
+
+  const parent = folders.find(item => item.id === folder.parentId);
+
+  return parent ? getFolderDisplayPath(parent, folders) : "";
+}
+
 app.get("/api/gallery/folders/:id", (req, res) => {
   const folder = db.findFolder(req.params.id);
 
@@ -483,19 +511,22 @@ app.get("/api/gallery/folders/:id", (req, res) => {
   }
 
   const files = db.listFiles(folder.id, "approved");
-  const folders = db.listFolders()
+  const allFolders = db.listFolders();
+  const folders = allFolders
     .filter(item => item.parentId === folder.id)
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
 
   res.json({
     id: folder.id,
     title: folder.name,
-    subtitle: folder.path,
+    subtitle: getFolderParentDisplayPath(folder, allFolders) || getFolderDisplayPath(folder, allFolders),
     count: files.length,
     folders: folders.map(item => ({
       id: item.id,
       name: item.name,
       path: item.path,
+      displayPath: getFolderDisplayPath(item, allFolders),
+      parentDisplayPath: getFolderParentDisplayPath(item, allFolders),
       description: item.description,
       filesCount: item.filesCount,
       approvedCount: item.approvedCount,
