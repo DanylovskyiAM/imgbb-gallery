@@ -877,9 +877,6 @@ async function loadFolders() {
   renderParentOptions(addingParentId);
 
   if (!didApplyDefaultCollapse) {
-    folders
-      .filter(folder => !folder.parentId)
-      .forEach(folder => collapsedFolderIds.add(folder.id));
     didApplyDefaultCollapse = true;
   }
 

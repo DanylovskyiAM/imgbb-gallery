@@ -90,6 +90,82 @@ npm run seed:folders
 
 The script creates root folders, `Summer - Week 1` through `Summer - Week 7`, and the activity folders inside each week. It skips folders that already exist in the same parent folder, so it is safe to run again.
 
+## Parse MYA Stages
+
+The project includes a parser for MYA holiday camp data. It reads the MYA Stages listings for Promosport and Actionsport, opens each event, then reads the real booking groups for that event. The output is import-friendly records with company, site, period, English discipline name, group time, dates, address, price, and source IDs.
+
+Export all stage disciplines as JSON:
+
+```bash
+npm run parse:mya -- --out mya-stages.json
+```
+
+The default parser includes both branded MYA stage listings: Promosport from `pr1` and Actionsport from `pr2`.
+
+Export only Mixed games rows:
+
+```bash
+npm run parse:mya -- --discipline "Mixed games" --out mya-mixed-games.json
+```
+
+Export CSV instead of JSON:
+
+```bash
+npm run parse:mya -- --discipline "Mixed games" --format csv --out mya-mixed-games.csv
+```
+
+Example row:
+
+```json
+{
+  "company": "Promosport",
+  "site": "Hamme-Mille – Ecole autonome",
+  "period": "Summer - Week 1",
+  "discipline": "Mixed games (6 - 12 years)",
+  "groupTime": "09:00 - 12:00",
+  "eventId": 678,
+  "groupId": 32922,
+  "disciplineId": 91,
+  "startDate": "2026-07-06",
+  "endDate": "2026-07-10"
+}
+```
+
+Import the generated JSON into the app as folders:
+
+```bash
+npm run server
+```
+
+Then, in another terminal, run:
+
+```bash
+npm run import:mya -- --file mya-stages.json
+```
+
+Preview the import without creating folders:
+
+```bash
+npm run import:mya -- --file mya-stages.json --dry-run
+```
+
+Import only one discipline:
+
+```bash
+npm run import:mya -- --file mya-stages.json --discipline "Mixed games"
+```
+
+The importer creates folders in this structure:
+
+```text
+Company
+└── Site
+    └── Period
+        └── Discipline Group time
+```
+
+It skips folders that already exist in the same parent folder, so it is safe to run again.
+
 ## API
 
 Get album data:
