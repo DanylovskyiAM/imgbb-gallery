@@ -28,8 +28,26 @@
         </div>
 
         <form id="uploadForm" class="upload-form">
-          <label for="uploadInput">Choose photos</label>
-          <input id="uploadInput" type="file" accept="image/*" multiple />
+          <div class="upload-folder-fields">
+            <div class="upload-folder-field">
+              <label for="periodSelect">Period</label>
+              <select id="periodSelect" name="period">
+                <option value="">Select period</option>
+              </select>
+            </div>
+
+            <div class="upload-folder-field">
+              <label for="disciplineSelect">Discipline</label>
+              <select id="disciplineSelect" name="discipline">
+                <option value="">Select discipline</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="upload-file-field">
+            <label for="uploadInput">Choose photos</label>
+            <input id="uploadInput" type="file" accept="image/*" multiple />
+          </div>
 
           <div class="expiration-field">
             <label for="expirationSelect">Expiration</label>

@@ -376,6 +376,29 @@ function approveFolderFiles(folderId) {
   return count;
 }
 
+function approveFolderTreeFiles(folderId) {
+  const db = readDb();
+  const folderIds = new Set(getDescendantFolderIds(db, folderId));
+  const timestamp = now();
+  let count = 0;
+
+  db.files.forEach(file => {
+    if (!folderIds.has(file.folderId) || file.status === "approved") {
+      return;
+    }
+
+    file.status = "approved";
+    file.updatedAt = timestamp;
+    file.approvedAt = timestamp;
+    file.approvedBy = "admin";
+    count += 1;
+  });
+
+  writeDb(db);
+
+  return count;
+}
+
 function deleteFolderFiles(folderId) {
   const db = readDb();
   const before = db.files.length;
@@ -508,6 +531,7 @@ module.exports = {
   listFiles,
   listFolders,
   approveFolderFiles,
+  approveFolderTreeFiles,
   deleteFolderFiles,
   mergeDb,
   reorderFolder,

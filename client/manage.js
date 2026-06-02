@@ -55,6 +55,10 @@ let editingFolder = null;
 let addingParentId = null;
 const collapsedFolderIds = new Set();
 let didApplyDefaultCollapse = false;
+let folderById = new Map();
+let foldersByParentId = new Map();
+let folderStatsCache = new Map();
+let folderDisplayPathCache = new Map();
 
 function setBulkActionsVisible(isVisible) {
   bulkFileActions.classList.toggle("hidden", !isVisible);
@@ -65,6 +69,62 @@ function setBulkActionsVisible(isVisible) {
 function setBulkActionsEnabled(isEnabled) {
   approveAllBtn.disabled = !isEnabled;
   deleteAllBtn.disabled = !isEnabled;
+}
+
+function updateBulkActionsForFiles(files) {
+  const hasFiles = files.length > 0;
+  const hasPendingFiles = files.some(file => file.status !== "approved");
+
+  approveAllBtn.disabled = !hasPendingFiles;
+  deleteAllBtn.disabled = !hasFiles;
+}
+
+async function refreshSelectedLeafFolder(expectedFiles = null) {
+  if (!selectedFolder) {
+    await loadFolders();
+    return;
+  }
+
+  const selectedFolderId = selectedFolder.id;
+  const filesData = expectedFiles
+    ? { files: expectedFiles }
+    : await api(`/api/folders/${selectedFolderId}/files?status=all`);
+  const foldersData = await api("/api/folders");
+
+  folders = foldersData.folders;
+  syncFolderStatsFromFiles(selectedFolderId, filesData.files);
+  rebuildFolderIndexes();
+  selectedFolder = folderById.get(selectedFolderId) || selectedFolder;
+
+  renderFolders();
+  filesTitle.textContent = "Files:";
+  renderFilesBreadcrumb(selectedFolder);
+  setBulkActionsVisible(true);
+  renderFiles(filesData.files);
+  updateBulkActionsForFiles(filesData.files);
+}
+
+function syncFolderStatsFromFiles(folderId, files) {
+  const folder = folders.find(item => item.id === folderId);
+
+  if (!folder) {
+    return;
+  }
+
+  const pendingFiles = files.filter(file => file.status !== "approved");
+  const approvedFiles = files.filter(file => file.status === "approved");
+  const latestFile = files
+    .slice()
+    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))[0];
+  const latestPendingFile = pendingFiles
+    .slice()
+    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))[0];
+
+  folder.filesCount = files.length;
+  folder.pendingCount = pendingFiles.length;
+  folder.approvedCount = approvedFiles.length;
+  folder.lastUploadedAt = latestFile?.createdAt || null;
+  folder.lastPendingUploadedAt = latestPendingFile?.createdAt || null;
 }
 
 async function api(path, options = {}) {
@@ -83,25 +143,57 @@ async function api(path, options = {}) {
   return data;
 }
 
+function getParentKey(parentId = null) {
+  return parentId || "root";
+}
+
+function rebuildFolderIndexes() {
+  folderById = new Map();
+  foldersByParentId = new Map();
+  folderStatsCache = new Map();
+  folderDisplayPathCache = new Map();
+
+  folders.forEach((folder) => {
+    folderById.set(folder.id, folder);
+
+    const parentKey = getParentKey(folder.parentId);
+    const siblings = foldersByParentId.get(parentKey) || [];
+    siblings.push(folder);
+    foldersByParentId.set(parentKey, siblings);
+  });
+
+  foldersByParentId.forEach((siblings) => {
+    siblings.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+  });
+}
+
+function getChildFolders(parentId = null) {
+  return foldersByParentId.get(getParentKey(parentId)) || [];
+}
+
+function getDescendantFolders(parentId = null) {
+  return getChildFolders(parentId).flatMap(child => [
+    child,
+    ...getDescendantFolders(child.id)
+  ]);
+}
+
 function buildFolderTree(parentId = null) {
-  return folders
-    .filter(folder => (folder.parentId || null) === parentId)
-    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
-    .map(folder => ({
-      ...folder,
-      children: buildFolderTree(folder.id)
-    }));
+  return getChildFolders(parentId);
 }
 
 function renderParentOptions(selectedParentId = "") {
   addParentFolder.innerHTML = '<option value="">Root folder</option>';
   folders
-    .slice()
-    .sort((a, b) => getFolderDisplayPath(a).localeCompare(getFolderDisplayPath(b)))
+    .map(folder => ({
+      folder,
+      displayPath: getFolderDisplayPath(folder)
+    }))
+    .sort((a, b) => a.displayPath.localeCompare(b.displayPath))
     .forEach(folder => {
       const option = document.createElement("option");
-      option.value = folder.id;
-      option.textContent = getFolderDisplayPath(folder);
+      option.value = folder.folder.id;
+      option.textContent = folder.displayPath;
       addParentFolder.appendChild(option);
     });
   addParentFolder.value = selectedParentId || "";
@@ -206,7 +298,7 @@ function getFolderParentPath(folder) {
     return "Root";
   }
 
-  const parent = folders.find(item => item.id === folder.parentId);
+  const parent = folderById.get(folder.parentId);
 
   return parent ? getFolderDisplayPath(parent) : "Root";
 }
@@ -241,9 +333,13 @@ function getLatestDateValue(currentValue, nextValue) {
 }
 
 function getCombinedFolderStats(folder) {
-  const children = folder.children || folders.filter(item => item.parentId === folder.id);
+  if (folderStatsCache.has(folder.id)) {
+    return folderStatsCache.get(folder.id);
+  }
 
-  return children.reduce((stats, child) => {
+  const children = getChildFolders(folder.id);
+
+  const stats = children.reduce((stats, child) => {
     const childStats = getCombinedFolderStats(child);
 
     return {
@@ -260,6 +356,10 @@ function getCombinedFolderStats(folder) {
     lastUploadedAt: folder.lastUploadedAt || null,
     lastPendingUploadedAt: folder.lastPendingUploadedAt || null
   });
+
+  folderStatsCache.set(folder.id, stats);
+
+  return stats;
 }
 
 function isFolderDescendantOf(folder, parentId) {
@@ -270,22 +370,26 @@ function isFolderDescendantOf(folder, parentId) {
       return true;
     }
 
-    currentParentId = folders.find(item => item.id === currentParentId)?.parentId || null;
+    currentParentId = folderById.get(currentParentId)?.parentId || null;
   }
 
   return false;
 }
 
 function hasChildFolders(folder) {
-  return folders.some(item => item.parentId === folder.id);
+  return getChildFolders(folder.id).length > 0;
 }
 
 function getFolderDisplayPath(folder) {
+  if (folderDisplayPathCache.has(folder.id)) {
+    return folderDisplayPathCache.get(folder.id);
+  }
+
   const segments = [folder.name];
   let parentId = folder.parentId;
 
   while (parentId) {
-    const parent = folders.find(item => item.id === parentId);
+    const parent = folderById.get(parentId);
 
     if (!parent) {
       break;
@@ -295,7 +399,10 @@ function getFolderDisplayPath(folder) {
     parentId = parent.parentId;
   }
 
-  return segments.join(" / ");
+  const displayPath = segments.join(" / ");
+  folderDisplayPathCache.set(folder.id, displayPath);
+
+  return displayPath;
 }
 
 function getFolderBreadcrumb(folder) {
@@ -303,7 +410,7 @@ function getFolderBreadcrumb(folder) {
   let parentId = folder.parentId;
 
   while (parentId) {
-    const parent = folders.find(item => item.id === parentId);
+    const parent = folderById.get(parentId);
 
     if (!parent) {
       break;
@@ -329,10 +436,10 @@ function renderFilesBreadcrumb(folder) {
 
   if (folder) {
     rootSegment.type = "button";
-    rootSegment.onclick = () => {
+    rootSegment.onclick = async () => {
       selectedFolder = null;
       currentFiles = [];
-      renderFolders();
+      await loadFolders();
       renderFolderOverview();
     };
   }
@@ -356,7 +463,10 @@ function renderFilesBreadcrumb(folder) {
 
     if (!isLast) {
       segment.type = "button";
-      segment.onclick = () => loadFiles(item);
+      segment.onclick = async () => {
+        await loadFolders();
+        await loadFiles(folderById.get(item.id) || item);
+      };
     }
 
     filesSubtitle.appendChild(segment);
@@ -506,40 +616,44 @@ function closeEditFolderModal() {
 }
 
 function toggleFolderCollapse(folder) {
-  if (!folder.children.length) {
+  if (!hasChildFolders(folder)) {
     return;
   }
 
   if (collapsedFolderIds.has(folder.id)) {
-    if (!folder.parentId) {
-      folders
-        .filter(item => !item.parentId && item.id !== folder.id)
-        .forEach(item => collapsedFolderIds.add(item.id));
-    }
-
-    collapsedFolderIds.delete(folder.id);
+    expandFolder(folder);
   } else {
     collapsedFolderIds.add(folder.id);
   }
 }
 
+function collapseDescendantFolders(folder) {
+  getChildFolders(folder.id).forEach((child) => {
+    if (hasChildFolders(child)) {
+      collapsedFolderIds.add(child.id);
+      collapseDescendantFolders(child);
+    }
+  });
+}
+
 function expandFolder(folder) {
-  if (!folder.children.length) {
+  if (!hasChildFolders(folder)) {
     return;
   }
 
   if (!folder.parentId) {
-    folders
-      .filter(item => !item.parentId && item.id !== folder.id)
+    getChildFolders()
+      .filter(item => item.id !== folder.id)
       .forEach(item => collapsedFolderIds.add(item.id));
   }
 
+  collapseDescendantFolders(folder);
   collapsedFolderIds.delete(folder.id);
 }
 
 async function handleFolderSelection(folder) {
   if (selectedFolder?.id === folder.id) {
-    if (folder.children.length) {
+    if (hasChildFolders(folder)) {
       collapsedFolderIds.add(folder.id);
     }
 
@@ -557,6 +671,8 @@ async function handleFolderSelection(folder) {
 function renderFolderNode(folder, depth = 0) {
   const wrapper = document.createElement("div");
   wrapper.className = "folder-node";
+  const childFolders = getChildFolders(folder.id);
+  const hasChildren = childFolders.length > 0;
 
   const item = document.createElement("div");
   item.className = "folder-node-content";
@@ -581,12 +697,12 @@ function renderFolderNode(folder, depth = 0) {
 
   const icon = document.createElement("span");
   icon.className = "folder-icon";
-  icon.textContent = folder.children.length
+  icon.textContent = hasChildren
     ? (collapsedFolderIds.has(folder.id) ? "▸" : "▾")
     : "•";
   icon.setAttribute("aria-hidden", "true");
 
-  if (folder.children.length) {
+  if (hasChildren) {
     icon.classList.add("is-toggle");
     icon.onclick = (e) => {
       e.stopPropagation();
@@ -671,20 +787,20 @@ function renderFolderNode(folder, depth = 0) {
 
   actions.append(addBtn, renameBtn, deleteBtn, uploadLink, viewLink);
 
-  if (folder.children.length) {
+  if (!folder.parentId) {
     uploadLink.classList.add("is-disabled");
     uploadLink.setAttribute("aria-disabled", "true");
     uploadLink.removeAttribute("href");
-    uploadLink.title = "Parent folders cannot be uploaded to directly";
+    uploadLink.title = "Open a location, period, or discipline folder to upload";
   }
 
   item.append(info, meta, actions);
   wrapper.appendChild(item);
 
-  if (folder.children.length && !collapsedFolderIds.has(folder.id)) {
+  if (hasChildren && !collapsedFolderIds.has(folder.id)) {
     const children = document.createElement("div");
     children.className = "folder-children";
-    folder.children.forEach(child => children.appendChild(renderFolderNode(child, depth + 1)));
+    childFolders.forEach(child => children.appendChild(renderFolderNode(child, depth + 1)));
     wrapper.appendChild(children);
   }
 
@@ -707,23 +823,15 @@ function renderFolders() {
 }
 
 function renderFolderOverview(parentFolder = null) {
-  const scopedFolders = parentFolder
-    ? folders.filter(folder => isFolderDescendantOf(folder, parentFolder.id))
-    : folders;
   const overviewFolders = parentFolder
-    ? folders.filter(folder => folder.parentId === parentFolder.id)
+    ? getDescendantFolders(parentFolder.id)
     : folders;
   const overviewItems = overviewFolders
     .map(folder => ({
       folder,
-      stats: parentFolder
-        ? getCombinedFolderStats(folder)
-        : {
-          pendingCount: Number(folder.pendingCount) || 0,
-          lastPendingUploadedAt: folder.lastPendingUploadedAt || null
-        }
+      stats: getCombinedFolderStats(folder)
     }))
-    .filter(item => item.stats.pendingCount > 0);
+    .filter(item => !hasChildFolders(item.folder) && item.stats.pendingCount > 0);
 
   filesTitle.textContent = "Folder overview";
   renderFilesBreadcrumb(parentFolder);
@@ -743,16 +851,19 @@ function renderFolderOverview(parentFolder = null) {
   title.innerHTML = `<strong>${overviewItems.length} folders</strong><span>${totalPending} waiting files</span>`;
 
   const approveAllWaiting = createActionButton("Approve all waiting", async () => {
-    const foldersWithPending = scopedFolders.filter(folder => folder.pendingCount > 0);
     approveAllWaiting.disabled = true;
 
-    await Promise.all(foldersWithPending.map(folder => (
-      api(`/api/folders/${folder.id}/files/approve-all`, { method: "POST" })
-    )));
-    await loadFolders();
+    try {
+      for (const item of overviewItems) {
+        await api(`/api/folders/${item.folder.id}/files/approve-all`, { method: "POST" });
+      }
 
-    if (selectedFolder && hasChildFolders(selectedFolder)) {
-      renderFolderOverview(selectedFolder);
+      await loadFolders();
+
+      renderFolderOverview(parentFolder ? folderById.get(parentFolder.id) || parentFolder : null);
+    } catch (err) {
+      approveAllWaiting.disabled = false;
+      window.alert(err.message || "Failed to approve waiting files.");
     }
   }, { disabled: totalPending === 0 });
 
@@ -874,14 +985,21 @@ function prevFile() {
 async function loadFolders() {
   const data = await api("/api/folders");
   folders = data.folders;
-  renderParentOptions(addingParentId);
+  rebuildFolderIndexes();
+
+  if (!addFolderModal.classList.contains("hidden")) {
+    renderParentOptions(addingParentId);
+  }
 
   if (!didApplyDefaultCollapse) {
+    folders
+      .filter(folder => hasChildFolders(folder))
+      .forEach(folder => collapsedFolderIds.add(folder.id));
     didApplyDefaultCollapse = true;
   }
 
   if (selectedFolder) {
-    selectedFolder = folders.find(folder => folder.id === selectedFolder.id) || selectedFolder;
+    selectedFolder = folderById.get(selectedFolder.id) || selectedFolder;
   }
 
   renderFolders();
@@ -907,7 +1025,7 @@ async function loadFiles(folder) {
 
   const data = await api(`/api/folders/${folder.id}/files?status=all`);
   renderFiles(data.files);
-  setBulkActionsEnabled(data.files.length > 0);
+  updateBulkActionsForFiles(data.files);
 }
 
 addFolderForm.onsubmit = async (e) => {
@@ -1012,8 +1130,18 @@ approveAllBtn.onclick = async () => {
     await Promise.all(pendingFiles.map(file => api(`/api/files/${file.id}/approve`, { method: "POST" })));
   }
 
-  await loadFiles(selectedFolder);
-  await loadFolders();
+  const approvedFiles = currentFiles.map(file => ({
+    ...file,
+    status: "approved"
+  }));
+
+  syncFolderStatsFromFiles(selectedFolder.id, approvedFiles);
+  rebuildFolderIndexes();
+  selectedFolder = folderById.get(selectedFolder.id) || selectedFolder;
+  renderFolders();
+  renderFiles(approvedFiles);
+  updateBulkActionsForFiles(approvedFiles);
+  await refreshSelectedLeafFolder(approvedFiles);
 };
 
 deleteAllBtn.onclick = async () => {
@@ -1029,8 +1157,13 @@ deleteAllBtn.onclick = async () => {
     await Promise.all(currentFiles.map(file => api(`/api/files/${file.id}`, { method: "DELETE" })));
   }
 
-  await loadFiles(selectedFolder);
-  await loadFolders();
+  syncFolderStatsFromFiles(selectedFolder.id, []);
+  rebuildFolderIndexes();
+  selectedFolder = folderById.get(selectedFolder.id) || selectedFolder;
+  renderFolders();
+  renderFiles([]);
+  updateBulkActionsForFiles([]);
+  await refreshSelectedLeafFolder([]);
 };
 
 editFolderForm.onsubmit = async (e) => {
@@ -1065,7 +1198,7 @@ editFolderForm.onsubmit = async (e) => {
   });
 
   if (selectedFolder?.id === editingFolderId) {
-    selectedFolder = folders.find(folder => folder.id === editingFolderId) || selectedFolder;
+    selectedFolder = folderById.get(editingFolderId) || selectedFolder;
   }
 
   closeEditFolderModal();

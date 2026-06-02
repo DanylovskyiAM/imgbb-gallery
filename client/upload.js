@@ -1,5 +1,8 @@
 const uploadForm = document.getElementById("uploadForm");
 const uploadInput = document.getElementById("uploadInput");
+const uploadButton = uploadForm.querySelector("button[type='submit']");
+const periodSelect = document.getElementById("periodSelect");
+const disciplineSelect = document.getElementById("disciplineSelect");
 const expirationSelect = document.getElementById("expirationSelect");
 const uploadStatus = document.getElementById("uploadStatus");
 const uploadResults = document.getElementById("uploadResults");
@@ -23,13 +26,24 @@ const folderParam = params.get("folder");
 let uploadedImages = [];
 let currentPreviewIndex = 0;
 let lockedScrollY = 0;
+let folders = [];
+let folderById = new Map();
+let currentLocation = null;
+let selectedUploadFolderId = "";
 
 if (folderParam) {
   uploadSubtitle.textContent = `Upload to folder: ${folderParam}`;
-  loadFolderTitle(folderParam);
+  loadFolderContext(folderParam);
+} else {
+  periodSelect.disabled = true;
+  disciplineSelect.disabled = true;
+  updateUploadButtonState();
+  uploadSubtitle.textContent = "Open upload from a location, period, or discipline folder";
 }
 
-async function loadFolderTitle(folderId) {
+updateUploadButtonState();
+
+async function loadFolderContext(folderId) {
   try {
     const response = await fetch(`${apiBase}/api/folders`);
     const data = await response.json();
@@ -38,24 +52,62 @@ async function loadFolderTitle(folderId) {
       throw new Error(data.error || "Failed to load folders.");
     }
 
-    const folder = data.folders.find(item => (
+    folders = data.folders;
+    folderById = new Map(folders.map(folder => [folder.id, folder]));
+
+    const folder = folders.find(item => (
       item.id === folderId || item.slug === folderId || item.path === folderId
     ));
 
     if (folder) {
-      uploadSubtitle.textContent = `Upload to folder: ${getFolderDisplayPath(folder, data.folders)}`;
+      applyFolderContext(folder);
+      return;
     }
+
+    throw new Error("Folder was not found.");
   } catch (err) {
     uploadSubtitle.textContent = `Upload to folder: ${folderId}`;
+    periodSelect.disabled = true;
+    disciplineSelect.disabled = true;
+    updateUploadButtonState();
+    setStatus("Folder was not found. Open upload from the manage page.", true);
   }
 }
 
-function getFolderDisplayPath(folder, folders) {
+function getChildFolders(parentId) {
+  return folders
+    .filter(folder => folder.parentId === parentId)
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+}
+
+function hasChildFolders(folder) {
+  return getChildFolders(folder.id).length > 0;
+}
+
+function getFolderAncestors(folder) {
+  const ancestors = [folder];
+  let parentId = folder.parentId;
+
+  while (parentId) {
+    const parent = folderById.get(parentId);
+
+    if (!parent) {
+      break;
+    }
+
+    ancestors.unshift(parent);
+    parentId = parent.parentId;
+  }
+
+  return ancestors;
+}
+
+function getFolderDisplayPath(folder) {
   const segments = [folder.name];
   let parentId = folder.parentId;
 
   while (parentId) {
-    const parent = folders.find(item => item.id === parentId);
+    const parent = folderById.get(parentId);
 
     if (!parent) {
       break;
@@ -66,6 +118,84 @@ function getFolderDisplayPath(folder, folders) {
   }
 
   return segments.join(" / ");
+}
+
+function setSelectOptions(select, items, placeholder) {
+  select.innerHTML = "";
+
+  const option = document.createElement("option");
+  option.value = "";
+  option.textContent = placeholder;
+  select.appendChild(option);
+
+  items.forEach((item) => {
+    const itemOption = document.createElement("option");
+    itemOption.value = item.id;
+    itemOption.textContent = item.name;
+    select.appendChild(itemOption);
+  });
+}
+
+function resolveFolderContext(folder) {
+  const ancestors = getFolderAncestors(folder);
+
+  return {
+    company: ancestors[0] || null,
+    location: ancestors[1] || null,
+    period: ancestors[2] || null,
+    discipline: ancestors[3] || null
+  };
+}
+
+function applyFolderContext(folder) {
+  const context = resolveFolderContext(folder);
+
+  if (!context.location) {
+    uploadSubtitle.textContent = `Upload to folder: ${getFolderDisplayPath(folder)}`;
+    periodSelect.disabled = true;
+    disciplineSelect.disabled = true;
+    updateUploadButtonState();
+    setStatus("Choose a location, period, or discipline folder from manage page.", true);
+    return;
+  }
+
+  currentLocation = context.location;
+  uploadSubtitle.textContent = `Upload to location: ${getFolderDisplayPath(currentLocation)}`;
+  periodSelect.disabled = false;
+  disciplineSelect.disabled = false;
+
+  setSelectOptions(periodSelect, getChildFolders(currentLocation.id), "Select period");
+  periodSelect.value = context.period?.id || "";
+  updateDisciplineOptions(context.discipline?.id || "");
+  updateSelectedUploadFolder();
+}
+
+function updateDisciplineOptions(selectedDisciplineId = "") {
+  const period = folderById.get(periodSelect.value);
+  const disciplines = period ? getChildFolders(period.id) : [];
+
+  setSelectOptions(disciplineSelect, disciplines, period ? "Select discipline" : "Select period first");
+  disciplineSelect.disabled = !period;
+  disciplineSelect.value = selectedDisciplineId && disciplines.some(item => item.id === selectedDisciplineId)
+    ? selectedDisciplineId
+    : "";
+}
+
+function updateSelectedUploadFolder() {
+  const discipline = folderById.get(disciplineSelect.value);
+  selectedUploadFolderId = discipline?.id || "";
+  updateUploadButtonState();
+
+  if (discipline) {
+    uploadSubtitle.textContent = `Upload to folder: ${getFolderDisplayPath(discipline)}`;
+    setStatus("");
+  } else if (currentLocation) {
+    uploadSubtitle.textContent = `Upload to location: ${getFolderDisplayPath(currentLocation)}`;
+  }
+}
+
+function updateUploadButtonState(isUploading = false) {
+  uploadButton.disabled = isUploading || !periodSelect.value || !disciplineSelect.value || !selectedUploadFolderId;
 }
 
 function readFileAsDataUrl(file) {
@@ -236,8 +366,8 @@ async function uploadImage(image, expiration) {
     body: JSON.stringify({
       images: [image],
       expiration,
-      folderId: folderParam,
-      folderSlug: folderParam
+      folderId: selectedUploadFolderId,
+      folderSlug: selectedUploadFolderId
     })
   });
   const contentType = response.headers.get("content-type") || "";
@@ -261,6 +391,11 @@ uploadForm.onsubmit = async (e) => {
 
   const files = Array.from(uploadInput.files || []);
 
+  if (!selectedUploadFolderId) {
+    setStatus("Select a period and discipline before uploading.", true);
+    return;
+  }
+
   if (!files.length) {
     setStatus("Choose at least one image.", true);
     return;
@@ -268,7 +403,7 @@ uploadForm.onsubmit = async (e) => {
 
   try {
     const expiration = expirationSelect.value;
-    uploadForm.querySelector("button").disabled = true;
+    updateUploadButtonState(true);
     setStatus(`Preparing ${files.length} image(s)...`);
     uploadResults.innerHTML = "";
 
@@ -290,9 +425,16 @@ uploadForm.onsubmit = async (e) => {
   } catch (err) {
     setStatus(err.message || "Upload failed.", true);
   } finally {
-    uploadForm.querySelector("button").disabled = false;
+    updateUploadButtonState();
   }
 };
+
+periodSelect.onchange = () => {
+  updateDisciplineOptions();
+  updateSelectedUploadFolder();
+};
+
+disciplineSelect.onchange = updateSelectedUploadFolder;
 
 closeBtn.onclick = closeModal;
 nextBtn.onclick = nextPreview;

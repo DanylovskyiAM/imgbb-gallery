@@ -458,7 +458,9 @@ app.post("/api/folders/:id/files/approve-all", (req, res) => {
 
   res.json({
     ok: true,
-    count: db.approveFolderFiles(folder.id)
+    count: req.query.recursive === "1"
+      ? db.approveFolderTreeFiles(folder.id)
+      : db.approveFolderFiles(folder.id)
   });
 });
 
