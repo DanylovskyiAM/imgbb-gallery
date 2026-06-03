@@ -23,6 +23,7 @@ const modalApproveBtn = document.getElementById("modalApproveBtn");
 const modalDeleteBtn = document.getElementById("modalDeleteBtn");
 const toTopBtn = document.getElementById("toTopBtn");
 const exportDbBtn = document.getElementById("exportDbBtn");
+const logoutBtn = document.getElementById("logoutBtn");
 const exportModal = document.getElementById("exportModal");
 const exportBackupBtn = document.getElementById("exportBackupBtn");
 const exportExcelBtn = document.getElementById("exportExcelBtn");
@@ -141,6 +142,11 @@ async function api(path, options = {}) {
   }
 
   return data;
+}
+
+async function logout() {
+  await api("/api/auth/logout", { method: "POST" });
+  window.location.href = "/login.html";
 }
 
 function getParentKey(parentId = null) {
@@ -1059,6 +1065,7 @@ addRootFolderBtn.onclick = () => openAddFolderModal(null);
 cancelAddFolder.onclick = closeAddFolderModal;
 
 exportDbBtn.onclick = openExportModal;
+logoutBtn.onclick = logout;
 cancelExport.onclick = closeExportModal;
 
 exportBackupBtn.onclick = () => {

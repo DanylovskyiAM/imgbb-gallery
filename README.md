@@ -60,6 +60,14 @@ Open:
 http://127.0.0.1:3000/
 ```
 
+Open the management page:
+
+```text
+http://127.0.0.1:3000/manage.html
+```
+
+The first visit to the management page redirects to `login.html`. If no admin account exists yet, the login page asks you to create the first account. Account and session data are stored in the local server database file.
+
 Open a gallery directly:
 
 ```text

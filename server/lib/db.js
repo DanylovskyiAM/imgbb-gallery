@@ -4,6 +4,25 @@ const crypto = require("crypto");
 
 const DATA_DIR = path.join(__dirname, "../data");
 const DB_PATH = path.join(DATA_DIR, "db.json");
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const COMMON_PASSWORDS = new Set([
+  "password",
+  "password1",
+  "password12",
+  "password123",
+  "qwerty",
+  "qwerty123",
+  "admin",
+  "admin123",
+  "letmein",
+  "welcome",
+  "welcome123",
+  "12345678",
+  "123456789",
+  "1234567890",
+  "11111111",
+  "00000000"
+]);
 
 function now() {
   return new Date().toISOString();
@@ -25,7 +44,9 @@ function ensureDb() {
   if (!fs.existsSync(DB_PATH)) {
     writeDb({
       folders: [],
-      files: []
+      files: [],
+      users: [],
+      sessions: []
     });
   }
 }
@@ -49,8 +70,13 @@ function writeDb(db) {
 function normalizeDb(db) {
   db.folders = Array.isArray(db.folders) ? db.folders : [];
   db.files = Array.isArray(db.files) ? db.files : [];
+  db.users = Array.isArray(db.users) ? db.users : [];
+  db.sessions = Array.isArray(db.sessions) ? db.sessions : [];
 
   const siblingCounters = {};
+  const timestamp = now();
+
+  db.sessions = db.sessions.filter(session => !session.expiresAt || new Date(session.expiresAt) > new Date(timestamp));
 
   db.folders.forEach((folder) => {
     const parentKey = folder.parentId || "root";
@@ -64,6 +90,155 @@ function normalizeDb(db) {
       folder.sortOrder = siblingCounters[parentKey];
     }
   });
+}
+
+function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
+  const hash = crypto.pbkdf2Sync(String(password || ""), salt, 120000, 32, "sha256").toString("hex");
+
+  return { salt, hash };
+}
+
+function validatePassword(password, username = "") {
+  const value = String(password || "");
+  const normalized = value.toLowerCase();
+  const normalizedUsername = String(username || "").trim().toLowerCase();
+
+  if (value.length < 10) {
+    throw new Error("Password must be at least 10 characters");
+  }
+
+  if (/^\d+$/.test(value)) {
+    throw new Error("Password cannot contain only numbers");
+  }
+
+  if (!/[a-z]/.test(value) || !/[A-Z]/.test(value)) {
+    throw new Error("Password must include uppercase and lowercase letters");
+  }
+
+  if (!/\d/.test(value)) {
+    throw new Error("Password must include at least one number");
+  }
+
+  if (!/[^A-Za-z0-9]/.test(value)) {
+    throw new Error("Password must include at least one special symbol");
+  }
+
+  if (COMMON_PASSWORDS.has(normalized)) {
+    throw new Error("Password is too common");
+  }
+
+  if (normalizedUsername && normalized.includes(normalizedUsername)) {
+    throw new Error("Password cannot contain the username");
+  }
+}
+
+function hasUsers() {
+  const db = readDb();
+
+  return db.users.length > 0;
+}
+
+function publicUser(user) {
+  return user ? {
+    id: user.id,
+    username: user.username,
+    createdAt: user.createdAt
+  } : null;
+}
+
+function createUser(username, password) {
+  const db = readDb();
+  const name = String(username || "").trim();
+
+  if (!name) {
+    throw new Error("Username is required");
+  }
+
+  validatePassword(password, name);
+
+  if (db.users.some(user => user.username.toLowerCase() === name.toLowerCase())) {
+    throw new Error("An account with this username already exists");
+  }
+
+  const timestamp = now();
+  const passwordHash = hashPassword(password);
+  const user = {
+    id: crypto.randomUUID(),
+    username: name,
+    passwordSalt: passwordHash.salt,
+    passwordHash: passwordHash.hash,
+    createdAt: timestamp,
+    updatedAt: timestamp
+  };
+
+  db.users.push(user);
+  writeDb(db);
+
+  return publicUser(user);
+}
+
+function verifyUser(username, password) {
+  const db = readDb();
+  const user = db.users.find(item => item.username.toLowerCase() === String(username || "").trim().toLowerCase());
+
+  if (!user) {
+    return null;
+  }
+
+  const passwordHash = hashPassword(password, user.passwordSalt);
+  const expected = Buffer.from(user.passwordHash, "hex");
+  const actual = Buffer.from(passwordHash.hash, "hex");
+  const isMatch = expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
+
+  return isMatch ? publicUser(user) : null;
+}
+
+function createSession(userId) {
+  const db = readDb();
+  const user = db.users.find(item => item.id === userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const timestamp = now();
+  const session = {
+    id: crypto.randomBytes(32).toString("hex"),
+    userId,
+    createdAt: timestamp,
+    expiresAt: new Date(Date.now() + SESSION_TTL_MS).toISOString()
+  };
+
+  db.sessions.push(session);
+  writeDb(db);
+
+  return session;
+}
+
+function findSession(sessionId) {
+  const db = readDb();
+  const session = db.sessions.find(item => item.id === sessionId);
+
+  if (!session || (session.expiresAt && new Date(session.expiresAt) <= new Date())) {
+    return null;
+  }
+
+  const user = db.users.find(item => item.id === session.userId);
+
+  return user ? {
+    session,
+    user: publicUser(user)
+  } : null;
+}
+
+function deleteSession(sessionId) {
+  const db = readDb();
+  const before = db.sessions.length;
+
+  db.sessions = db.sessions.filter(session => session.id !== sessionId);
+  writeDb(db);
+
+  return before - db.sessions.length;
 }
 
 function uniqueSlug(db, name, parentId, currentId = null) {
@@ -523,11 +698,16 @@ function getOrCreateDefaultFolder() {
 module.exports = {
   createFile,
   createFolder,
+  createSession,
+  createUser,
+  deleteSession,
   deleteFile,
   deleteFolder,
   exportDb,
   findFolder,
+  findSession,
   getOrCreateDefaultFolder,
+  hasUsers,
   listFiles,
   listFolders,
   approveFolderFiles,
@@ -537,5 +717,6 @@ module.exports = {
   reorderFolder,
   replaceDb,
   updateFile,
-  updateFolder
+  updateFolder,
+  verifyUser
 };

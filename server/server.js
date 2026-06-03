@@ -41,6 +41,55 @@ const CACHE_TTL_MS = 5 * 60 * 1000;
 const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
 
 const cache = {};
+const SESSION_COOKIE = "mya_admin_session";
+
+function parseCookies(req) {
+  return String(req.headers.cookie || "")
+    .split(";")
+    .map(item => item.trim())
+    .filter(Boolean)
+    .reduce((cookies, item) => {
+      const separatorIndex = item.indexOf("=");
+
+      if (separatorIndex < 0) {
+        return cookies;
+      }
+
+      cookies[item.slice(0, separatorIndex)] = decodeURIComponent(item.slice(separatorIndex + 1));
+      return cookies;
+    }, {});
+}
+
+function getAuth(req) {
+  const sessionId = parseCookies(req)[SESSION_COOKIE];
+
+  return sessionId ? db.findSession(sessionId) : null;
+}
+
+function setSessionCookie(res, session) {
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+
+  res.setHeader("Set-Cookie", `${SESSION_COOKIE}=${encodeURIComponent(session.id)}; Path=/; HttpOnly; SameSite=Lax; Expires=${new Date(session.expiresAt).toUTCString()}${secure}`);
+}
+
+function clearSessionCookie(res) {
+  res.setHeader("Set-Cookie", `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Expires=Thu, 01 Jan 1970 00:00:00 GMT`);
+}
+
+function requireManageAuth(req, res, next) {
+  const auth = getAuth(req);
+
+  if (auth) {
+    req.user = auth.user;
+    return next();
+  }
+
+  if (req.accepts("html") && !req.path.startsWith("/api/")) {
+    return res.redirect(`/login.html?next=${encodeURIComponent(req.originalUrl || "/manage.html")}`);
+  }
+
+  return res.status(401).json({ error: "Authentication required" });
+}
 
 function mapImageObject(item) {
   const medium = item.medium?.url || item.display_url;
@@ -360,7 +409,57 @@ app.get("/api/folders", (req, res) => {
   res.json({ folders: db.listFolders() });
 });
 
-app.get("/api/db/export", (req, res) => {
+app.get("/api/auth/status", (req, res) => {
+  const auth = getAuth(req);
+
+  res.json({
+    hasAccounts: db.hasUsers(),
+    authenticated: Boolean(auth),
+    user: auth?.user || null
+  });
+});
+
+app.post("/api/auth/setup", (req, res) => {
+  if (db.hasUsers()) {
+    return res.status(400).json({ error: "An account already exists" });
+  }
+
+  try {
+    const user = db.createUser(req.body.username, req.body.password);
+    const session = db.createSession(user.id);
+
+    setSessionCookie(res, session);
+    res.status(201).json({ user });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.post("/api/auth/login", (req, res) => {
+  const user = db.verifyUser(req.body.username, req.body.password);
+
+  if (!user) {
+    return res.status(401).json({ error: "Invalid username or password" });
+  }
+
+  const session = db.createSession(user.id);
+
+  setSessionCookie(res, session);
+  res.json({ user });
+});
+
+app.post("/api/auth/logout", (req, res) => {
+  const sessionId = parseCookies(req)[SESSION_COOKIE];
+
+  if (sessionId) {
+    db.deleteSession(sessionId);
+  }
+
+  clearSessionCookie(res);
+  res.json({ ok: true });
+});
+
+app.get("/api/db/export", requireManageAuth, (req, res) => {
   const exportedDb = db.exportDb();
   const filename = `imgbb-gallery-db-${new Date().toISOString().slice(0, 10)}.zip`;
   const zip = createZip("db.json", JSON.stringify(exportedDb, null, 2));
@@ -370,7 +469,7 @@ app.get("/api/db/export", (req, res) => {
   res.send(zip);
 });
 
-app.post("/api/db/import", (req, res) => {
+app.post("/api/db/import", requireManageAuth, (req, res) => {
   const mode = req.body.mode === "replace" ? "replace" : "update";
 
   try {
@@ -388,7 +487,7 @@ app.post("/api/db/import", (req, res) => {
   }
 });
 
-app.post("/api/folders", (req, res) => {
+app.post("/api/folders", requireManageAuth, (req, res) => {
   try {
     const folder = db.createFolder(req.body.name, req.body.parentId || null, req.body.description || "");
     res.status(201).json({ folder });
@@ -397,7 +496,7 @@ app.post("/api/folders", (req, res) => {
   }
 });
 
-app.patch("/api/folders/:id", (req, res) => {
+app.patch("/api/folders/:id", requireManageAuth, (req, res) => {
   try {
     const updates = {};
 
@@ -422,7 +521,7 @@ app.patch("/api/folders/:id", (req, res) => {
   }
 });
 
-app.post("/api/folders/:id/order", (req, res) => {
+app.post("/api/folders/:id/order", requireManageAuth, (req, res) => {
   try {
     const folder = db.reorderFolder(req.params.id, req.body.direction);
     res.json({ folder });
@@ -431,12 +530,12 @@ app.post("/api/folders/:id/order", (req, res) => {
   }
 });
 
-app.delete("/api/folders/:id", (req, res) => {
+app.delete("/api/folders/:id", requireManageAuth, (req, res) => {
   db.deleteFolder(req.params.id);
   res.json({ ok: true });
 });
 
-app.get("/api/folders/:id/files", (req, res) => {
+app.get("/api/folders/:id/files", requireManageAuth, (req, res) => {
   const folder = db.findFolder(req.params.id);
 
   if (!folder) {
@@ -449,7 +548,7 @@ app.get("/api/folders/:id/files", (req, res) => {
   });
 });
 
-app.post("/api/folders/:id/files/approve-all", (req, res) => {
+app.post("/api/folders/:id/files/approve-all", requireManageAuth, (req, res) => {
   const folder = db.findFolder(req.params.id);
 
   if (!folder) {
@@ -464,7 +563,7 @@ app.post("/api/folders/:id/files/approve-all", (req, res) => {
   });
 });
 
-app.delete("/api/folders/:id/files", (req, res) => {
+app.delete("/api/folders/:id/files", requireManageAuth, (req, res) => {
   const folder = db.findFolder(req.params.id);
 
   if (!folder) {
@@ -546,7 +645,7 @@ app.get("/api/gallery/folders/:id", (req, res) => {
   });
 });
 
-app.patch("/api/files/:id", (req, res) => {
+app.patch("/api/files/:id", requireManageAuth, (req, res) => {
   try {
     const file = db.updateFile(req.params.id, req.body);
     res.json({ file });
@@ -555,7 +654,7 @@ app.patch("/api/files/:id", (req, res) => {
   }
 });
 
-app.post("/api/files/:id/approve", (req, res) => {
+app.post("/api/files/:id/approve", requireManageAuth, (req, res) => {
   try {
     const file = db.updateFile(req.params.id, {
       status: "approved",
@@ -567,7 +666,7 @@ app.post("/api/files/:id/approve", (req, res) => {
   }
 });
 
-app.delete("/api/files/:id", (req, res) => {
+app.delete("/api/files/:id", requireManageAuth, (req, res) => {
   db.deleteFile(req.params.id);
   res.json({ ok: true });
 });
@@ -621,6 +720,10 @@ app.post("/api/upload", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Failed to upload images" });
   }
+});
+
+app.get("/manage.html", requireManageAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/manage.html"));
 });
 
 app.use(express.static(path.join(__dirname, "../client")));

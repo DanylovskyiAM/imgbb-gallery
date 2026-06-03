@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="login-page">
+  <main class="login-main">
+    <form id="loginForm" class="login-panel">
+      <div class="login-heading">
+        <h1 id="loginTitle">Manage Login</h1>
+        <p id="loginSubtitle">Sign in to manage folders and uploads.</p>
+      </div>
+
+      <label>
+        Username
+        <input id="loginUsername" name="username" type="text" autocomplete="username" required />
+      </label>
+
+      <label>
+        Password
+        <input id="loginPassword" name="password" type="password" autocomplete="current-password" required />
+      </label>
+      <p id="passwordHint" class="password-hint hidden">Use at least 10 characters with uppercase and lowercase letters, a number, and a special symbol.</p>
+
+      <button id="loginSubmit" type="submit">Sign in</button>
+      <p id="loginStatus" class="login-status"></p>
+    </form>
+  </main>
+
+  <script src="login.js"></script>
+</body>
+</html>
