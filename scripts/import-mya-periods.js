@@ -11,28 +11,28 @@ const stats = {
 let authCookie = "";
 
 function printHelp() {
-  console.log(`Usage: npm run import:mya -- [options]
+  console.log(`Usage: npm run import:mya-periods -- [options]
 
 Options:
-  --file <path>          MYA JSON file to import. Default: mya-stages.json
-  --discipline <text>    Import only rows whose discipline contains this text
+  --file <path>          MYA periods JSON file to import. Default: mya-periods.json
+  --company <text>       Import only one company, e.g. "Actionsport"
   --username <text>      Admin username. Can also use MYA_ADMIN_USERNAME
   --password <text>      Admin password. Can also use MYA_ADMIN_PASSWORD
   --dry-run              Preview the folder paths without writing to the app
   --help                 Show this help
 
 Examples:
-  npm run import:mya -- --file mya-stages.json
-  npm run import:mya -- --file mya-stages.json --username admin --password "your-password"
-  npm run import:mya -- --file mya-stages.json --discipline "Mixed games"
-  npm run import:mya -- --file mya-stages.json --dry-run
+  npm run import:mya-periods -- --file mya-periods.json
+  npm run import:mya-periods -- --file mya-periods.json --username admin --password "your-password"
+  npm run import:mya-periods -- --file mya-periods.json --company "Actionsport"
+  npm run import:mya-periods -- --file mya-periods.json --dry-run
 `);
 }
 
 function parseArgs(argv) {
   const options = {
-    file: "mya-stages.json",
-    discipline: "",
+    file: "mya-periods.json",
+    company: "",
     username: process.env.MYA_ADMIN_USERNAME || "",
     password: process.env.MYA_ADMIN_PASSWORD || "",
     dryRun: false
@@ -46,8 +46,8 @@ function parseArgs(argv) {
     } else if (arg === "--file") {
       options.file = argv[index + 1];
       index += 1;
-    } else if (arg === "--discipline") {
-      options.discipline = argv[index + 1] || "";
+    } else if (arg === "--company") {
+      options.company = argv[index + 1] || "";
       index += 1;
     } else if (arg === "--username") {
       options.username = argv[index + 1] || "";
@@ -79,26 +79,23 @@ function requiredText(value, label) {
   return text;
 }
 
-function loadRows(filePath, disciplineFilter) {
+function loadRows(filePath, companyFilter) {
   const absolutePath = path.resolve(process.cwd(), filePath);
   const data = JSON.parse(fs.readFileSync(absolutePath, "utf8"));
 
   if (!Array.isArray(data.rows)) {
-    throw new Error("MYA JSON must contain a rows array");
+    throw new Error("MYA periods JSON must contain a rows array");
   }
 
-  const wantedDiscipline = normalizeName(disciplineFilter);
+  const wantedCompany = normalizeName(companyFilter);
 
   return data.rows
-    .filter(row => !wantedDiscipline || normalizeName(row.discipline).includes(wantedDiscipline))
+    .filter(row => !wantedCompany || normalizeName(row.company).includes(wantedCompany))
     .map(row => ({
-      company: requiredText(row.company || "Promosport", "Company"),
+      company: requiredText(row.company, "Company"),
       site: requiredText(row.site, "Site"),
       period: requiredText(row.period, "Period"),
-      discipline: requiredText(row.discipline, "Discipline"),
-      groupTime: row.groupTime || "",
       eventId: row.eventId || "",
-      disciplineId: row.disciplineId || "",
       startDate: row.startDate || "",
       endDate: row.endDate || "",
       city: row.city || "",
@@ -108,8 +105,7 @@ function loadRows(filePath, disciplineFilter) {
     .sort((a, b) => (
       a.company.localeCompare(b.company) ||
       a.site.localeCompare(b.site) ||
-      a.period.localeCompare(b.period, undefined, { numeric: true }) ||
-      a.discipline.localeCompare(b.discipline, undefined, { numeric: true })
+      a.period.localeCompare(b.period, undefined, { numeric: true })
     ));
 }
 
@@ -146,32 +142,16 @@ function createSiteDescription(row) {
 }
 
 function createPeriodDescription(row) {
-  if (!row.startDate && !row.endDate) {
-    return "";
-  }
-
   return createDescription([
     formatDateRange(row.startDate, row.endDate)
   ]);
-}
-
-function createDisciplineDescription(row) {
-  return createDescription([
-    row.eventId ? `MYA event ID: ${row.eventId}` : "",
-    row.disciplineId ? `MYA discipline ID: ${row.disciplineId}` : "",
-    row.groupTime
-  ]);
-}
-
-function createDisciplineFolderName(row) {
-  return row.groupTime ? `${row.discipline} ${row.groupTime}` : row.discipline;
 }
 
 function uniqueRows(rows) {
   const seen = new Set();
 
   return rows.filter((row) => {
-    const key = [row.company, row.site, row.period, createDisciplineFolderName(row)].map(normalizeName).join("\0");
+    const key = [row.company, row.site, row.period].map(normalizeName).join("\0");
 
     if (seen.has(key)) {
       stats.duplicateInput += 1;
@@ -272,13 +252,11 @@ function printDryRun(rows) {
   const companyKeys = new Set();
   const siteKeys = new Set();
   const periodKeys = new Set();
-  const disciplineKeys = new Set();
 
   rows.forEach((row) => {
     companyKeys.add(normalizeName(row.company));
     siteKeys.add([row.company, row.site].map(normalizeName).join("\0"));
     periodKeys.add([row.company, row.site, row.period].map(normalizeName).join("\0"));
-    disciplineKeys.add([row.company, row.site, row.period, createDisciplineFolderName(row)].map(normalizeName).join("\0"));
   });
 
   console.log("Dry run only. No folders were created.");
@@ -286,9 +264,8 @@ function printDryRun(rows) {
   console.log(`Unique companies: ${companyKeys.size}`);
   console.log(`Unique sites: ${siteKeys.size}`);
   console.log(`Unique periods: ${periodKeys.size}`);
-  console.log(`Unique discipline folders: ${disciplineKeys.size}`);
   console.log(`Duplicate input rows skipped: ${stats.duplicateInput}`);
-  console.log(`Total folder paths to check/create: ${companyKeys.size + siteKeys.size + periodKeys.size + disciplineKeys.size}`);
+  console.log(`Total folder paths to check/create: ${companyKeys.size + siteKeys.size + periodKeys.size}`);
 }
 
 async function importRows(rows) {
@@ -308,18 +285,11 @@ async function importRows(rows) {
       createSiteDescription(row)
     );
 
-    const period = await getOrCreateFolder(
+    await getOrCreateFolder(
       folders,
       row.period,
       site.id,
       createPeriodDescription(row)
-    );
-
-    await getOrCreateFolder(
-      folders,
-      createDisciplineFolderName(row),
-      period.id,
-      createDisciplineDescription(row)
     );
   }
 }
@@ -332,7 +302,7 @@ async function main() {
     return;
   }
 
-  const rows = uniqueRows(loadRows(options.file, options.discipline));
+  const rows = uniqueRows(loadRows(options.file, options.company));
 
   if (options.dryRun) {
     printDryRun(rows);

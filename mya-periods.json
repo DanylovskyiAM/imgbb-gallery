@@ -1,0 +1,4769 @@
+{
+  "generatedAt": "2026-06-03T18:30:19.200Z",
+  "source": "mya-periods.txt",
+  "sources": [
+    {
+      "type": "manual",
+      "file": "mya-periods.txt"
+    },
+    {
+      "type": "mya-api",
+      "productTypeId": "81",
+      "skipped": false
+    }
+  ],
+  "totalEvents": 249,
+  "totalRows": 249,
+  "rows": [
+    {
+      "company": "Actionsport",
+      "site": "Auderghem - Lutgardiscollege",
+      "period": "Summer - Week 5",
+      "eventId": 1114,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "De Wahalaan 11",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Auderghem - Lutgardiscollege",
+      "period": "Summer - Week 6",
+      "eventId": 725,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "De Wahalaan 11",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Auderghem – Athénée Royal",
+      "period": "Summer - Week 1",
+      "eventId": 696,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "Avenue du Parc de Woluwe, 27",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Auderghem – Athénée Royal",
+      "period": "Summer - Week 7",
+      "eventId": 1014,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "Avenue du Parc de Woluwe, 27",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Auderghem – Centre sportif",
+      "period": "Autumn - Week 1",
+      "eventId": 1207,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "Chaussée de Wavre 1690 ",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Auderghem – Centre sportif",
+      "period": "Autumn - Week 2",
+      "eventId": 1209,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "Chaussée de Wavre 1690 ",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Auderghem – Centre sportif",
+      "period": "Summer - Week 2",
+      "eventId": 723,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "Chaussée de Wavre 1690 ",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Auderghem – Centre sportif",
+      "period": "Summer - Week 3",
+      "eventId": 724,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "Chaussée de Wavre 1690 ",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Etterbeek – Saint-Michel",
+      "period": "Autumn - Week 1",
+      "eventId": 1204,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Etterbeek",
+      "postalCode": "1040",
+      "address": "Rue Père Eudore Devroye 12",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Etterbeek – Saint-Michel",
+      "period": "Autumn - Week 2",
+      "eventId": 1205,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Etterbeek",
+      "postalCode": "1040",
+      "address": "Rue Père Eudore Devroye 12",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Etterbeek – Saint-Michel",
+      "period": "Summer - Week 1",
+      "eventId": "",
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Etterbeek",
+      "postalCode": "1040",
+      "address": "Rue Père Eudore Devroye 12",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Etterbeek – Saint-Michel",
+      "period": "Summer - Week 2",
+      "eventId": "",
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Etterbeek",
+      "postalCode": "1040",
+      "address": "Rue Père Eudore Devroye 12",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Etterbeek – Saint-Michel",
+      "period": "Summer - Week 3",
+      "eventId": "",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Etterbeek",
+      "postalCode": "1040",
+      "address": "Rue Père Eudore Devroye 12",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Etterbeek – Saint-Michel",
+      "period": "Summer - Week 4",
+      "eventId": "",
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Etterbeek",
+      "postalCode": "1040",
+      "address": "Rue Père Eudore Devroye 12",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Etterbeek – Saint-Michel",
+      "period": "Summer - Week 5",
+      "eventId": "",
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Etterbeek",
+      "postalCode": "1040",
+      "address": "Rue Père Eudore Devroye 12",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Etterbeek – Saint-Michel",
+      "period": "Summer - Week 6",
+      "eventId": "",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Etterbeek",
+      "postalCode": "1040",
+      "address": "Rue Père Eudore Devroye 12",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Etterbeek – Saint-Michel",
+      "period": "Summer - Week 7",
+      "eventId": "",
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Etterbeek",
+      "postalCode": "1040",
+      "address": "Rue Père Eudore Devroye 12",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Koekelberg – Centre Sportif Victoria",
+      "period": "Autumn - Week 1",
+      "eventId": "",
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Koekelberg",
+      "postalCode": "1081",
+      "address": "Rue Léon Autrique 4",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Koekelberg – Centre Sportif Victoria",
+      "period": "Autumn - Week 2",
+      "eventId": "",
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Koekelberg",
+      "postalCode": "1081",
+      "address": "Rue Léon Autrique 4",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Koekelberg – Centre Sportif Victoria",
+      "period": "Summer - Week 5",
+      "eventId": "",
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Koekelberg",
+      "postalCode": "1081",
+      "address": "Rue Léon Autrique 4",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Koekelberg – Centre Sportif Victoria",
+      "period": "Summer - Week 6",
+      "eventId": "",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Koekelberg",
+      "postalCode": "1081",
+      "address": "Rue Léon Autrique 4",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Koekelberg – Centre Sportif Victoria",
+      "period": "Summer - Week 7",
+      "eventId": "",
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Koekelberg",
+      "postalCode": "1081",
+      "address": "Rue Léon Autrique 4",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Strombeek-Bever – Poneys Club Hof te Bever",
+      "period": "Summer - Week 0",
+      "eventId": "",
+      "startDate": "2026-06-29",
+      "endDate": "2026-07-03",
+      "city": "Strombeek-Bever",
+      "postalCode": "1853",
+      "address": "Hof te Beverlaan 195",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Strombeek-Bever – Poneys Club Hof te Bever",
+      "period": "Summer - Week 1",
+      "eventId": "",
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Strombeek-Bever",
+      "postalCode": "1853",
+      "address": "Hof te Beverlaan 195",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Strombeek-Bever – Poneys Club Hof te Bever",
+      "period": "Summer - Week 2",
+      "eventId": "",
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Strombeek-Bever",
+      "postalCode": "1853",
+      "address": "Hof te Beverlaan 195",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Strombeek-Bever – Poneys Club Hof te Bever",
+      "period": "Summer - Week 3",
+      "eventId": "",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Strombeek-Bever",
+      "postalCode": "1853",
+      "address": "Hof te Beverlaan 195",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Strombeek-Bever – Poneys Club Hof te Bever",
+      "period": "Summer - Week 4",
+      "eventId": "",
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Strombeek-Bever",
+      "postalCode": "1853",
+      "address": "Hof te Beverlaan 195",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Strombeek-Bever – Poneys Club Hof te Bever",
+      "period": "Summer - Week 5",
+      "eventId": "",
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Strombeek-Bever",
+      "postalCode": "1853",
+      "address": "Hof te Beverlaan 195",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Strombeek-Bever – Poneys Club Hof te Bever",
+      "period": "Summer - Week 6",
+      "eventId": "",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Strombeek-Bever",
+      "postalCode": "1853",
+      "address": "Hof te Beverlaan 195",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Strombeek-Bever – Poneys Club Hof te Bever",
+      "period": "Summer - Week 7",
+      "eventId": "",
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Strombeek-Bever",
+      "postalCode": "1853",
+      "address": "Hof te Beverlaan 195",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Strombeek-Bever – Poneys Club Hof te Bever",
+      "period": "Summer - Week 8",
+      "eventId": "",
+      "startDate": "2026-08-24",
+      "endDate": "2026-08-28",
+      "city": "Strombeek-Bever",
+      "postalCode": "1853",
+      "address": "Hof te Beverlaan 195",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Manège de la Cambre",
+      "period": "Autumn - Week 1",
+      "eventId": "",
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Chaussée de Waterloo 872",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Manège de la Cambre",
+      "period": "Autumn - Week 2",
+      "eventId": "",
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Chaussée de Waterloo 872",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Manège de la Cambre",
+      "period": "Summer - Week 1",
+      "eventId": "",
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Chaussée de Waterloo 872",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Manège de la Cambre",
+      "period": "Summer - Week 2",
+      "eventId": "",
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Chaussée de Waterloo 872",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Manège de la Cambre",
+      "period": "Summer - Week 3",
+      "eventId": "",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Chaussée de Waterloo 872",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Manège de la Cambre",
+      "period": "Summer - Week 4",
+      "eventId": "",
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Chaussée de Waterloo 872",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Manège de la Cambre",
+      "period": "Summer - Week 5",
+      "eventId": "",
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Chaussée de Waterloo 872",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Manège de la Cambre",
+      "period": "Summer - Week 6",
+      "eventId": "",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Chaussée de Waterloo 872",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Manège de la Cambre",
+      "period": "Summer - Week 7",
+      "eventId": "",
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Chaussée de Waterloo 872",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Manège de la Cambre",
+      "period": "Winter - Week 1",
+      "eventId": "",
+      "startDate": "2026-12-21",
+      "endDate": "2026-12-24",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Chaussée de Waterloo 872",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Manège de la Cambre",
+      "period": "Winter - Week 2",
+      "eventId": "",
+      "startDate": "2026-12-28",
+      "endDate": "2026-12-31",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Chaussée de Waterloo 872",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Notre-Dame des Champs",
+      "period": "Summer - Week 1",
+      "eventId": "",
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Rue Roberts Jones 24",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Notre-Dame des Champs",
+      "period": "Summer - Week 2",
+      "eventId": "",
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Rue Roberts Jones 24",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Notre-Dame des Champs",
+      "period": "Summer - Week 4",
+      "eventId": "",
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Rue Roberts Jones 24",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Notre-Dame des Champs",
+      "period": "Summer - Week 5",
+      "eventId": "",
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Rue Roberts Jones 24",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Notre-Dame des Champs",
+      "period": "Summer - Week 6",
+      "eventId": "",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Rue Roberts Jones 24",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Uccle – Notre-Dame des Champs",
+      "period": "Summer - Week 7",
+      "eventId": "",
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Uccle",
+      "postalCode": "1180",
+      "address": "Rue Roberts Jones 24",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Autumn - Week 1",
+      "eventId": 1201,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Autumn - Week 2",
+      "eventId": 1202,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Summer - Week 1",
+      "eventId": "",
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Summer - Week 1 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Summer - Week 2",
+      "eventId": "",
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Summer - Week 2 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Summer - Week 3",
+      "eventId": "",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Summer - Week 3 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Summer - Week 4",
+      "eventId": "",
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Summer - Week 4 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Summer - Week 5",
+      "eventId": "",
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Summer - Week 6",
+      "eventId": "",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Summer - Week 6 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Summer - Week 7",
+      "eventId": "",
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Summer - Week 7 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Winter - Week 1",
+      "eventId": 895,
+      "startDate": "2026-12-21",
+      "endDate": "2026-12-24",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Winter - Week 2",
+      "eventId": 1203,
+      "startDate": "2026-12-28",
+      "endDate": "2026-12-31",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Autumn - Week 1",
+      "eventId": "",
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Autumn - Week 2",
+      "eventId": "",
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 0",
+      "eventId": "",
+      "startDate": "2026-06-29",
+      "endDate": "2026-07-03",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 1",
+      "eventId": "",
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 1 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 2",
+      "eventId": "",
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 2 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 3",
+      "eventId": "",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 3 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 4",
+      "eventId": "",
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 4 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 5",
+      "eventId": "",
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 6",
+      "eventId": "",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 6 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 7",
+      "eventId": "",
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 7 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Summer - Week 8",
+      "eventId": "",
+      "startDate": "2026-08-24",
+      "endDate": "2026-08-28",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Actionsport",
+      "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+      "period": "Winter - Week 2",
+      "eventId": "",
+      "startDate": "2026-12-28",
+      "endDate": "2026-12-31",
+      "city": "Woluwe-Saint-Pierre",
+      "postalCode": "1150",
+      "address": "Avenue Salomé 2",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Promosport",
+      "site": "Auderghem - Lutgardiscollege",
+      "period": "Summer - Week 5",
+      "eventId": 1114,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "De Wahalaan 11",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Auderghem - Lutgardiscollege",
+      "period": "Summer - Week 6",
+      "eventId": 725,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "De Wahalaan 11",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Auderghem – Athénée Royal",
+      "period": "Summer - Week 1",
+      "eventId": 696,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "Avenue du Parc de Woluwe, 27",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Auderghem – Athénée Royal",
+      "period": "Summer - Week 7",
+      "eventId": 1014,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "Avenue du Parc de Woluwe, 27",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Auderghem – Centre sportif",
+      "period": "Autumn - Week 1",
+      "eventId": 1207,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "Chaussée de Wavre 1690 ",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Auderghem – Centre sportif",
+      "period": "Autumn - Week 2",
+      "eventId": 1209,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "Chaussée de Wavre 1690 ",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Auderghem – Centre sportif",
+      "period": "Summer - Week 2",
+      "eventId": 723,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "Chaussée de Wavre 1690 ",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Auderghem – Centre sportif",
+      "period": "Summer - Week 3",
+      "eventId": 724,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Auderghem",
+      "postalCode": "1160",
+      "address": "Chaussée de Wavre 1690 ",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Bierges – Le Verseau",
+      "period": "Autumn - Week 1",
+      "eventId": 740,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Bierges",
+      "postalCode": "1301",
+      "address": "Rue de Wavre 60",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Bierges – Le Verseau",
+      "period": "Autumn - Week 2",
+      "eventId": 741,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Bierges",
+      "postalCode": "1301",
+      "address": "Rue de Wavre 60",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Bierges – Le Verseau",
+      "period": "Summer - Week 1",
+      "eventId": 721,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Bierges",
+      "postalCode": "1301",
+      "address": "Rue de Wavre 60",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Bierges – Le Verseau",
+      "period": "Summer - Week 2",
+      "eventId": 722,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Bierges",
+      "postalCode": "1301",
+      "address": "Rue de Wavre 60",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Bierges – Le Verseau",
+      "period": "Summer - Week 3",
+      "eventId": 726,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Bierges",
+      "postalCode": "1301",
+      "address": "Rue de Wavre 60",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Bierges – Le Verseau",
+      "period": "Summer - Week 4",
+      "eventId": 727,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Bierges",
+      "postalCode": "1301",
+      "address": "Rue de Wavre 60",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Bierges – Le Verseau",
+      "period": "Summer - Week 5",
+      "eventId": 728,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Bierges",
+      "postalCode": "1301",
+      "address": "Rue de Wavre 60",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Bierges – Le Verseau",
+      "period": "Summer - Week 6",
+      "eventId": 729,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Bierges",
+      "postalCode": "1301",
+      "address": "Rue de Wavre 60",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Bierges – Le Verseau",
+      "period": "Summer - Week 7",
+      "eventId": 730,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Bierges",
+      "postalCode": "1301",
+      "address": "Rue de Wavre 60",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Bierges – Le Verseau",
+      "period": "Winter - Week 1",
+      "eventId": 742,
+      "startDate": "2026-12-21",
+      "endDate": "2026-12-24",
+      "city": "Bierges",
+      "postalCode": "1301",
+      "address": "Rue de Wavre 60",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Bierges – Le Verseau",
+      "period": "Winter - Week 2",
+      "eventId": 743,
+      "startDate": "2026-12-28",
+      "endDate": "2026-12-31",
+      "city": "Bierges",
+      "postalCode": "1301",
+      "address": "Rue de Wavre 60",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Autumn - Week 1",
+      "eventId": 860,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Autumn - Week 2",
+      "eventId": 861,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 1",
+      "eventId": 853,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 1 - Special lunch box",
+      "eventId": 1154,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 2",
+      "eventId": 854,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 2 - Special lunch box",
+      "eventId": 1155,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 3",
+      "eventId": 855,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 3 - Special lunch box",
+      "eventId": 1156,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 4",
+      "eventId": 856,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 4 - Special lunch box",
+      "eventId": 1157,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 5",
+      "eventId": 857,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 5 - Special lunch box",
+      "eventId": 1158,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 6",
+      "eventId": 858,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 6 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 7",
+      "eventId": 859,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Summer - Week 7 - Special lunch box",
+      "eventId": 1160,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Winter - Week 1",
+      "eventId": 862,
+      "startDate": "2026-12-21",
+      "endDate": "2026-12-24",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Braine-l'Alleud – Cardinal Mercier",
+      "period": "Winter - Week 2",
+      "eventId": 863,
+      "startDate": "2026-12-28",
+      "endDate": "2026-12-31",
+      "city": "Braine-l'Alleud",
+      "postalCode": "1420",
+      "address": "Chaussée de Mont-St-Jean 83",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Eghezée – Abbé Noël",
+      "period": "Autumn - Week 1",
+      "eventId": 772,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Eghezée",
+      "postalCode": "5310",
+      "address": "Route de Gembloux 32",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Eghezée – Abbé Noël",
+      "period": "Autumn - Week 2",
+      "eventId": 773,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Eghezée",
+      "postalCode": "5310",
+      "address": "Route de Gembloux 32",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Eghezée – Abbé Noël",
+      "period": "Summer - Week 1",
+      "eventId": 758,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Eghezée",
+      "postalCode": "5310",
+      "address": "Route de Gembloux 32",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Eghezée – Abbé Noël",
+      "period": "Summer - Week 2",
+      "eventId": 759,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Eghezée",
+      "postalCode": "5310",
+      "address": "Route de Gembloux 32",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Eghezée – Abbé Noël",
+      "period": "Summer - Week 5",
+      "eventId": 760,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Eghezée",
+      "postalCode": "5310",
+      "address": "Route de Gembloux 32",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Eghezée – Abbé Noël",
+      "period": "Summer - Week 6",
+      "eventId": 770,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Eghezée",
+      "postalCode": "5310",
+      "address": "Route de Gembloux 32",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Eghezée – Abbé Noël",
+      "period": "Summer - Week 7",
+      "eventId": 771,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Eghezée",
+      "postalCode": "5310",
+      "address": "Route de Gembloux 32",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Embourg – Sartay",
+      "period": "Summer - Week 1",
+      "eventId": 1016,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Embourg",
+      "postalCode": "4053",
+      "address": "Rue Pierre Henvard 64",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Embourg – Sartay",
+      "period": "Summer - Week 6",
+      "eventId": 1018,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Embourg",
+      "postalCode": "4053",
+      "address": "Rue Pierre Henvard 64",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Embourg – Sartay",
+      "period": "Summer - Week 7",
+      "eventId": 1019,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Embourg",
+      "postalCode": "4053",
+      "address": "Rue Pierre Henvard 64",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Etterbeek – Saint-Michel",
+      "period": "Autumn - Week 1",
+      "eventId": 1204,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Etterbeek",
+      "postalCode": "1040",
+      "address": "Rue Père Eudore Devroye 12",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Etterbeek – Saint-Michel",
+      "period": "Autumn - Week 2",
+      "eventId": 1205,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Etterbeek",
+      "postalCode": "1040",
+      "address": "Rue Père Eudore Devroye 12",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Gembloux – Chapelle-Dieu",
+      "period": "Autumn - Week 1",
+      "eventId": 893,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Gembloux",
+      "postalCode": "5030",
+      "address": "Rue Chapelle Dieu 48",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Gembloux – Chapelle-Dieu",
+      "period": "Autumn - Week 2",
+      "eventId": 894,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Gembloux",
+      "postalCode": "5030",
+      "address": "Rue Chapelle Dieu 48",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Gembloux – Chapelle-Dieu",
+      "period": "Summer - Week 1",
+      "eventId": 877,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Gembloux",
+      "postalCode": "5030",
+      "address": "Rue Chapelle Dieu 48",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Gembloux – Chapelle-Dieu",
+      "period": "Summer - Week 2",
+      "eventId": 878,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Gembloux",
+      "postalCode": "5030",
+      "address": "Rue Chapelle Dieu 48",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Gembloux – Chapelle-Dieu",
+      "period": "Summer - Week 3",
+      "eventId": 883,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Gembloux",
+      "postalCode": "5030",
+      "address": "Rue Chapelle Dieu 48",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Gembloux – Chapelle-Dieu",
+      "period": "Summer - Week 4",
+      "eventId": 885,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Gembloux",
+      "postalCode": "5030",
+      "address": "Rue Chapelle Dieu 48",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Gembloux – Chapelle-Dieu",
+      "period": "Summer - Week 5",
+      "eventId": 886,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Gembloux",
+      "postalCode": "5030",
+      "address": "Rue Chapelle Dieu 48",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Gembloux – Chapelle-Dieu",
+      "period": "Summer - Week 6",
+      "eventId": 891,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Gembloux",
+      "postalCode": "5030",
+      "address": "Rue Chapelle Dieu 48",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Gembloux – Chapelle-Dieu",
+      "period": "Summer - Week 7",
+      "eventId": 892,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Gembloux",
+      "postalCode": "5030",
+      "address": "Rue Chapelle Dieu 48",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Grez-Doiceau – Centre sportif",
+      "period": "Summer - Week 5",
+      "eventId": 713,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Grez-Doiceau",
+      "postalCode": "1390",
+      "address": "Chaussée de Wavre 99",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Grez-Doiceau – Centre sportif",
+      "period": "Summer - Week 6",
+      "eventId": 714,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Grez-Doiceau",
+      "postalCode": "1390",
+      "address": "Chaussée de Wavre 99",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Grez-Doiceau – Centre sportif",
+      "period": "Summer - Week 7",
+      "eventId": 715,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Grez-Doiceau",
+      "postalCode": "1390",
+      "address": "Chaussée de Wavre 99",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Hamme-Mille – Ecole autonome",
+      "period": "Summer - Week 1",
+      "eventId": 678,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Hamme-Mille",
+      "postalCode": "1320",
+      "address": "Rue René Ménada  12",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Hamme-Mille – Ecole autonome",
+      "period": "Summer - Week 2",
+      "eventId": 679,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Hamme-Mille",
+      "postalCode": "1320",
+      "address": "Rue René Ménada  12",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Autumn - Week 1",
+      "eventId": 847,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Autumn - Week 2",
+      "eventId": 848,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Summer - Week 1",
+      "eventId": 830,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Summer - Week 1 - Special lunch box",
+      "eventId": 1161,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Summer - Week 2",
+      "eventId": 831,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Summer - Week 2 - Special lunch box",
+      "eventId": 1162,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Summer - Week 3",
+      "eventId": 832,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Summer - Week 3 - Special lunch box",
+      "eventId": 1163,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Summer - Week 4",
+      "eventId": 843,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Summer - Week 4 - Special lunch box",
+      "eventId": 1164,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Summer - Week 5",
+      "eventId": 845,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Summer - Week 5 - Special lunch box",
+      "eventId": 1165,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Summer - Week 6",
+      "eventId": 846,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Summer - Week 6 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Winter - Week 1",
+      "eventId": 849,
+      "startDate": "2026-12-21",
+      "endDate": "2026-12-24",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Jambes – Athenée",
+      "period": "Winter - Week 2",
+      "eventId": 850,
+      "startDate": "2026-12-28",
+      "endDate": "2026-12-31",
+      "city": "Jambes",
+      "postalCode": "5100",
+      "address": "Rue de Géronsart 150, 5100 Namur",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Les Bons Villers – Aquacenter",
+      "period": "Autumn - Week 1",
+      "eventId": 810,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Les Bons Villers",
+      "postalCode": "6210",
+      "address": "Chaussée de Bruxelles 551B",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Les Bons Villers – Aquacenter",
+      "period": "Autumn - Week 2",
+      "eventId": 811,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Les Bons Villers",
+      "postalCode": "6210",
+      "address": "Chaussée de Bruxelles 551B",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Les Bons Villers – Aquacenter",
+      "period": "Summer - Week 1",
+      "eventId": 803,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Les Bons Villers",
+      "postalCode": "6210",
+      "address": "Chaussée de Bruxelles 551B",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Les Bons Villers – Aquacenter",
+      "period": "Summer - Week 2",
+      "eventId": 804,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Les Bons Villers",
+      "postalCode": "6210",
+      "address": "Chaussée de Bruxelles 551B",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Les Bons Villers – Aquacenter",
+      "period": "Summer - Week 3",
+      "eventId": 805,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Les Bons Villers",
+      "postalCode": "6210",
+      "address": "Chaussée de Bruxelles 551B",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Les Bons Villers – Aquacenter",
+      "period": "Summer - Week 4",
+      "eventId": 806,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Les Bons Villers",
+      "postalCode": "6210",
+      "address": "Chaussée de Bruxelles 551B",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Les Bons Villers – Aquacenter",
+      "period": "Summer - Week 5",
+      "eventId": 807,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Les Bons Villers",
+      "postalCode": "6210",
+      "address": "Chaussée de Bruxelles 551B",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Les Bons Villers – Aquacenter",
+      "period": "Summer - Week 6",
+      "eventId": 808,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Les Bons Villers",
+      "postalCode": "6210",
+      "address": "Chaussée de Bruxelles 551B",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Les Bons Villers – Aquacenter",
+      "period": "Summer - Week 7",
+      "eventId": 809,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Les Bons Villers",
+      "postalCode": "6210",
+      "address": "Chaussée de Bruxelles 551B",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Liège – Sainte-Véronique",
+      "period": "Autumn - Week 1",
+      "eventId": 710,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Liège",
+      "postalCode": "4000",
+      "address": "Rue Rennequin Sualem 13",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Liège – Sainte-Véronique",
+      "period": "Autumn - Week 2",
+      "eventId": 711,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Liège",
+      "postalCode": "4000",
+      "address": "Rue Rennequin Sualem 13",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Liège – Sainte-Véronique",
+      "period": "Summer - Week 1",
+      "eventId": 703,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Liège",
+      "postalCode": "4000",
+      "address": "Rue Rennequin Sualem 13",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Liège – Sainte-Véronique",
+      "period": "Summer - Week 2",
+      "eventId": 704,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Liège",
+      "postalCode": "4000",
+      "address": "Rue Rennequin Sualem 13",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Liège – Sainte-Véronique",
+      "period": "Summer - Week 3",
+      "eventId": 705,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Liège",
+      "postalCode": "4000",
+      "address": "Rue Rennequin Sualem 13",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Liège – Sainte-Véronique",
+      "period": "Summer - Week 4",
+      "eventId": 706,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Liège",
+      "postalCode": "4000",
+      "address": "Rue Rennequin Sualem 13",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Liège – Sainte-Véronique",
+      "period": "Summer - Week 5",
+      "eventId": 707,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Liège",
+      "postalCode": "4000",
+      "address": "Rue Rennequin Sualem 13",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Liège – Sainte-Véronique",
+      "period": "Summer - Week 6",
+      "eventId": 708,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Liège",
+      "postalCode": "4000",
+      "address": "Rue Rennequin Sualem 13",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Liège – Sainte-Véronique",
+      "period": "Summer - Week 7",
+      "eventId": 709,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Liège",
+      "postalCode": "4000",
+      "address": "Rue Rennequin Sualem 13",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Autumn - Week 1",
+      "eventId": 796,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Autumn - Week 2",
+      "eventId": 797,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 1",
+      "eventId": 789,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 1 - Special lunch box",
+      "eventId": 1168,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 2",
+      "eventId": 790,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 2 - Special lunch box",
+      "eventId": 1169,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 3",
+      "eventId": 791,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 3 - Special lunch box",
+      "eventId": 1170,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 4",
+      "eventId": 792,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 4 - Special lunch box",
+      "eventId": 1171,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 5",
+      "eventId": 793,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 5 - Special lunch box",
+      "eventId": 1172,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 6",
+      "eventId": 794,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 6 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+fallback"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 7",
+      "eventId": 795,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Summer - Week 7 - Special lunch box",
+      "eventId": 1174,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Louvain-la-Neuve – Biéreau/Martin v",
+      "period": "Winter - Week 2",
+      "eventId": 812,
+      "startDate": "2026-12-28",
+      "endDate": "2026-12-31",
+      "city": "Louvain-la-Neuve",
+      "postalCode": "1348",
+      "address": "Rue du collège 2 et 3",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nalinnes – Aquacenter",
+      "period": "Autumn - Week 1",
+      "eventId": 694,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Ham-sur-Heure-Nalinnes",
+      "postalCode": "6120",
+      "address": "Rue Nicolas Monnom 65",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nalinnes – Aquacenter",
+      "period": "Autumn - Week 2",
+      "eventId": 695,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Ham-sur-Heure-Nalinnes",
+      "postalCode": "6120",
+      "address": "Rue Nicolas Monnom 65",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nalinnes – Aquacenter",
+      "period": "Summer - Week 1",
+      "eventId": 687,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Ham-sur-Heure-Nalinnes",
+      "postalCode": "6120",
+      "address": "Rue Nicolas Monnom 65",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nalinnes – Aquacenter",
+      "period": "Summer - Week 2",
+      "eventId": 688,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Ham-sur-Heure-Nalinnes",
+      "postalCode": "6120",
+      "address": "Rue Nicolas Monnom 65",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nalinnes – Aquacenter",
+      "period": "Summer - Week 3",
+      "eventId": 689,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Ham-sur-Heure-Nalinnes",
+      "postalCode": "6120",
+      "address": "Rue Nicolas Monnom 65",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nalinnes – Aquacenter",
+      "period": "Summer - Week 4",
+      "eventId": 690,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Ham-sur-Heure-Nalinnes",
+      "postalCode": "6120",
+      "address": "Rue Nicolas Monnom 65",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nalinnes – Aquacenter",
+      "period": "Summer - Week 5",
+      "eventId": 691,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Ham-sur-Heure-Nalinnes",
+      "postalCode": "6120",
+      "address": "Rue Nicolas Monnom 65",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nalinnes – Aquacenter",
+      "period": "Summer - Week 6",
+      "eventId": 692,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Ham-sur-Heure-Nalinnes",
+      "postalCode": "6120",
+      "address": "Rue Nicolas Monnom 65",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nalinnes – Aquacenter",
+      "period": "Summer - Week 7",
+      "eventId": 693,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Ham-sur-Heure-Nalinnes",
+      "postalCode": "6120",
+      "address": "Rue Nicolas Monnom 65",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nivelles – Sotriamont",
+      "period": "Autumn - Week 1",
+      "eventId": 873,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Nivelles",
+      "postalCode": "1400",
+      "address": "Rue des Coquelets 24",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nivelles – Sotriamont",
+      "period": "Autumn - Week 2",
+      "eventId": 874,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Nivelles",
+      "postalCode": "1400",
+      "address": "Rue des Coquelets 24",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nivelles – Sotriamont",
+      "period": "Summer - Week 1",
+      "eventId": 866,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Nivelles",
+      "postalCode": "1400",
+      "address": "Rue des Coquelets 24",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nivelles – Sotriamont",
+      "period": "Summer - Week 2",
+      "eventId": 867,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Nivelles",
+      "postalCode": "1400",
+      "address": "Rue des Coquelets 24",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nivelles – Sotriamont",
+      "period": "Summer - Week 3",
+      "eventId": 868,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Nivelles",
+      "postalCode": "1400",
+      "address": "Rue des Coquelets 24",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nivelles – Sotriamont",
+      "period": "Summer - Week 4",
+      "eventId": 869,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Nivelles",
+      "postalCode": "1400",
+      "address": "Rue des Coquelets 24",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nivelles – Sotriamont",
+      "period": "Summer - Week 5",
+      "eventId": 870,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Nivelles",
+      "postalCode": "1400",
+      "address": "Rue des Coquelets 24",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nivelles – Sotriamont",
+      "period": "Summer - Week 6",
+      "eventId": 871,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Nivelles",
+      "postalCode": "1400",
+      "address": "Rue des Coquelets 24",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Nivelles – Sotriamont",
+      "period": "Summer - Week 7",
+      "eventId": 872,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Nivelles",
+      "postalCode": "1400",
+      "address": "Rue des Coquelets 24",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Perwez – Jean-Paul II",
+      "period": "Autumn - Week 1",
+      "eventId": 754,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Perwez",
+      "postalCode": "1360",
+      "address": "Rue de Brabant 35",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Perwez – Jean-Paul II",
+      "period": "Autumn - Week 2",
+      "eventId": 755,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Perwez",
+      "postalCode": "1360",
+      "address": "Rue de Brabant 35",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Perwez – Jean-Paul II",
+      "period": "Summer - Week 1",
+      "eventId": 746,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Perwez",
+      "postalCode": "1360",
+      "address": "Rue de Brabant 35",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Perwez – Jean-Paul II",
+      "period": "Summer - Week 2",
+      "eventId": 747,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Perwez",
+      "postalCode": "1360",
+      "address": "Rue de Brabant 35",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Perwez – Jean-Paul II",
+      "period": "Summer - Week 3",
+      "eventId": 749,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Perwez",
+      "postalCode": "1360",
+      "address": "Rue de Brabant 35",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Perwez – Jean-Paul II",
+      "period": "Summer - Week 4",
+      "eventId": 750,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Perwez",
+      "postalCode": "1360",
+      "address": "Rue de Brabant 35",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Perwez – Jean-Paul II",
+      "period": "Summer - Week 5",
+      "eventId": 751,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Perwez",
+      "postalCode": "1360",
+      "address": "Rue de Brabant 35",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Perwez – Jean-Paul II",
+      "period": "Summer - Week 6",
+      "eventId": 752,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Perwez",
+      "postalCode": "1360",
+      "address": "Rue de Brabant 35",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Perwez – Jean-Paul II",
+      "period": "Summer - Week 7",
+      "eventId": 753,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Perwez",
+      "postalCode": "1360",
+      "address": "Rue de Brabant 35",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Profondeville – La Hulle",
+      "period": "Summer - Week 3",
+      "eventId": 1108,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Profondeville",
+      "postalCode": "5170",
+      "address": "Avenue Roquebrune Cap Martin 32",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Profondeville – La Hulle",
+      "period": "Summer - Week 4",
+      "eventId": 1109,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Profondeville",
+      "postalCode": "5170",
+      "address": "Avenue Roquebrune Cap Martin 32",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Profondeville – La Hulle",
+      "period": "Summer - Week 5",
+      "eventId": 1110,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Profondeville",
+      "postalCode": "5170",
+      "address": "Avenue Roquebrune Cap Martin 32",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Profondeville – La Hulle",
+      "period": "Summer - Week 6",
+      "eventId": 1111,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Profondeville",
+      "postalCode": "5170",
+      "address": "Avenue Roquebrune Cap Martin 32",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Profondeville – La Hulle",
+      "period": "Summer - Week 7",
+      "eventId": 1112,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Profondeville",
+      "postalCode": "5170",
+      "address": "Avenue Roquebrune Cap Martin 32",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Waterloo – Sacrés-Cœurs Le Clos",
+      "period": "Summer - Week 1",
+      "eventId": 775,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Waterloo",
+      "postalCode": "1410",
+      "address": "Avenue Beau Séjour 16A",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Waterloo – Sacrés-Cœurs Le Clos",
+      "period": "Summer - Week 2",
+      "eventId": 776,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Waterloo",
+      "postalCode": "1410",
+      "address": "Avenue Beau Séjour 16A",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Waterloo – Sacrés-Cœurs Le Clos",
+      "period": "Summer - Week 6",
+      "eventId": 777,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Waterloo",
+      "postalCode": "1410",
+      "address": "Avenue Beau Séjour 16A",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Waterloo – Sacrés-Cœurs Le Clos",
+      "period": "Summer - Week 7",
+      "eventId": 778,
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-21",
+      "city": "Waterloo",
+      "postalCode": "1410",
+      "address": "Avenue Beau Séjour 16A",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Autumn - Week 1",
+      "eventId": 1201,
+      "startDate": "2026-10-19",
+      "endDate": "2026-10-23",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Autumn - Week 2",
+      "eventId": 1202,
+      "startDate": "2026-10-26",
+      "endDate": "2026-10-30",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Winter - Week 1",
+      "eventId": 895,
+      "startDate": "2026-12-21",
+      "endDate": "2026-12-24",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Hall des sports",
+      "period": "Winter - Week 2",
+      "eventId": 1203,
+      "startDate": "2026-12-28",
+      "endDate": "2026-12-31",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue Jacques Brel 30",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Lindthout",
+      "period": "Summer - Week 1",
+      "eventId": 779,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue des Deux Tilleuls 8",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Lindthout",
+      "period": "Summer - Week 1 - Special lunch box",
+      "eventId": 1175,
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-10",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue des Deux Tilleuls 8",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Lindthout",
+      "period": "Summer - Week 2",
+      "eventId": 780,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue des Deux Tilleuls 8",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Lindthout",
+      "period": "Summer - Week 2 - Special lunch box",
+      "eventId": 1176,
+      "startDate": "2026-07-13",
+      "endDate": "2026-07-17",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue des Deux Tilleuls 8",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Lindthout",
+      "period": "Summer - Week 3",
+      "eventId": 781,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue des Deux Tilleuls 8",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Lindthout",
+      "period": "Summer - Week 3 - Special lunch box",
+      "eventId": 1177,
+      "startDate": "2026-07-20",
+      "endDate": "2026-07-24",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue des Deux Tilleuls 8",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Lindthout",
+      "period": "Summer - Week 4",
+      "eventId": 782,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue des Deux Tilleuls 8",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Lindthout",
+      "period": "Summer - Week 4 - Special lunch box",
+      "eventId": 1178,
+      "startDate": "2026-07-27",
+      "endDate": "2026-07-31",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue des Deux Tilleuls 8",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Lindthout",
+      "period": "Summer - Week 5",
+      "eventId": 783,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue des Deux Tilleuls 8",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Lindthout",
+      "period": "Summer - Week 5 - Special lunch box",
+      "eventId": 1179,
+      "startDate": "2026-08-03",
+      "endDate": "2026-08-07",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue des Deux Tilleuls 8",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Lindthout",
+      "period": "Summer - Week 6",
+      "eventId": 784,
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue des Deux Tilleuls 8",
+      "dataSource": "manual+mya"
+    },
+    {
+      "company": "Promosport",
+      "site": "Woluwe-Saint-Lambert – Lindthout",
+      "period": "Summer - Week 6 - Special lunch box",
+      "eventId": "",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-14",
+      "city": "Woluwe-Saint-Lambert",
+      "postalCode": "1200",
+      "address": "Avenue des Deux Tilleuls 8",
+      "dataSource": "manual+fallback"
+    }
+  ],
+  "companies": [
+    {
+      "company": "Actionsport",
+      "sites": [
+        {
+          "site": "Auderghem - Lutgardiscollege",
+          "city": "Auderghem",
+          "postalCode": "1160",
+          "address": "De Wahalaan 11",
+          "periods": [
+            {
+              "period": "Summer - Week 5",
+              "eventId": 1114,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 725,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            }
+          ]
+        },
+        {
+          "site": "Auderghem – Athénée Royal",
+          "city": "Auderghem",
+          "postalCode": "1160",
+          "address": "Avenue du Parc de Woluwe, 27",
+          "periods": [
+            {
+              "period": "Summer - Week 1",
+              "eventId": 696,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 1014,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Auderghem – Centre sportif",
+          "city": "Auderghem",
+          "postalCode": "1160",
+          "address": "Chaussée de Wavre 1690 ",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 1207,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 1209,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 723,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": 724,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            }
+          ]
+        },
+        {
+          "site": "Etterbeek – Saint-Michel",
+          "city": "Etterbeek",
+          "postalCode": "1040",
+          "address": "Rue Père Eudore Devroye 12",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 1204,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 1205,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": "",
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": "",
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": "",
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": "",
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": "",
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": "",
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": "",
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Koekelberg – Centre Sportif Victoria",
+          "city": "Koekelberg",
+          "postalCode": "1081",
+          "address": "Rue Léon Autrique 4",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": "",
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": "",
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": "",
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": "",
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": "",
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Strombeek-Bever – Poneys Club Hof te Bever",
+          "city": "Strombeek-Bever",
+          "postalCode": "1853",
+          "address": "Hof te Beverlaan 195",
+          "periods": [
+            {
+              "period": "Summer - Week 0",
+              "eventId": "",
+              "startDate": "2026-06-29",
+              "endDate": "2026-07-03"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": "",
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": "",
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": "",
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": "",
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": "",
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": "",
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": "",
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            },
+            {
+              "period": "Summer - Week 8",
+              "eventId": "",
+              "startDate": "2026-08-24",
+              "endDate": "2026-08-28"
+            }
+          ]
+        },
+        {
+          "site": "Uccle – Manège de la Cambre",
+          "city": "Uccle",
+          "postalCode": "1180",
+          "address": "Chaussée de Waterloo 872",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": "",
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": "",
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": "",
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": "",
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": "",
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": "",
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": "",
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": "",
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": "",
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            },
+            {
+              "period": "Winter - Week 1",
+              "eventId": "",
+              "startDate": "2026-12-21",
+              "endDate": "2026-12-24"
+            },
+            {
+              "period": "Winter - Week 2",
+              "eventId": "",
+              "startDate": "2026-12-28",
+              "endDate": "2026-12-31"
+            }
+          ]
+        },
+        {
+          "site": "Uccle – Notre-Dame des Champs",
+          "city": "Uccle",
+          "postalCode": "1180",
+          "address": "Rue Roberts Jones 24",
+          "periods": [
+            {
+              "period": "Summer - Week 1",
+              "eventId": "",
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": "",
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": "",
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": "",
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": "",
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": "",
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Woluwe-Saint-Lambert – Hall des sports",
+          "city": "Woluwe-Saint-Lambert",
+          "postalCode": "1200",
+          "address": "Avenue Jacques Brel 30",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 1201,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 1202,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": "",
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 1 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": "",
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 2 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": "",
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 3 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": "",
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 4 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": "",
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": "",
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 6 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": "",
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            },
+            {
+              "period": "Summer - Week 7 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            },
+            {
+              "period": "Winter - Week 1",
+              "eventId": 895,
+              "startDate": "2026-12-21",
+              "endDate": "2026-12-24"
+            },
+            {
+              "period": "Winter - Week 2",
+              "eventId": 1203,
+              "startDate": "2026-12-28",
+              "endDate": "2026-12-31"
+            }
+          ]
+        },
+        {
+          "site": "Woluwe-Saint-Pierre – Sportcity/Crommelynck",
+          "city": "Woluwe-Saint-Pierre",
+          "postalCode": "1150",
+          "address": "Avenue Salomé 2",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": "",
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": "",
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 0",
+              "eventId": "",
+              "startDate": "2026-06-29",
+              "endDate": "2026-07-03"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": "",
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 1 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": "",
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 2 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": "",
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 3 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": "",
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 4 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": "",
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": "",
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 6 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": "",
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            },
+            {
+              "period": "Summer - Week 7 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            },
+            {
+              "period": "Summer - Week 8",
+              "eventId": "",
+              "startDate": "2026-08-24",
+              "endDate": "2026-08-28"
+            },
+            {
+              "period": "Winter - Week 2",
+              "eventId": "",
+              "startDate": "2026-12-28",
+              "endDate": "2026-12-31"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "company": "Promosport",
+      "sites": [
+        {
+          "site": "Auderghem - Lutgardiscollege",
+          "city": "Auderghem",
+          "postalCode": "1160",
+          "address": "De Wahalaan 11",
+          "periods": [
+            {
+              "period": "Summer - Week 5",
+              "eventId": 1114,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 725,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            }
+          ]
+        },
+        {
+          "site": "Auderghem – Athénée Royal",
+          "city": "Auderghem",
+          "postalCode": "1160",
+          "address": "Avenue du Parc de Woluwe, 27",
+          "periods": [
+            {
+              "period": "Summer - Week 1",
+              "eventId": 696,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 1014,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Auderghem – Centre sportif",
+          "city": "Auderghem",
+          "postalCode": "1160",
+          "address": "Chaussée de Wavre 1690 ",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 1207,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 1209,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 723,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": 724,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            }
+          ]
+        },
+        {
+          "site": "Bierges – Le Verseau",
+          "city": "Bierges",
+          "postalCode": "1301",
+          "address": "Rue de Wavre 60",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 740,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 741,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": 721,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 722,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": 726,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": 727,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": 728,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 729,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 730,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            },
+            {
+              "period": "Winter - Week 1",
+              "eventId": 742,
+              "startDate": "2026-12-21",
+              "endDate": "2026-12-24"
+            },
+            {
+              "period": "Winter - Week 2",
+              "eventId": 743,
+              "startDate": "2026-12-28",
+              "endDate": "2026-12-31"
+            }
+          ]
+        },
+        {
+          "site": "Braine-l'Alleud – Cardinal Mercier",
+          "city": "Braine-l'Alleud",
+          "postalCode": "1420",
+          "address": "Chaussée de Mont-St-Jean 83",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 860,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 861,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": 853,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 1 - Special lunch box",
+              "eventId": 1154,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 854,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 2 - Special lunch box",
+              "eventId": 1155,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": 855,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 3 - Special lunch box",
+              "eventId": 1156,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": 856,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 4 - Special lunch box",
+              "eventId": 1157,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": 857,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 5 - Special lunch box",
+              "eventId": 1158,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 858,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 6 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 859,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            },
+            {
+              "period": "Summer - Week 7 - Special lunch box",
+              "eventId": 1160,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            },
+            {
+              "period": "Winter - Week 1",
+              "eventId": 862,
+              "startDate": "2026-12-21",
+              "endDate": "2026-12-24"
+            },
+            {
+              "period": "Winter - Week 2",
+              "eventId": 863,
+              "startDate": "2026-12-28",
+              "endDate": "2026-12-31"
+            }
+          ]
+        },
+        {
+          "site": "Eghezée – Abbé Noël",
+          "city": "Eghezée",
+          "postalCode": "5310",
+          "address": "Route de Gembloux 32",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 772,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 773,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": 758,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 759,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": 760,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 770,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 771,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Embourg – Sartay",
+          "city": "Embourg",
+          "postalCode": "4053",
+          "address": "Rue Pierre Henvard 64",
+          "periods": [
+            {
+              "period": "Summer - Week 1",
+              "eventId": 1016,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 1018,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 1019,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Etterbeek – Saint-Michel",
+          "city": "Etterbeek",
+          "postalCode": "1040",
+          "address": "Rue Père Eudore Devroye 12",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 1204,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 1205,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            }
+          ]
+        },
+        {
+          "site": "Gembloux – Chapelle-Dieu",
+          "city": "Gembloux",
+          "postalCode": "5030",
+          "address": "Rue Chapelle Dieu 48",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 893,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 894,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": 877,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 878,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": 883,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": 885,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": 886,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 891,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 892,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Grez-Doiceau – Centre sportif",
+          "city": "Grez-Doiceau",
+          "postalCode": "1390",
+          "address": "Chaussée de Wavre 99",
+          "periods": [
+            {
+              "period": "Summer - Week 5",
+              "eventId": 713,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 714,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 715,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Hamme-Mille – Ecole autonome",
+          "city": "Hamme-Mille",
+          "postalCode": "1320",
+          "address": "Rue René Ménada  12",
+          "periods": [
+            {
+              "period": "Summer - Week 1",
+              "eventId": 678,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 679,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            }
+          ]
+        },
+        {
+          "site": "Jambes – Athenée",
+          "city": "Jambes",
+          "postalCode": "5100",
+          "address": "Rue de Géronsart 150, 5100 Namur",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 847,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 848,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": 830,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 1 - Special lunch box",
+              "eventId": 1161,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 831,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 2 - Special lunch box",
+              "eventId": 1162,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": 832,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 3 - Special lunch box",
+              "eventId": 1163,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": 843,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 4 - Special lunch box",
+              "eventId": 1164,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": 845,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 5 - Special lunch box",
+              "eventId": 1165,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 846,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 6 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Winter - Week 1",
+              "eventId": 849,
+              "startDate": "2026-12-21",
+              "endDate": "2026-12-24"
+            },
+            {
+              "period": "Winter - Week 2",
+              "eventId": 850,
+              "startDate": "2026-12-28",
+              "endDate": "2026-12-31"
+            }
+          ]
+        },
+        {
+          "site": "Les Bons Villers – Aquacenter",
+          "city": "Les Bons Villers",
+          "postalCode": "6210",
+          "address": "Chaussée de Bruxelles 551B",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 810,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 811,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": 803,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 804,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": 805,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": 806,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": 807,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 808,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 809,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Liège – Sainte-Véronique",
+          "city": "Liège",
+          "postalCode": "4000",
+          "address": "Rue Rennequin Sualem 13",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 710,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 711,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": 703,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 704,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": 705,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": 706,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": 707,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 708,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 709,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Louvain-la-Neuve – Biéreau/Martin v",
+          "city": "Louvain-la-Neuve",
+          "postalCode": "1348",
+          "address": "Rue du collège 2 et 3",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 796,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 797,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": 789,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 1 - Special lunch box",
+              "eventId": 1168,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 790,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 2 - Special lunch box",
+              "eventId": 1169,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": 791,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 3 - Special lunch box",
+              "eventId": 1170,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": 792,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 4 - Special lunch box",
+              "eventId": 1171,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": 793,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 5 - Special lunch box",
+              "eventId": 1172,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 794,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 6 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 795,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            },
+            {
+              "period": "Summer - Week 7 - Special lunch box",
+              "eventId": 1174,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            },
+            {
+              "period": "Winter - Week 2",
+              "eventId": 812,
+              "startDate": "2026-12-28",
+              "endDate": "2026-12-31"
+            }
+          ]
+        },
+        {
+          "site": "Nalinnes – Aquacenter",
+          "city": "Ham-sur-Heure-Nalinnes",
+          "postalCode": "6120",
+          "address": "Rue Nicolas Monnom 65",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 694,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 695,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": 687,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 688,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": 689,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": 690,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": 691,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 692,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 693,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Nivelles – Sotriamont",
+          "city": "Nivelles",
+          "postalCode": "1400",
+          "address": "Rue des Coquelets 24",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 873,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 874,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": 866,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 867,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": 868,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": 869,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": 870,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 871,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 872,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Perwez – Jean-Paul II",
+          "city": "Perwez",
+          "postalCode": "1360",
+          "address": "Rue de Brabant 35",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 754,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 755,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Summer - Week 1",
+              "eventId": 746,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 747,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": 749,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": 750,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": 751,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 752,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 753,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Profondeville – La Hulle",
+          "city": "Profondeville",
+          "postalCode": "5170",
+          "address": "Avenue Roquebrune Cap Martin 32",
+          "periods": [
+            {
+              "period": "Summer - Week 3",
+              "eventId": 1108,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": 1109,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": 1110,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 1111,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 1112,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Waterloo – Sacrés-Cœurs Le Clos",
+          "city": "Waterloo",
+          "postalCode": "1410",
+          "address": "Avenue Beau Séjour 16A",
+          "periods": [
+            {
+              "period": "Summer - Week 1",
+              "eventId": 775,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 776,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 777,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 7",
+              "eventId": 778,
+              "startDate": "2026-08-17",
+              "endDate": "2026-08-21"
+            }
+          ]
+        },
+        {
+          "site": "Woluwe-Saint-Lambert – Hall des sports",
+          "city": "Woluwe-Saint-Lambert",
+          "postalCode": "1200",
+          "address": "Avenue Jacques Brel 30",
+          "periods": [
+            {
+              "period": "Autumn - Week 1",
+              "eventId": 1201,
+              "startDate": "2026-10-19",
+              "endDate": "2026-10-23"
+            },
+            {
+              "period": "Autumn - Week 2",
+              "eventId": 1202,
+              "startDate": "2026-10-26",
+              "endDate": "2026-10-30"
+            },
+            {
+              "period": "Winter - Week 1",
+              "eventId": 895,
+              "startDate": "2026-12-21",
+              "endDate": "2026-12-24"
+            },
+            {
+              "period": "Winter - Week 2",
+              "eventId": 1203,
+              "startDate": "2026-12-28",
+              "endDate": "2026-12-31"
+            }
+          ]
+        },
+        {
+          "site": "Woluwe-Saint-Lambert – Lindthout",
+          "city": "Woluwe-Saint-Lambert",
+          "postalCode": "1200",
+          "address": "Avenue des Deux Tilleuls 8",
+          "periods": [
+            {
+              "period": "Summer - Week 1",
+              "eventId": 779,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 1 - Special lunch box",
+              "eventId": 1175,
+              "startDate": "2026-07-06",
+              "endDate": "2026-07-10"
+            },
+            {
+              "period": "Summer - Week 2",
+              "eventId": 780,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 2 - Special lunch box",
+              "eventId": 1176,
+              "startDate": "2026-07-13",
+              "endDate": "2026-07-17"
+            },
+            {
+              "period": "Summer - Week 3",
+              "eventId": 781,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 3 - Special lunch box",
+              "eventId": 1177,
+              "startDate": "2026-07-20",
+              "endDate": "2026-07-24"
+            },
+            {
+              "period": "Summer - Week 4",
+              "eventId": 782,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 4 - Special lunch box",
+              "eventId": 1178,
+              "startDate": "2026-07-27",
+              "endDate": "2026-07-31"
+            },
+            {
+              "period": "Summer - Week 5",
+              "eventId": 783,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 5 - Special lunch box",
+              "eventId": 1179,
+              "startDate": "2026-08-03",
+              "endDate": "2026-08-07"
+            },
+            {
+              "period": "Summer - Week 6",
+              "eventId": 784,
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            },
+            {
+              "period": "Summer - Week 6 - Special lunch box",
+              "eventId": "",
+              "startDate": "2026-08-10",
+              "endDate": "2026-08-14"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

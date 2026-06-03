@@ -1,0 +1,252 @@
+Actionsport:
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 0
+Strombeek-Bever – Poneys Club Hof te Bever ; Eté - semaine 0
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 1 - Spécial lunch box
+Woluwe-Saint-Lambert – Hall des sports ; Eté - semaine 1 - Spécial lunch box
+Auderghem – Athénée Royal ; Eté - semaine 1
+Woluwe-Saint-Lambert – Hall des sports ; Eté - semaine 1
+Etterbeek – Saint-Michel ; Eté - semaine 1
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 1
+Uccle – Manège de la Cambre ; Eté - semaine 1
+Strombeek-Bever – Poneys Club Hof te Bever ; Eté - semaine 1
+Uccle – Notre-Dame des Champs ; Eté - semaine 1
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 2 - Spécial lunch box
+Woluwe-Saint-Lambert – Hall des sports ; Eté - semaine 2 - Spécial lunch box
+Auderghem – Centre sportif ; Eté - semaine 2
+Woluwe-Saint-Lambert – Hall des sports ; Eté - semaine 2
+Etterbeek – Saint-Michel ; Eté - semaine 2
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 2
+Uccle – Manège de la Cambre ; Eté - semaine 2
+Strombeek-Bever – Poneys Club Hof te Bever ; Eté - semaine 2
+Uccle – Notre-Dame des Champs ; Eté - semaine 2
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 3 - Spécial lunch box
+Woluwe-Saint-Lambert – Hall des sports ; Eté - semaine 3 - Spécial lunch box
+Auderghem – Centre sportif ; Eté - semaine 3
+Woluwe-Saint-Lambert – Hall des sports ; Eté - semaine 3
+Etterbeek – Saint-Michel ; Eté - semaine 3
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 3
+Uccle – Manège de la Cambre ; Eté - semaine 3
+Strombeek-Bever – Poneys Club Hof te Bever ; Eté - semaine 3
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 4 - Spécial lunch box
+Woluwe-Saint-Lambert – Hall des sports ; Eté - semaine 4 - Spécial lunch box
+Woluwe-Saint-Lambert – Hall des sports ; Eté - semaine 4
+Etterbeek – Saint-Michel ; Eté - semaine 4
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 4
+Uccle – Manège de la Cambre ; Eté - semaine 4
+Strombeek-Bever – Poneys Club Hof te Bever ; Eté - semaine 4
+Uccle – Notre-Dame des Champs ; Eté - semaine 4
+Woluwe-Saint-Lambert – Hall des sports ; Eté - semaine 5
+Etterbeek – Saint-Michel ; Eté - semaine 5
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 5
+Koekelberg – Centre Sportif Victoria ; Eté - semaine 5
+Uccle – Manège de la Cambre ; Eté - semaine 5
+Strombeek-Bever – Poneys Club Hof te Bever ; Eté - semaine 5
+Auderghem - Lutgardiscollege ; Eté - semaine 5
+Uccle – Notre-Dame des Champs ; Eté - semaine 5
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 6 - Spécial lunch box
+Woluwe-Saint-Lambert – Hall des sports ; Eté - semaine 6 - Spécial lunch box
+Auderghem - Lutgardiscollege ; Eté - semaine 6
+Woluwe-Saint-Lambert – Hall des sports ; Eté - semaine 6
+Etterbeek – Saint-Michel ; Eté - semaine 6
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 6
+Koekelberg – Centre Sportif Victoria ; Eté - semaine 6
+Uccle – Manège de la Cambre ; Eté - semaine 6
+Strombeek-Bever – Poneys Club Hof te Bever ; Eté - semaine 6
+Uccle – Notre-Dame des Champs ; Eté - semaine 6
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 7 - Spécial lunch box
+Woluwe-Saint-Lambert – Hall des sports ; Eté - semaine 7 - Spécial lunch box
+Auderghem – Athénée Royal ; Eté - semaine 7
+Woluwe-Saint-Lambert – Hall des sports ; Eté - semaine 7
+Etterbeek – Saint-Michel ; Eté - semaine 7
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 7
+Koekelberg – Centre Sportif Victoria ; Eté - semaine 7
+Uccle – Manège de la Cambre ; Eté - semaine 7
+Strombeek-Bever – Poneys Club Hof te Bever ; Eté - semaine 7
+Uccle – Notre-Dame des Champs ; Eté - semaine 7
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Eté - semaine 8
+Strombeek-Bever – Poneys Club Hof te Bever ; Eté - semaine 8
+Woluwe-Saint-Lambert – Hall des sports ; Automne - semaine 1
+Etterbeek – Saint-Michel ; Automne - semaine 1
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Automne - semaine 1
+Koekelberg – Centre Sportif Victoria ; Automne - semaine 1
+Uccle – Manège de la Cambre ; Automne - semaine 1
+Auderghem – Centre sportif ; Automne - semaine 1
+Woluwe-Saint-Lambert – Hall des sports ; Automne - semaine 2
+Etterbeek – Saint-Michel ; Automne - semaine 2
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Automne - semaine 2
+Koekelberg – Centre Sportif Victoria ; Automne - semaine 2
+Uccle – Manège de la Cambre ; Automne - semaine 2
+Auderghem – Centre sportif ; Automne - semaine 2
+Woluwe-Saint-Lambert – Hall des sports ; Hiver - semaine 1
+Uccle – Manège de la Cambre ; Hiver - semaine 1
+Woluwe-Saint-Lambert – Hall des sports ; Hiver - semaine 2
+Woluwe-Saint-Pierre – Sportcity/Crommelynck ; Hiver - semaine 2
+Uccle – Manège de la Cambre ; Hiver - semaine 2
+
+Promosport:
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 1 - Spécial lunch box
+Jambes – Athenée ; Eté - semaine 1 - Spécial lunch box
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 1 - Spécial lunch box
+Woluwe-Saint-Lambert – Lindthout ; Eté - semaine 1 - Spécial lunch box
+Hamme-Mille – Ecole autonome ; Eté - semaine 1
+Nalinnes – Aquacenter ; Eté - semaine 1
+Auderghem – Athénée Royal ; Eté - semaine 1
+Liège – Sainte-Véronique ; Eté - semaine 1
+Bierges – Le Verseau ; Eté - semaine 1
+Perwez – Jean-Paul II ; Eté - semaine 1
+Eghezée – Abbé Noël ; Eté - semaine 1
+Waterloo – Sacrés-Cœurs Le Clos ; Eté - semaine 1
+Woluwe-Saint-Lambert – Lindthout ; Eté - semaine 1
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 1
+Les Bons Villers – Aquacenter ; Eté - semaine 1
+Jambes – Athenée ; Eté - semaine 1
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 1
+Nivelles – Sotriamont ; Eté - semaine 1
+Gembloux – Chapelle-Dieu ; Eté - semaine 1
+Embourg – Sartay ; Eté - semaine 1
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 2 - Spécial lunch box
+Jambes – Athenée ; Eté - semaine 2 - Spécial lunch box
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 2 - Spécial lunch box
+Woluwe-Saint-Lambert – Lindthout ; Eté - semaine 2 - Spécial lunch box
+Hamme-Mille – Ecole autonome ; Eté - semaine 2
+Nalinnes – Aquacenter ; Eté - semaine 2
+Liège – Sainte-Véronique ; Eté - semaine 2
+Bierges – Le Verseau ; Eté - semaine 2
+Auderghem – Centre sportif ; Eté - semaine 2
+Perwez – Jean-Paul II ; Eté - semaine 2
+Eghezée – Abbé Noël ; Eté - semaine 2
+Waterloo – Sacrés-Cœurs Le Clos ; Eté - semaine 2
+Woluwe-Saint-Lambert – Lindthout ; Eté - semaine 2
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 2
+Les Bons Villers – Aquacenter ; Eté - semaine 2
+Jambes – Athenée ; Eté - semaine 2
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 2
+Nivelles – Sotriamont ; Eté - semaine 2
+Gembloux – Chapelle-Dieu ; Eté - semaine 2
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 3 - Spécial lunch box
+Jambes – Athenée ; Eté - semaine 3 - Spécial lunch box
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 3 - Spécial lunch box
+Woluwe-Saint-Lambert – Lindthout ; Eté - semaine 3 - Spécial lunch box
+Nalinnes – Aquacenter ; Eté - semaine 3
+Liège – Sainte-Véronique ; Eté - semaine 3
+Auderghem – Centre sportif ; Eté - semaine 3
+Bierges – Le Verseau ; Eté - semaine 3
+Perwez – Jean-Paul II ; Eté - semaine 3
+Woluwe-Saint-Lambert – Lindthout ; Eté - semaine 3
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 3
+Les Bons Villers – Aquacenter ; Eté - semaine 3
+Jambes – Athenée ; Eté - semaine 3
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 3
+Nivelles – Sotriamont ; Eté - semaine 3
+Gembloux – Chapelle-Dieu ; Eté - semaine 3
+Profondeville – La Hulle ; Eté - semaine 3
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 4 - Spécial lunch box
+Jambes – Athenée ; Eté - semaine 4 - Spécial lunch box
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 4 - Spécial lunch box
+Woluwe-Saint-Lambert – Lindthout ; Eté - semaine 4 - Spécial lunch box
+Nalinnes – Aquacenter ; Eté - semaine 4
+Liège – Sainte-Véronique ; Eté - semaine 4
+Bierges – Le Verseau ; Eté - semaine 4
+Perwez – Jean-Paul II ; Eté - semaine 4
+Woluwe-Saint-Lambert – Lindthout ; Eté - semaine 4
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 4
+Les Bons Villers – Aquacenter ; Eté - semaine 4
+Jambes – Athenée ; Eté - semaine 4
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 4
+Nivelles – Sotriamont ; Eté - semaine 4
+Gembloux – Chapelle-Dieu ; Eté - semaine 4
+Profondeville – La Hulle ; Eté - semaine 4
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 5 - Spécial lunch box
+Jambes – Athenée ; Eté - semaine 5 - Spécial lunch box
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 5 - Spécial lunch box
+Woluwe-Saint-Lambert – Lindthout ; Eté - semaine 5 - Spécial lunch box
+Nalinnes – Aquacenter ; Eté - semaine 5
+Liège – Sainte-Véronique ; Eté - semaine 5
+Grez-Doiceau – Centre sportif ; Eté - semaine 5
+Bierges – Le Verseau ; Eté - semaine 5
+Perwez – Jean-Paul II ; Eté - semaine 5
+Eghezée – Abbé Noël ; Eté - semaine 5
+Woluwe-Saint-Lambert – Lindthout ; Eté - semaine 5
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 5
+Les Bons Villers – Aquacenter ; Eté - semaine 5
+Jambes – Athenée ; Eté - semaine 5
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 5
+Nivelles – Sotriamont ; Eté - semaine 5
+Gembloux – Chapelle-Dieu ; Eté - semaine 5
+Profondeville – La Hulle ; Eté - semaine 5
+Auderghem - Lutgardiscollege ; Eté - semaine 5
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 6 - Spécial lunch box
+Jambes – Athenée ; Eté - semaine 6 - Spécial lunch box
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 6 - Spécial lunch box
+Woluwe-Saint-Lambert – Lindthout ; Eté - semaine 6 - Spécial lunch box
+Nalinnes – Aquacenter ; Eté - semaine 6
+Liège – Sainte-Véronique ; Eté - semaine 6
+Grez-Doiceau – Centre sportif ; Eté - semaine 6
+Auderghem - Lutgardiscollege ; Eté - semaine 6
+Bierges – Le Verseau ; Eté - semaine 6
+Perwez – Jean-Paul II ; Eté - semaine 6
+Eghezée – Abbé Noël ; Eté - semaine 6
+Waterloo – Sacrés-Cœurs Le Clos ; Eté - semaine 6
+Woluwe-Saint-Lambert – Lindthout ; Eté - semaine 6
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 6
+Les Bons Villers – Aquacenter ; Eté - semaine 6
+Jambes – Athenée ; Eté - semaine 6
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 6
+Nivelles – Sotriamont ; Eté - semaine 6
+Gembloux – Chapelle-Dieu ; Eté - semaine 6
+Embourg – Sartay ; Eté - semaine 6
+Profondeville – La Hulle ; Eté - semaine 6
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 7 - Spécial lunch box
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 7 - Spécial lunch box
+Nalinnes – Aquacenter ; Eté - semaine 7
+Liège – Sainte-Véronique ; Eté - semaine 7
+Grez-Doiceau – Centre sportif ; Eté - semaine 7
+Bierges – Le Verseau ; Eté - semaine 7
+Perwez – Jean-Paul II ; Eté - semaine 7
+Eghezée – Abbé Noël ; Eté - semaine 7
+Waterloo – Sacrés-Cœurs Le Clos ; Eté - semaine 7
+Louvain-la-Neuve – Biéreau/Martin v ; Eté - semaine 7
+Les Bons Villers – Aquacenter ; Eté - semaine 7
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 7
+Nivelles – Sotriamont ; Eté - semaine 7
+Gembloux – Chapelle-Dieu ; Eté - semaine 7
+Auderghem – Athénée Royal ; Eté - semaine 7
+Embourg – Sartay ; Eté - semaine 7
+Profondeville – La Hulle ; Eté - semaine 7
+Nalinnes – Aquacenter ; Automne - semaine 1
+Liège – Sainte-Véronique ; Automne - semaine 1
+Bierges – Le Verseau ; Automne - semaine 1
+Perwez – Jean-Paul II ; Automne - semaine 1
+Eghezée – Abbé Noël ; Automne - semaine 1
+Louvain-la-Neuve – Biéreau/Martin v ; Automne - semaine 1
+Les Bons Villers – Aquacenter ; Automne - semaine 1
+Jambes – Athenée ; Automne - semaine 1
+Braine-l'Alleud – Cardinal Mercier ; Automne - semaine 1
+Nivelles – Sotriamont ; Automne - semaine 1
+Gembloux – Chapelle-Dieu ; Automne - semaine 1
+Woluwe-Saint-Lambert – Hall des sports ; Automne - semaine 1
+Etterbeek – Saint-Michel ; Automne - semaine 1
+Auderghem – Centre sportif ; Automne - semaine 1
+Nalinnes – Aquacenter ; Automne - semaine 2
+Liège – Sainte-Véronique ; Automne - semaine 2
+Bierges – Le Verseau ; Automne - semaine 2
+Perwez – Jean-Paul II ; Automne - semaine 2
+Eghezée – Abbé Noël ; Automne - semaine 2
+Louvain-la-Neuve – Biéreau/Martin v ; Automne - semaine 2
+Les Bons Villers – Aquacenter ; Automne - semaine 2
+Jambes – Athenée ; Automne - semaine 2
+Braine-l'Alleud – Cardinal Mercier ; Automne - semaine 2
+Nivelles – Sotriamont ; Automne - semaine 2
+Gembloux – Chapelle-Dieu ; Automne - semaine 2
+Woluwe-Saint-Lambert – Hall des sports ; Automne - semaine 2
+Etterbeek – Saint-Michel ; Automne - semaine 2
+Auderghem – Centre sportif ; Automne - semaine 2
+Bierges – Le Verseau ; Hiver - semaine 1
+Jambes – Athenée ; Hiver - semaine 1
+Braine-l'Alleud – Cardinal Mercier ; Hiver - semaine 1
+Woluwe-Saint-Lambert – Hall des sports ; Hiver - semaine 1
+Bierges – Le Verseau ; Hiver - semaine 2
+Louvain-la-Neuve – Biéreau/Martin v ; Hiver - semaine 2
+Jambes – Athenée ; Hiver - semaine 2
+Braine-l'Alleud – Cardinal Mercier ; Hiver - semaine 2
+Woluwe-Saint-Lambert – Hall des sports ; Hiver - semaine 2

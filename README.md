@@ -122,6 +122,48 @@ Export CSV instead of JSON:
 npm run parse:mya -- --discipline "Mixed games" --format csv --out mya-mixed-games.csv
 ```
 
+Export company, site, and period rows from the manual period source, enriched with MYA dates and addresses where available:
+
+```bash
+npm run parse:mya-periods -- --out mya-periods.json
+```
+
+The periods-only parser reads `mya-periods.txt` by default. That file uses `Company:` headers and `Site ; Period` rows. The parser keeps that list as the source of truth, enriches matching rows from the MYA API, and falls back to known period dates and site addresses for rows that MYA does not expose through the public listing.
+
+Import the periods-only JSON into the app as folders:
+
+```bash
+npm run import:mya-periods -- --file mya-periods.json --username admin --password "your-password"
+```
+
+This creates only the top-level camp structure:
+
+```text
+Company
+└── Site
+    └── Period
+```
+
+If you only need to convert a manually copied period list without API enrichment, save it as plain text with `Company:` headers and `Site ; Period` rows:
+
+```text
+Actionsport:
+Auderghem – Athénée Royal ; Eté - semaine 1
+
+Promosport:
+Braine-l'Alleud – Cardinal Mercier ; Eté - semaine 1
+```
+
+```bash
+npm run convert:mya-periods -- --file mya-periods.txt --out mya-periods.json
+```
+
+For a file that contains only one company and no header:
+
+```bash
+npm run convert:mya-periods -- --file promosport.txt --default-company Promosport --out mya-periods.json
+```
+
 Example row:
 
 ```json
@@ -148,8 +190,10 @@ npm run server
 Then, in another terminal, run:
 
 ```bash
-npm run import:mya -- --file mya-stages.json
+npm run import:mya -- --file mya-stages.json --username admin --password "your-password"
 ```
+
+You can also set `MYA_ADMIN_USERNAME` and `MYA_ADMIN_PASSWORD` instead of passing credentials in the command.
 
 Preview the import without creating folders:
 

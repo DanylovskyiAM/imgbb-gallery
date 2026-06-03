@@ -8,7 +8,10 @@
     "dev": "concurrently \"npm run server:watch\" \"npm run client\"",
     "seed:folders": "node scripts/create-folder-structure.js",
     "parse:mya": "node scripts/parse-mya-stages.js",
-    "import:mya": "node scripts/import-mya-stages.js"
+    "parse:mya-periods": "node scripts/parse-mya-periods.js",
+    "convert:mya-periods": "node scripts/convert-mya-periods-text.js",
+    "import:mya": "node scripts/import-mya-stages.js",
+    "import:mya-periods": "node scripts/import-mya-periods.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",
