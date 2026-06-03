@@ -2,7 +2,6 @@ const uploadForm = document.getElementById("uploadForm");
 const uploadInput = document.getElementById("uploadInput");
 const uploadButton = uploadForm.querySelector("button[type='submit']");
 const periodSelect = document.getElementById("periodSelect");
-const disciplineSelect = document.getElementById("disciplineSelect");
 const expirationSelect = document.getElementById("expirationSelect");
 const uploadStatus = document.getElementById("uploadStatus");
 const uploadResults = document.getElementById("uploadResults");
@@ -36,9 +35,8 @@ if (folderParam) {
   loadFolderContext(folderParam);
 } else {
   periodSelect.disabled = true;
-  disciplineSelect.disabled = true;
   updateUploadButtonState();
-  uploadSubtitle.textContent = "Open upload from a location, period, or discipline folder";
+  uploadSubtitle.textContent = "Open upload from a location or period folder";
 }
 
 updateUploadButtonState();
@@ -68,7 +66,6 @@ async function loadFolderContext(folderId) {
   } catch (err) {
     uploadSubtitle.textContent = `Upload to folder: ${folderId}`;
     periodSelect.disabled = true;
-    disciplineSelect.disabled = true;
     updateUploadButtonState();
     setStatus("Folder was not found. Open upload from the manage page.", true);
   }
@@ -142,8 +139,7 @@ function resolveFolderContext(folder) {
   return {
     company: ancestors[0] || null,
     location: ancestors[1] || null,
-    period: ancestors[2] || null,
-    discipline: ancestors[3] || null
+    period: ancestors[2] || null
   };
 }
 
@@ -153,41 +149,27 @@ function applyFolderContext(folder) {
   if (!context.location) {
     uploadSubtitle.textContent = `Upload to folder: ${getFolderDisplayPath(folder)}`;
     periodSelect.disabled = true;
-    disciplineSelect.disabled = true;
     updateUploadButtonState();
-    setStatus("Choose a location, period, or discipline folder from manage page.", true);
+    setStatus("Choose a location or period folder from manage page.", true);
     return;
   }
 
   currentLocation = context.location;
   uploadSubtitle.textContent = `Upload to location: ${getFolderDisplayPath(currentLocation)}`;
   periodSelect.disabled = false;
-  disciplineSelect.disabled = false;
 
   setSelectOptions(periodSelect, getChildFolders(currentLocation.id), "Select period");
   periodSelect.value = context.period?.id || "";
-  updateDisciplineOptions(context.discipline?.id || "");
   updateSelectedUploadFolder();
 }
 
-function updateDisciplineOptions(selectedDisciplineId = "") {
-  const period = folderById.get(periodSelect.value);
-  const disciplines = period ? getChildFolders(period.id) : [];
-
-  setSelectOptions(disciplineSelect, disciplines, period ? "Select discipline" : "Select period first");
-  disciplineSelect.disabled = !period;
-  disciplineSelect.value = selectedDisciplineId && disciplines.some(item => item.id === selectedDisciplineId)
-    ? selectedDisciplineId
-    : "";
-}
-
 function updateSelectedUploadFolder() {
-  const discipline = folderById.get(disciplineSelect.value);
-  selectedUploadFolderId = discipline?.id || "";
+  const period = folderById.get(periodSelect.value);
+  selectedUploadFolderId = period?.id || "";
   updateUploadButtonState();
 
-  if (discipline) {
-    uploadSubtitle.textContent = `Upload to folder: ${getFolderDisplayPath(discipline)}`;
+  if (period) {
+    uploadSubtitle.textContent = `Upload to folder: ${getFolderDisplayPath(period)}`;
     setStatus("");
   } else if (currentLocation) {
     uploadSubtitle.textContent = `Upload to location: ${getFolderDisplayPath(currentLocation)}`;
@@ -195,7 +177,7 @@ function updateSelectedUploadFolder() {
 }
 
 function updateUploadButtonState(isUploading = false) {
-  uploadButton.disabled = isUploading || !periodSelect.value || !disciplineSelect.value || !selectedUploadFolderId;
+  uploadButton.disabled = isUploading || !periodSelect.value || !selectedUploadFolderId;
 }
 
 function readFileAsDataUrl(file) {
@@ -392,7 +374,7 @@ uploadForm.onsubmit = async (e) => {
   const files = Array.from(uploadInput.files || []);
 
   if (!selectedUploadFolderId) {
-    setStatus("Select a period and discipline before uploading.", true);
+    setStatus("Select a period before uploading.", true);
     return;
   }
 
@@ -430,11 +412,8 @@ uploadForm.onsubmit = async (e) => {
 };
 
 periodSelect.onchange = () => {
-  updateDisciplineOptions();
   updateSelectedUploadFolder();
 };
-
-disciplineSelect.onchange = updateSelectedUploadFolder;
 
 closeBtn.onclick = closeModal;
 nextBtn.onclick = nextPreview;

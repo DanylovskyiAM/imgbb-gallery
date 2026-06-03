@@ -797,7 +797,7 @@ function renderFolderNode(folder, depth = 0) {
     uploadLink.classList.add("is-disabled");
     uploadLink.setAttribute("aria-disabled", "true");
     uploadLink.removeAttribute("href");
-    uploadLink.title = "Open a location, period, or discipline folder to upload";
+    uploadLink.title = "Open a location or period folder to upload";
   }
 
   item.append(info, meta, actions);
