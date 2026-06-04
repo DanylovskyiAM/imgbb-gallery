@@ -27,6 +27,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 const exportModal = document.getElementById("exportModal");
 const exportBackupBtn = document.getElementById("exportBackupBtn");
 const exportExcelBtn = document.getElementById("exportExcelBtn");
+const excelExportModeInputs = document.querySelectorAll("input[name='excelExportMode']");
 const cancelExport = document.getElementById("cancelExport");
 const openImportDbBtn = document.getElementById("openImportDbBtn");
 const importDbModal = document.getElementById("importDbModal");
@@ -299,6 +300,28 @@ function getLeafFolders() {
     .sort((a, b) => (a.path || a.name).localeCompare(b.path || b.name));
 }
 
+function getFolderDepth(folder) {
+  let depth = 0;
+  let parentId = folder.parentId;
+
+  while (parentId) {
+    depth += 1;
+    parentId = folderById.get(parentId)?.parentId || null;
+  }
+
+  return depth;
+}
+
+function getSiteFolders() {
+  return folders
+    .filter(folder => getFolderDepth(folder) === 1)
+    .sort((a, b) => (a.path || a.name).localeCompare(b.path || b.name));
+}
+
+function getExcelExportMode() {
+  return [...excelExportModeInputs].find(input => input.checked)?.value || "periods";
+}
+
 function getFolderParentPath(folder) {
   if (!folder.parentId) {
     return "Root";
@@ -492,6 +515,8 @@ function csvCell(value) {
 
 function exportFoldersToExcel() {
   const origin = window.location.origin;
+  const mode = getExcelExportMode();
+  const exportFolders = mode === "sites" ? getSiteFolders() : getLeafFolders();
   const rows = [
     [
       "Path",
@@ -501,7 +526,7 @@ function exportFoldersToExcel() {
       "Uploading",
       "Viewing"
     ],
-    ...getLeafFolders().map(folder => [
+    ...exportFolders.map(folder => [
       getFolderParentPath(folder),
       folder.name,
       folder.filesCount,
@@ -515,7 +540,7 @@ function exportFoldersToExcel() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `folders-export-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.download = `${mode}-folders-export-${new Date().toISOString().slice(0, 10)}.csv`;
   document.body.appendChild(link);
   link.click();
   link.remove();

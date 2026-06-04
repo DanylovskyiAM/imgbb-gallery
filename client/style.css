@@ -1256,6 +1256,49 @@ body.modal-open {
   gap: 10px;
 }
 
+.excel-export-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin: 34px 0 0;
+  padding: 2px;
+  border: 1px solid #cccce0;
+  border-radius: 4px;
+  background: #f4f4f7;
+}
+
+.excel-export-mode label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  color: #52525c;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.excel-export-mode input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.excel-export-mode span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 30px;
+  border-radius: 3px;
+}
+
+.excel-export-mode input:checked + span {
+  background: white;
+  color: #18181b;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+}
+
 .export-options button {
   min-height: 34px;
   padding: 5px 12px;

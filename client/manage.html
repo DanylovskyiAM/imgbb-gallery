@@ -92,9 +92,18 @@
     <h3>Export</h3>
     <div class="export-options">
       <button id="exportBackupBtn" type="button">Export DB backup</button>
+      <fieldset class="excel-export-mode" aria-label="Excel export folder type">
+        <label>
+          <input type="radio" name="excelExportMode" value="sites" />
+          <span>Site folders</span>
+        </label>
+        <label>
+          <input type="radio" name="excelExportMode" value="periods" checked />
+          <span>Periods folders</span>
+        </label>
+      </fieldset>
       <button id="exportExcelBtn" type="button">Export to Excel</button>
     </div>
-    <p class="import-status">Excel export includes only folders without child folders.</p>
     <div class="edit-folder-actions">
       <button id="cancelExport" type="button">Cancel</button>
     </div>
