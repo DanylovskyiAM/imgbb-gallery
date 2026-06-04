@@ -1,4 +1,5 @@
 const addRootFolderBtn = document.getElementById("addRootFolderBtn");
+const preferredPeriodSelect = document.getElementById("preferredPeriodSelect");
 const addFolderModal = document.getElementById("addFolderModal");
 const addFolderForm = document.getElementById("addFolderForm");
 const addParentFolder = document.getElementById("addParentFolder");
@@ -47,6 +48,7 @@ const cancelEditFolder = document.getElementById("cancelEditFolder");
 const apiHost = window.location.hostname || "127.0.0.1";
 const isLocalClient = ["localhost", "127.0.0.1"].includes(apiHost) && window.location.port === "5500";
 const apiBase = isLocalClient ? `http://${apiHost}:3000` : window.location.origin;
+const preferredPeriodStorageKey = "myaPreferredUploadPeriod";
 
 let folders = [];
 let selectedFolder = null;
@@ -176,6 +178,68 @@ function rebuildFolderIndexes() {
 
 function getChildFolders(parentId = null) {
   return foldersByParentId.get(getParentKey(parentId)) || [];
+}
+
+function getAvailablePeriodNames() {
+  return [...new Set(folders
+    .filter(folder => getFolderDepth(folder) === 2)
+    .map(folder => folder.name)
+    .filter(Boolean))]
+    .sort(comparePeriodNames);
+}
+
+function getSeasonSortValue(periodName) {
+  const seasonOrder = ["spring", "summer", "autumn", "winter"];
+  const normalizedName = String(periodName || "").trim().toLowerCase();
+  const index = seasonOrder.findIndex(season => normalizedName.startsWith(season));
+
+  return index >= 0 ? index : seasonOrder.length;
+}
+
+function comparePeriodNames(a, b) {
+  const seasonDiff = getSeasonSortValue(a) - getSeasonSortValue(b);
+
+  if (seasonDiff) {
+    return seasonDiff;
+  }
+
+  return a.localeCompare(b, undefined, {
+    numeric: true,
+    sensitivity: "base"
+  });
+}
+
+function getPreferredPeriodName() {
+  return localStorage.getItem(preferredPeriodStorageKey) || "";
+}
+
+function renderPreferredPeriodSelect() {
+  const selectedPeriod = getPreferredPeriodName();
+  const periodNames = getAvailablePeriodNames();
+
+  preferredPeriodSelect.innerHTML = '<option value="">Period</option>';
+
+  periodNames.forEach((periodName) => {
+    const option = document.createElement("option");
+    option.value = periodName;
+    option.textContent = periodName;
+    preferredPeriodSelect.appendChild(option);
+  });
+
+  preferredPeriodSelect.value = periodNames.includes(selectedPeriod) ? selectedPeriod : "";
+}
+
+function buildUploadUrl(folder) {
+  const url = new URL("/upload.html", window.location.origin);
+  const preferredPeriod = getPreferredPeriodName();
+
+  url.searchParams.set("folder", folder.id);
+
+  if (preferredPeriod) {
+    url.searchParams.set("period", preferredPeriod);
+  }
+
+  return `${url.pathname}${url.search}`;
 }
 
 function getDescendantFolders(parentId = null) {
@@ -785,7 +849,7 @@ function renderFolderNode(folder, depth = 0) {
 
   const uploadLink = document.createElement("a");
   uploadLink.textContent = "Upload";
-  uploadLink.href = `/upload.html?folder=${encodeURIComponent(folder.id)}`;
+  uploadLink.href = buildUploadUrl(folder);
 
   const viewLink = document.createElement("a");
   viewLink.textContent = "View";
@@ -1017,6 +1081,7 @@ async function loadFolders() {
   const data = await api("/api/folders");
   folders = data.folders;
   rebuildFolderIndexes();
+  renderPreferredPeriodSelect();
 
   if (!addFolderModal.classList.contains("hidden")) {
     renderParentOptions(addingParentId);
@@ -1088,6 +1153,15 @@ addFolderForm.onsubmit = async (e) => {
 
 addRootFolderBtn.onclick = () => openAddFolderModal(null);
 cancelAddFolder.onclick = closeAddFolderModal;
+preferredPeriodSelect.onchange = () => {
+  if (preferredPeriodSelect.value) {
+    localStorage.setItem(preferredPeriodStorageKey, preferredPeriodSelect.value);
+  } else {
+    localStorage.removeItem(preferredPeriodStorageKey);
+  }
+
+  renderFolders();
+};
 
 exportDbBtn.onclick = openExportModal;
 logoutBtn.onclick = logout;

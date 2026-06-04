@@ -22,6 +22,8 @@ const isLocalClient = ["localhost", "127.0.0.1"].includes(apiHost) && window.loc
 const apiBase = isLocalClient ? `http://${apiHost}:3000` : window.location.origin;
 const params = new URLSearchParams(window.location.search);
 const folderParam = params.get("folder");
+const periodParam = params.get("period");
+const preferredPeriodStorageKey = "myaPreferredUploadPeriod";
 let uploadedImages = [];
 let currentPreviewIndex = 0;
 let lockedScrollY = 0;
@@ -133,6 +135,23 @@ function setSelectOptions(select, items, placeholder) {
   });
 }
 
+function findPreferredPeriod(periods) {
+  const preferredPeriod = String(periodParam || localStorage.getItem(preferredPeriodStorageKey) || "").trim();
+
+  if (!preferredPeriod) {
+    return null;
+  }
+
+  const normalizedPreferredPeriod = preferredPeriod.toLowerCase();
+
+  return periods.find(period => (
+    period.id === preferredPeriod ||
+    period.slug === preferredPeriod ||
+    period.path === preferredPeriod ||
+    String(period.name || "").toLowerCase() === normalizedPreferredPeriod
+  )) || null;
+}
+
 function resolveFolderContext(folder) {
   const ancestors = getFolderAncestors(folder);
 
@@ -158,8 +177,11 @@ function applyFolderContext(folder) {
   uploadSubtitle.textContent = `Upload to location: ${getFolderDisplayPath(currentLocation)}`;
   periodSelect.disabled = false;
 
-  setSelectOptions(periodSelect, getChildFolders(currentLocation.id), "Select period");
-  periodSelect.value = context.period?.id || "";
+  const periods = getChildFolders(currentLocation.id);
+  const preferredPeriod = context.period || findPreferredPeriod(periods);
+
+  setSelectOptions(periodSelect, periods, "Select period");
+  periodSelect.value = preferredPeriod?.id || "";
   updateSelectedUploadFolder();
 }
 

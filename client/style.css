@@ -751,6 +751,21 @@ body.modal-open {
   gap: 8px;
 }
 
+.preferred-period-select {
+  width: min(220px, 44vw);
+  height: 34px;
+  min-height: 34px;
+  padding: 5px 28px 5px 10px;
+  border: 1px solid #cccce0;
+  border-radius: 4px;
+  background: white;
+  color: #18181b;
+  font: inherit;
+  font-size: 14px;
+  line-height: 24px;
+  box-sizing: border-box;
+}
+
 .folder-tree {
   display: grid;
   gap: 8px;
