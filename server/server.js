@@ -789,14 +789,14 @@ app.post("/api/upload", async (req, res) => {
       return res.status(404).json({ error: "Folder not found" });
     }
 
-    const uploaded = await Promise.all(images.map(async (image) => {
+    const storedImages = await Promise.all(images.map(async (image) => {
       const stored = await imgbbStorage.uploadImage({
         apiKey: IMGBB_API_KEY,
         image,
         expiration: expirationSeconds
       });
 
-      return db.createFile({
+      return {
         folderId: folder.id,
         provider: stored.provider,
         providerFileId: stored.providerFileId,
@@ -806,8 +806,9 @@ app.post("/api/upload", async (req, res) => {
         originalUrl: stored.originalUrl,
         deleteUrl: stored.deleteUrl,
         uploadedBy: "manager"
-      });
+      };
     }));
+    const uploaded = db.createFiles(storedImages);
 
     logAction(req, "upload.create", `Uploaded ${uploaded.length} image(s) to "${folder.name}"`, {
       ...folderLogDetails(folder),

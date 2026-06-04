@@ -34,6 +34,18 @@ The server loads `.env` automatically in local development.
 
 Do not commit `.env`. It is already listed in `.gitignore`.
 
+## Database Storage
+
+SQLite is the default storage driver. On first start, the server creates `server/data/db.sqlite` and automatically migrates existing `server/data/db.json` data into it. Export/import still uses the same backup JSON structure, so existing backups remain compatible. Exports do not include active sessions.
+
+To temporarily use the old JSON file storage instead:
+
+```bash
+DB_DRIVER=json
+```
+
+The supported drivers are `sqlite` and `json`.
+
 ## Run Locally
 
 Run the single Express server:
