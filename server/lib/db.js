@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const DATA_DIR = path.join(__dirname, "../data");
 const DB_PATH = path.join(DATA_DIR, "db.json");
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const MAX_LOGS = 1000;
 const COMMON_PASSWORDS = new Set([
   "password",
   "password1",
@@ -46,7 +47,8 @@ function ensureDb() {
       folders: [],
       files: [],
       users: [],
-      sessions: []
+      sessions: [],
+      logs: []
     });
   }
 }
@@ -72,11 +74,13 @@ function normalizeDb(db) {
   db.files = Array.isArray(db.files) ? db.files : [];
   db.users = Array.isArray(db.users) ? db.users : [];
   db.sessions = Array.isArray(db.sessions) ? db.sessions : [];
+  db.logs = Array.isArray(db.logs) ? db.logs : [];
 
   const siblingCounters = {};
   const timestamp = now();
 
   db.sessions = db.sessions.filter(session => !session.expiresAt || new Date(session.expiresAt) > new Date(timestamp));
+  db.logs = db.logs.slice(-MAX_LOGS);
 
   db.folders.forEach((folder) => {
     const parentKey = folder.parentId || "root";
@@ -239,6 +243,52 @@ function deleteSession(sessionId) {
   writeDb(db);
 
   return before - db.sessions.length;
+}
+
+function createLog(entry) {
+  const db = readDb();
+  const timestamp = now();
+  const log = {
+    id: crypto.randomUUID(),
+    level: entry.level || "info",
+    action: String(entry.action || "action"),
+    message: String(entry.message || "").trim(),
+    userId: entry.userId || "",
+    username: entry.username || "",
+    ip: entry.ip || "",
+    details: entry.details && typeof entry.details === "object" ? entry.details : {},
+    createdAt: timestamp
+  };
+
+  db.logs.push(log);
+  db.logs = db.logs.slice(-MAX_LOGS);
+  writeDb(db);
+
+  return log;
+}
+
+function listLogs(options = {}) {
+  const limit = Math.min(Math.max(Number(options.limit) || 200, 1), 500);
+  const action = String(options.action || "").trim();
+  const level = String(options.level || "").trim();
+  const db = readDb();
+
+  return db.logs
+    .filter(log => !action || log.action === action)
+    .filter(log => !level || log.level === level)
+    .slice()
+    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+    .slice(0, limit);
+}
+
+function clearLogs() {
+  const db = readDb();
+  const count = db.logs.length;
+
+  db.logs = [];
+  writeDb(db);
+
+  return count;
 }
 
 function uniqueSlug(db, name, parentId, currentId = null) {
@@ -529,6 +579,12 @@ function deleteFile(id) {
   writeDb(db);
 }
 
+function findFile(id) {
+  const db = readDb();
+
+  return db.files.find(file => file.id === id) || null;
+}
+
 function approveFolderFiles(folderId) {
   const db = readDb();
   const timestamp = now();
@@ -696,20 +752,24 @@ function getOrCreateDefaultFolder() {
 }
 
 module.exports = {
+  clearLogs,
   createFile,
   createFolder,
+  createLog,
   createSession,
   createUser,
   deleteSession,
   deleteFile,
   deleteFolder,
   exportDb,
+  findFile,
   findFolder,
   findSession,
   getOrCreateDefaultFolder,
   hasUsers,
   listFiles,
   listFolders,
+  listLogs,
   approveFolderFiles,
   approveFolderTreeFiles,
   deleteFolderFiles,

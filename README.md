@@ -68,6 +68,22 @@ http://127.0.0.1:3000/manage.html
 
 The first visit to the management page redirects to `login.html`. If no admin account exists yet, the login page asks you to create the first account. Account and session data are stored in the local server database file.
 
+## Action Logs
+
+The server stores the latest main app actions in `server/data/db.json` under the `logs` key. Logs are capped to the latest 1000 entries and include auth events, database import/export, folder changes, file approvals/deletions, and uploads.
+
+Fetch recent logs while signed in as an admin:
+
+```text
+GET /api/logs?limit=200
+```
+
+Clear logs:
+
+```text
+DELETE /api/logs
+```
+
 Open a gallery directly:
 
 ```text

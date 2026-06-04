@@ -91,6 +91,37 @@ function requireManageAuth(req, res, next) {
   return res.status(401).json({ error: "Authentication required" });
 }
 
+function requestIp(req) {
+  return String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "")
+    .split(",")[0]
+    .trim();
+}
+
+function logAction(req, action, message, details = {}, level = "info", user = req.user) {
+  try {
+    return db.createLog({
+      action,
+      message,
+      level,
+      userId: user?.id || "",
+      username: user?.username || "",
+      ip: requestIp(req),
+      details
+    });
+  } catch (err) {
+    console.error("Failed to write app log:", err.message);
+    return null;
+  }
+}
+
+function folderLogDetails(folder) {
+  return folder ? {
+    folderId: folder.id,
+    folderName: folder.name,
+    folderPath: folder.path
+  } : {};
+}
+
 function mapImageObject(item) {
   const medium = item.medium?.url || item.display_url;
   const original = item.image?.url || item.url;
@@ -429,6 +460,7 @@ app.post("/api/auth/setup", (req, res) => {
     const session = db.createSession(user.id);
 
     setSessionCookie(res, session);
+    logAction(req, "auth.setup", `Created admin account "${user.username}"`, { username: user.username }, "info", user);
     res.status(201).json({ user });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -439,23 +471,27 @@ app.post("/api/auth/login", (req, res) => {
   const user = db.verifyUser(req.body.username, req.body.password);
 
   if (!user) {
+    logAction(req, "auth.login_failed", "Failed admin login", { username: String(req.body.username || "").trim() }, "warn");
     return res.status(401).json({ error: "Invalid username or password" });
   }
 
   const session = db.createSession(user.id);
 
   setSessionCookie(res, session);
+  logAction(req, "auth.login", `Admin "${user.username}" signed in`, { username: user.username }, "info", user);
   res.json({ user });
 });
 
 app.post("/api/auth/logout", (req, res) => {
   const sessionId = parseCookies(req)[SESSION_COOKIE];
+  const auth = sessionId ? db.findSession(sessionId) : null;
 
   if (sessionId) {
     db.deleteSession(sessionId);
   }
 
   clearSessionCookie(res);
+  logAction(req, "auth.logout", "Admin signed out", {}, "info", auth?.user);
   res.json({ ok: true });
 });
 
@@ -464,6 +500,7 @@ app.get("/api/db/export", requireManageAuth, (req, res) => {
   const filename = `imgbb-gallery-db-${new Date().toISOString().slice(0, 10)}.zip`;
   const zip = createZip("db.json", JSON.stringify(exportedDb, null, 2));
 
+  logAction(req, "db.export", "Exported database backup", { filename });
   res.setHeader("Content-Type", "application/zip");
   res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
   res.send(zip);
@@ -478,6 +515,7 @@ app.post("/api/db/import", requireManageAuth, (req, res) => {
       ? db.replaceDb(importedDb)
       : db.mergeDb(importedDb);
 
+    logAction(req, "db.import", `Imported database backup with ${mode} mode`, { mode, summary });
     res.json({
       ok: true,
       summary
@@ -487,9 +525,27 @@ app.post("/api/db/import", requireManageAuth, (req, res) => {
   }
 });
 
+app.get("/api/logs", requireManageAuth, (req, res) => {
+  res.json({
+    logs: db.listLogs({
+      limit: req.query.limit,
+      action: req.query.action,
+      level: req.query.level
+    })
+  });
+});
+
+app.delete("/api/logs", requireManageAuth, (req, res) => {
+  const count = db.clearLogs();
+
+  logAction(req, "logs.clear", `Cleared ${count} log entries`, { count });
+  res.json({ ok: true, count });
+});
+
 app.post("/api/folders", requireManageAuth, (req, res) => {
   try {
     const folder = db.createFolder(req.body.name, req.body.parentId || null, req.body.description || "");
+    logAction(req, "folder.create", `Created folder "${folder.name}"`, folderLogDetails(folder));
     res.status(201).json({ folder });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -515,6 +571,10 @@ app.patch("/api/folders/:id", requireManageAuth, (req, res) => {
     const folder = db.updateFolder(req.params.id, {
       ...updates
     });
+    logAction(req, "folder.update", `Updated folder "${folder.name}"`, {
+      ...folderLogDetails(folder),
+      fields: Object.keys(updates)
+    });
     res.json({ folder });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -524,6 +584,10 @@ app.patch("/api/folders/:id", requireManageAuth, (req, res) => {
 app.post("/api/folders/:id/order", requireManageAuth, (req, res) => {
   try {
     const folder = db.reorderFolder(req.params.id, req.body.direction);
+    logAction(req, "folder.reorder", `Reordered folder "${folder.name}"`, {
+      ...folderLogDetails(folder),
+      direction: req.body.direction
+    });
     res.json({ folder });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -531,7 +595,10 @@ app.post("/api/folders/:id/order", requireManageAuth, (req, res) => {
 });
 
 app.delete("/api/folders/:id", requireManageAuth, (req, res) => {
+  const folder = db.findFolder(req.params.id);
+
   db.deleteFolder(req.params.id);
+  logAction(req, "folder.delete", folder ? `Deleted folder "${folder.name}"` : "Deleted folder", folderLogDetails(folder));
   res.json({ ok: true });
 });
 
@@ -555,11 +622,19 @@ app.post("/api/folders/:id/files/approve-all", requireManageAuth, (req, res) => 
     return res.status(404).json({ error: "Folder not found" });
   }
 
+  const recursive = req.query.recursive === "1";
+  const count = recursive
+    ? db.approveFolderTreeFiles(folder.id)
+    : db.approveFolderFiles(folder.id);
+
+  logAction(req, "files.approve_all", `Approved ${count} waiting file(s) in "${folder.name}"`, {
+    ...folderLogDetails(folder),
+    recursive,
+    count
+  });
   res.json({
     ok: true,
-    count: req.query.recursive === "1"
-      ? db.approveFolderTreeFiles(folder.id)
-      : db.approveFolderFiles(folder.id)
+    count
   });
 });
 
@@ -570,9 +645,15 @@ app.delete("/api/folders/:id/files", requireManageAuth, (req, res) => {
     return res.status(404).json({ error: "Folder not found" });
   }
 
+  const count = db.deleteFolderFiles(folder.id);
+
+  logAction(req, "files.delete_all", `Deleted ${count} file(s) from "${folder.name}"`, {
+    ...folderLogDetails(folder),
+    count
+  });
   res.json({
     ok: true,
-    count: db.deleteFolderFiles(folder.id)
+    count
   });
 });
 
@@ -648,6 +729,12 @@ app.get("/api/gallery/folders/:id", (req, res) => {
 app.patch("/api/files/:id", requireManageAuth, (req, res) => {
   try {
     const file = db.updateFile(req.params.id, req.body);
+    logAction(req, "file.update", `Updated file "${file.title || file.filename || file.id}"`, {
+      fileId: file.id,
+      folderId: file.folderId,
+      status: file.status,
+      fields: Object.keys(req.body || {})
+    });
     res.json({ file });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -660,6 +747,10 @@ app.post("/api/files/:id/approve", requireManageAuth, (req, res) => {
       status: "approved",
       approvedBy: "admin"
     });
+    logAction(req, "file.approve", `Approved file "${file.title || file.filename || file.id}"`, {
+      fileId: file.id,
+      folderId: file.folderId
+    });
     res.json({ file });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -667,7 +758,13 @@ app.post("/api/files/:id/approve", requireManageAuth, (req, res) => {
 });
 
 app.delete("/api/files/:id", requireManageAuth, (req, res) => {
+  const file = db.findFile(req.params.id);
+
   db.deleteFile(req.params.id);
+  logAction(req, "file.delete", file ? `Deleted file "${file.title || file.filename || file.id}"` : "Deleted file", {
+    fileId: req.params.id,
+    folderId: file?.folderId || ""
+  });
   res.json({ ok: true });
 });
 
@@ -712,6 +809,11 @@ app.post("/api/upload", async (req, res) => {
       });
     }));
 
+    logAction(req, "upload.create", `Uploaded ${uploaded.length} image(s) to "${folder.name}"`, {
+      ...folderLogDetails(folder),
+      count: uploaded.length,
+      expiration: expirationSeconds
+    });
     res.json({
       folder,
       count: uploaded.length,
