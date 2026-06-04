@@ -397,17 +397,26 @@ function getFolderParentPath(folder) {
 }
 
 function getFolderStatus(folder) {
-  const lastPendingText = folder.lastPendingUploadedAt
-    ? formatRelativeTime(folder.lastPendingUploadedAt)
+  return getStatsStatus({
+    filesCount: folder.filesCount,
+    pendingCount: folder.pendingCount,
+    lastUploadedAt: folder.lastUploadedAt,
+    lastPendingUploadedAt: folder.lastPendingUploadedAt
+  });
+}
+
+function getStatsStatus(stats) {
+  const lastPendingText = stats.lastPendingUploadedAt
+    ? formatRelativeTime(stats.lastPendingUploadedAt)
     : "";
-  const lastUpload = folder.lastUploadedAt
-    ? new Date(folder.lastUploadedAt).toLocaleString()
+  const lastUpload = stats.lastUploadedAt
+    ? new Date(stats.lastUploadedAt).toLocaleString()
     : "";
 
-  if (folder.pendingCount > 0) {
+  if (stats.pendingCount > 0) {
     return lastPendingText
-      ? `${folder.pendingCount} pending (${lastPendingText})`
-      : `${folder.pendingCount} pending`;
+      ? `${stats.pendingCount} pending (${lastPendingText})`
+      : `${stats.pendingCount} pending`;
   }
 
   return lastUpload ? `No pending, last upload ${lastUpload}` : "No pending";
@@ -590,14 +599,20 @@ function exportFoldersToExcel() {
       "Uploading",
       "Viewing"
     ],
-    ...exportFolders.map(folder => [
-      getFolderParentPath(folder),
-      folder.name,
-      folder.filesCount,
-      getFolderStatus(folder),
-      `${origin}/upload.html?folder=${encodeURIComponent(folder.id)}`,
-      `${origin}/?folder=${encodeURIComponent(folder.id)}`
-    ])
+    ...exportFolders.map((folder) => {
+      const stats = mode === "sites"
+        ? getCombinedFolderStats(folder)
+        : folder;
+
+      return [
+        getFolderParentPath(folder),
+        folder.name,
+        stats.filesCount,
+        getStatsStatus(stats),
+        `${origin}/upload.html?folder=${encodeURIComponent(folder.id)}`,
+        `${origin}/?folder=${encodeURIComponent(folder.id)}`
+      ];
+    })
   ];
   const csv = rows.map(row => row.map(csvCell).join(",")).join("\r\n");
   const blob = new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8" });
