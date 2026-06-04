@@ -146,6 +146,7 @@ function publicUser(user) {
   return user ? {
     id: user.id,
     username: user.username,
+    preferences: user.preferences && typeof user.preferences === "object" ? user.preferences : {},
     createdAt: user.createdAt
   } : null;
 }
@@ -171,6 +172,7 @@ function createUser(username, password) {
     username: name,
     passwordSalt: passwordHash.salt,
     passwordHash: passwordHash.hash,
+    preferences: {},
     createdAt: timestamp,
     updatedAt: timestamp
   };
@@ -195,6 +197,24 @@ function verifyUser(username, password) {
   const isMatch = expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
 
   return isMatch ? publicUser(user) : null;
+}
+
+function updateUserPreferences(userId, preferences) {
+  const db = readDb();
+  const user = db.users.find(item => item.id === userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  user.preferences = {
+    ...(user.preferences && typeof user.preferences === "object" ? user.preferences : {}),
+    ...(preferences && typeof preferences === "object" ? preferences : {})
+  };
+  user.updatedAt = now();
+  writeDb(db);
+
+  return publicUser(user).preferences;
 }
 
 function createSession(userId) {
@@ -806,5 +826,6 @@ module.exports = {
   replaceDb,
   updateFile,
   updateFolder,
+  updateUserPreferences,
   verifyUser
 };

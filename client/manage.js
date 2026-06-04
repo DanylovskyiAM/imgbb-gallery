@@ -63,6 +63,7 @@ let folderById = new Map();
 let foldersByParentId = new Map();
 let folderStatsCache = new Map();
 let folderDisplayPathCache = new Map();
+let preferredUploadPeriod = localStorage.getItem(preferredPeriodStorageKey) || "";
 
 function setBulkActionsVisible(isVisible) {
   bulkFileActions.classList.toggle("hidden", !isVisible);
@@ -210,7 +211,7 @@ function comparePeriodNames(a, b) {
 }
 
 function getPreferredPeriodName() {
-  return localStorage.getItem(preferredPeriodStorageKey) || "";
+  return preferredUploadPeriod;
 }
 
 function renderPreferredPeriodSelect() {
@@ -1093,8 +1094,13 @@ function prevFile() {
 }
 
 async function loadFolders() {
-  const data = await api("/api/folders");
+  const [data, preferencesData] = await Promise.all([
+    api("/api/folders"),
+    api("/api/preferences").catch(() => ({ preferences: {} }))
+  ]);
+
   folders = data.folders;
+  preferredUploadPeriod = preferencesData.preferences?.preferredUploadPeriod || localStorage.getItem(preferredPeriodStorageKey) || "";
   rebuildFolderIndexes();
   renderPreferredPeriodSelect();
 
@@ -1168,14 +1174,27 @@ addFolderForm.onsubmit = async (e) => {
 
 addRootFolderBtn.onclick = () => openAddFolderModal(null);
 cancelAddFolder.onclick = closeAddFolderModal;
-preferredPeriodSelect.onchange = () => {
-  if (preferredPeriodSelect.value) {
-    localStorage.setItem(preferredPeriodStorageKey, preferredPeriodSelect.value);
+preferredPeriodSelect.onchange = async () => {
+  preferredUploadPeriod = preferredPeriodSelect.value;
+
+  if (preferredUploadPeriod) {
+    localStorage.setItem(preferredPeriodStorageKey, preferredUploadPeriod);
   } else {
     localStorage.removeItem(preferredPeriodStorageKey);
   }
 
   renderFolders();
+
+  try {
+    await api("/api/preferences", {
+      method: "PATCH",
+      body: JSON.stringify({
+        preferredUploadPeriod
+      })
+    });
+  } catch (err) {
+    alert(err.message || "Failed to save selected period.");
+  }
 };
 
 exportDbBtn.onclick = openExportModal;

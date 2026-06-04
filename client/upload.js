@@ -31,6 +31,7 @@ let folders = [];
 let folderById = new Map();
 let currentLocation = null;
 let selectedUploadFolderId = "";
+let preferredUploadPeriod = localStorage.getItem(preferredPeriodStorageKey) || "";
 
 if (folderParam) {
   uploadSubtitle.textContent = `Upload to folder: ${folderParam}`;
@@ -54,6 +55,7 @@ async function loadFolderContext(folderId) {
 
     folders = data.folders;
     folderById = new Map(folders.map(folder => [folder.id, folder]));
+    await loadPreferredUploadPeriod();
 
     const folder = folders.find(item => (
       item.id === folderId || item.slug === folderId || item.path === folderId
@@ -136,7 +138,7 @@ function setSelectOptions(select, items, placeholder) {
 }
 
 function findPreferredPeriod(periods) {
-  const preferredPeriod = String(periodParam || localStorage.getItem(preferredPeriodStorageKey) || "").trim();
+  const preferredPeriod = String(periodParam || preferredUploadPeriod || localStorage.getItem(preferredPeriodStorageKey) || "").trim();
 
   if (!preferredPeriod) {
     return null;
@@ -150,6 +152,27 @@ function findPreferredPeriod(periods) {
     period.path === preferredPeriod ||
     String(period.name || "").toLowerCase() === normalizedPreferredPeriod
   )) || null;
+}
+
+async function loadPreferredUploadPeriod() {
+  if (periodParam) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`${apiBase}/api/preferences`);
+    const data = await response.json();
+
+    if (response.ok) {
+      preferredUploadPeriod = data.preferences?.preferredUploadPeriod || preferredUploadPeriod;
+
+      if (preferredUploadPeriod) {
+        localStorage.setItem(preferredPeriodStorageKey, preferredUploadPeriod);
+      }
+    }
+  } catch (err) {
+    // Local storage remains the fallback when preferences cannot be loaded.
+  }
 }
 
 function resolveFolderContext(folder) {

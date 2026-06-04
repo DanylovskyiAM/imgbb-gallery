@@ -495,6 +495,27 @@ app.post("/api/auth/logout", (req, res) => {
   res.json({ ok: true });
 });
 
+app.get("/api/preferences", requireManageAuth, (req, res) => {
+  res.json({
+    preferences: req.user.preferences || {}
+  });
+});
+
+app.patch("/api/preferences", requireManageAuth, (req, res) => {
+  try {
+    const preferences = db.updateUserPreferences(req.user.id, {
+      preferredUploadPeriod: String(req.body.preferredUploadPeriod || "").trim()
+    });
+
+    logAction(req, "preferences.update", "Updated preferences", {
+      fields: ["preferredUploadPeriod"]
+    });
+    res.json({ preferences });
+  } catch (err) {
+    res.status(400).json({ error: err.message || "Failed to update preferences" });
+  }
+});
+
 app.get("/api/db/export", requireManageAuth, (req, res) => {
   const exportedDb = db.exportDb();
   const filename = `imgbb-gallery-db-${new Date().toISOString().slice(0, 10)}.zip`;
