@@ -704,6 +704,10 @@ body.modal-open {
   cursor: default;
 }
 
+#toggleBinBtn {
+  background: #52525c;
+}
+
 .danger-action {
   border: 1px solid rgba(190, 18, 60, 0.28) !important;
   background: rgba(254, 242, 242, 0.96) !important;
@@ -810,6 +814,23 @@ body.modal-open {
 .folder-node-content.is-selected {
   border-color: #e50c7d;
   box-shadow: 0 0 0 2px rgba(229, 12, 125, 0.12);
+}
+
+.folder-node-content.is-deleted {
+  border-color: #d4d4d8;
+  background:
+    linear-gradient(90deg, rgba(113, 113, 123, 0.12) 0%, rgba(113, 113, 123, 0.12) 4%, transparent 10%),
+    #f4f4f5;
+  cursor: pointer;
+}
+
+.folder-node-content.is-deleted .folder-info {
+  cursor: pointer;
+}
+
+.folder-node-content.is-deleted .folder-icon {
+  background: #e4e4e7;
+  color: #71717b;
 }
 
 .folder-info {

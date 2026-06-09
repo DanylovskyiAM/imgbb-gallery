@@ -442,7 +442,15 @@ app.get("/api/download", async (req, res) => {
 });
 
 app.get("/api/folders", (req, res) => {
-  res.json({ folders: db.listFolders() });
+  const state = ["active", "deleted", "all"].includes(req.query.state)
+    ? req.query.state
+    : "active";
+
+  if (state !== "active" && !getAuth(req)) {
+    return res.status(401).json({ error: "Authentication required" });
+  }
+
+  res.json({ folders: db.listFolders({ state }) });
 });
 
 app.get("/api/auth/status", (req, res) => {
@@ -621,10 +629,29 @@ app.post("/api/folders/:id/order", requireManageAuth, (req, res) => {
 });
 
 app.delete("/api/folders/:id", requireManageAuth, (req, res) => {
-  const folder = db.findFolder(req.params.id);
+  const permanent = req.query.permanent === "1" || req.query.permanent === "true";
+  const folder = db.findFolder(req.params.id, { includeDeleted: permanent });
+
+  if (permanent) {
+    db.permanentlyDeleteFolder(req.params.id);
+    logAction(req, "folder.delete_permanent", folder ? `Permanently deleted folder "${folder.name}"` : "Permanently deleted folder", folderLogDetails(folder));
+    return res.json({ ok: true, permanent: true });
+  }
 
   db.deleteFolder(req.params.id);
-  logAction(req, "folder.delete", folder ? `Deleted folder "${folder.name}"` : "Deleted folder", folderLogDetails(folder));
+  logAction(req, "folder.delete", folder ? `Moved folder "${folder.name}" to bin` : "Moved folder to bin", folderLogDetails(folder));
+  res.json({ ok: true, deleted: true });
+});
+
+app.post("/api/folders/:id/restore", requireManageAuth, (req, res) => {
+  const folder = db.findFolder(req.params.id, { includeDeleted: true });
+
+  if (!folder) {
+    return res.status(404).json({ error: "Folder not found" });
+  }
+
+  db.restoreFolder(req.params.id);
+  logAction(req, "folder.restore", `Restored folder "${folder.name}"`, folderLogDetails(folder));
   res.json({ ok: true });
 });
 

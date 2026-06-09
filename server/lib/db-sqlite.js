@@ -658,21 +658,78 @@ function getDescendantFolderIds(db, folderId) {
 function deleteFolder(id) {
   const db = readDb();
   const folderIds = getDescendantFolderIds(db, id);
+  const timestamp = now();
+
+  db.folders.forEach(folder => {
+    if (folderIds.includes(folder.id)) {
+      folder.deletedAt = timestamp;
+      folder.updatedAt = timestamp;
+    }
+  });
+  writeDb(db);
+}
+
+function restoreFolder(id) {
+  const db = readDb();
+  const folderIds = getDescendantFolderIds(db, id);
+  let parentId = db.folders.find(folder => folder.id === id)?.parentId || null;
+  const timestamp = now();
+
+  while (parentId) {
+    const parent = db.folders.find(folder => folder.id === parentId);
+
+    if (!parent) {
+      break;
+    }
+
+    folderIds.push(parent.id);
+    parentId = parent.parentId;
+  }
+
+  db.folders.forEach(folder => {
+    if (folderIds.includes(folder.id)) {
+      folder.deletedAt = null;
+      folder.updatedAt = timestamp;
+    }
+  });
+  writeDb(db);
+}
+
+function permanentlyDeleteFolder(id) {
+  const db = readDb();
+  const folderIds = getDescendantFolderIds(db, id);
 
   db.folders = db.folders.filter(folder => !folderIds.includes(folder.id));
   db.files = db.files.filter(file => !folderIds.includes(file.folderId));
   writeDb(db);
 }
 
-function findFolder(identifier) {
+function findFolder(identifier, options = {}) {
   const db = readDb();
-  return db.folders.find(folder => folder.id === identifier || folder.slug === identifier || folder.path === identifier) || null;
+  const includeDeleted = Boolean(options.includeDeleted);
+
+  return db.folders.find(folder => (
+    (includeDeleted || !folder.deletedAt) &&
+    (folder.id === identifier || folder.slug === identifier || folder.path === identifier)
+  )) || null;
 }
 
-function listFolders() {
+function listFolders(options = {}) {
   const db = readDb();
+  const state = options.state || "active";
 
   return db.folders
+  .filter(folder => {
+    if (state === "deleted") {
+      return Boolean(folder.deletedAt);
+    }
+
+    if (state === "all") {
+      return true;
+    }
+
+    return !folder.deletedAt;
+  })
   .slice()
   .sort((a, b) => {
     if ((a.parentId || "") !== (b.parentId || "")) {
@@ -983,8 +1040,10 @@ module.exports = {
   approveFolderTreeFiles,
   deleteFolderFiles,
   mergeDb,
+  permanentlyDeleteFolder,
   reorderFolder,
   replaceDb,
+  restoreFolder,
   updateFile,
   updateFolder,
   updateUserPreferences,

@@ -1,5 +1,6 @@
 const addRootFolderBtn = document.getElementById("addRootFolderBtn");
 const preferredPeriodSelect = document.getElementById("preferredPeriodSelect");
+const toggleBinBtn = document.getElementById("toggleBinBtn");
 const addFolderModal = document.getElementById("addFolderModal");
 const addFolderForm = document.getElementById("addFolderForm");
 const addParentFolder = document.getElementById("addParentFolder");
@@ -64,6 +65,7 @@ let foldersByParentId = new Map();
 let folderStatsCache = new Map();
 let folderDisplayPathCache = new Map();
 let preferredUploadPeriod = localStorage.getItem(preferredPeriodStorageKey) || "";
+let folderViewMode = "active";
 
 function setBulkActionsVisible(isVisible) {
   bulkFileActions.classList.toggle("hidden", !isVisible);
@@ -165,8 +167,13 @@ function rebuildFolderIndexes() {
 
   folders.forEach((folder) => {
     folderById.set(folder.id, folder);
+  });
 
-    const parentKey = getParentKey(folder.parentId);
+  folders.forEach((folder) => {
+    const visibleParentId = folder.parentId && folderById.has(folder.parentId)
+      ? folder.parentId
+      : null;
+    const parentKey = getParentKey(visibleParentId);
     const siblings = foldersByParentId.get(parentKey) || [];
     siblings.push(folder);
     foldersByParentId.set(parentKey, siblings);
@@ -252,6 +259,10 @@ function getDescendantFolders(parentId = null) {
 
 function buildFolderTree(parentId = null) {
   return getChildFolders(parentId);
+}
+
+function isBinMode() {
+  return folderViewMode === "deleted";
 }
 
 function renderParentOptions(selectedParentId = "") {
@@ -763,6 +774,12 @@ function expandFolder(folder) {
 }
 
 async function handleFolderSelection(folder) {
+  if (isBinMode()) {
+    toggleFolderCollapse(folder);
+    renderFolders();
+    return;
+  }
+
   if (selectedFolder?.id === folder.id) {
     if (hasChildFolders(folder)) {
       collapsedFolderIds.add(folder.id);
@@ -794,6 +811,7 @@ function renderFolderNode(folder, depth = 0) {
   item.style.setProperty("--folder-branch-offset", `${Math.max(0, depth - 1) * 24}px`);
   item.style.setProperty("--folder-description-offset", `${depth ? 48 + Math.max(0, depth - 1) * 24 : 24}px`);
   item.onclick = () => handleFolderSelection(folder);
+  item.classList.toggle("is-deleted", Boolean(folder.deletedAt));
 
   if (selectedFolder?.id === folder.id) {
     item.classList.add("is-selected");
@@ -863,6 +881,36 @@ function renderFolderNode(folder, depth = 0) {
   actions.className = "manage-actions";
   actions.onclick = (e) => e.stopPropagation();
 
+  if (isBinMode()) {
+    const restoreBtn = createActionButton("Restore", async () => {
+      await api(`/api/folders/${folder.id}/restore`, { method: "POST" });
+      await loadFolders();
+    });
+
+    const deleteForeverBtn = createActionButton("Delete forever", async () => {
+      if (!window.confirm(`Permanently delete ${folder.path} and its file records? This cannot be undone.`)) {
+        return;
+      }
+
+      await api(`/api/folders/${folder.id}?permanent=1`, { method: "DELETE" });
+      await loadFolders();
+    });
+    deleteForeverBtn.classList.add("danger-action");
+
+    actions.append(restoreBtn, deleteForeverBtn);
+    item.append(info, meta, actions);
+    wrapper.appendChild(item);
+
+    if (hasChildren && !collapsedFolderIds.has(folder.id)) {
+      const children = document.createElement("div");
+      children.className = "folder-children";
+      childFolders.forEach(child => children.appendChild(renderFolderNode(child, depth + 1)));
+      wrapper.appendChild(children);
+    }
+
+    return wrapper;
+  }
+
   const uploadLink = document.createElement("a");
   uploadLink.textContent = "Upload";
   uploadLink.href = buildUploadUrl(folder);
@@ -924,7 +972,9 @@ function renderFolders() {
   const tree = buildFolderTree();
 
   if (!tree.length) {
-    folderList.innerHTML = '<p class="empty-state">No folders yet.</p>';
+    folderList.innerHTML = isBinMode()
+      ? '<p class="empty-state">Bin is empty.</p>'
+      : '<p class="empty-state">No folders yet.</p>';
     return;
   }
 
@@ -1095,7 +1145,7 @@ function prevFile() {
 
 async function loadFolders() {
   const [data, preferencesData] = await Promise.all([
-    api("/api/folders"),
+    api(`/api/folders?state=${folderViewMode}`),
     api("/api/preferences").catch(() => ({ preferences: {} }))
   ]);
 
@@ -1103,6 +1153,11 @@ async function loadFolders() {
   preferredUploadPeriod = preferencesData.preferences?.preferredUploadPeriod || localStorage.getItem(preferredPeriodStorageKey) || "";
   rebuildFolderIndexes();
   renderPreferredPeriodSelect();
+  toggleBinBtn.textContent = isBinMode() ? "Folders" : "Bin";
+  toggleBinBtn.classList.toggle("is-active", isBinMode());
+  addRootFolderBtn.classList.toggle("hidden", isBinMode());
+  preferredPeriodSelect.disabled = isBinMode();
+  preferredPeriodSelect.classList.toggle("hidden", isBinMode());
 
   if (!addFolderModal.classList.contains("hidden")) {
     renderParentOptions(addingParentId);
@@ -1119,9 +1174,21 @@ async function loadFolders() {
     selectedFolder = folderById.get(selectedFolder.id) || selectedFolder;
   }
 
+  if (isBinMode()) {
+    selectedFolder = null;
+    currentFiles = [];
+  }
+
   renderFolders();
 
-  if (!selectedFolder) {
+  if (isBinMode()) {
+    filesTitle.textContent = "Bin";
+    filesSubtitle.textContent = "";
+    setBulkActionsVisible(false);
+    fileList.classList.remove("manage-file-grid");
+    fileList.classList.add("folder-overview-list");
+    fileList.innerHTML = '<p class="empty-state">Deleted folders stay here until restored or permanently deleted.</p>';
+  } else if (!selectedFolder) {
     renderFolderOverview();
   }
 }
@@ -1174,6 +1241,14 @@ addFolderForm.onsubmit = async (e) => {
 
 addRootFolderBtn.onclick = () => openAddFolderModal(null);
 cancelAddFolder.onclick = closeAddFolderModal;
+toggleBinBtn.onclick = async () => {
+  folderViewMode = isBinMode() ? "active" : "deleted";
+  selectedFolder = null;
+  currentFiles = [];
+  collapsedFolderIds.clear();
+  didApplyDefaultCollapse = false;
+  await loadFolders();
+};
 preferredPeriodSelect.onchange = async () => {
   preferredUploadPeriod = preferredPeriodSelect.value;
 
