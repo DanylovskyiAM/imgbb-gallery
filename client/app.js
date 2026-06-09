@@ -16,6 +16,11 @@ const albumForm = document.getElementById("albumForm");
 const albumInput = document.getElementById("albumInput");
 const albumError = document.getElementById("albumError");
 const headerActions = document.querySelector(".header-actions");
+const footerPhone = document.getElementById("footerPhone");
+const footerPhoneText = document.getElementById("footerPhoneText");
+const footerEmail = document.getElementById("footerEmail");
+const footerEmailText = document.getElementById("footerEmailText");
+const footerCopyright = document.getElementById("footerCopyright");
 
 const params = new URLSearchParams(window.location.search);
 const albumId = params.get("id");
@@ -34,6 +39,54 @@ let pinchStartDistance = 0;
 let pinchStartScale = 1;
 let isPinching = false;
 
+const footerBrands = {
+  actionsport: {
+    name: "Actionsport",
+    phone: "+3227349416",
+    email: "info@actionsport.be",
+    privacyUrl: "https://mya-sport.be/en/pr2/privacy-policy",
+    termsUrl: "https://mya-sport.be/en/pr2/tos"
+  },
+  promosport: {
+    name: "Promosport",
+    phone: "+3210459300",
+    email: "info@promo-sport.be",
+    privacyUrl: "https://mya-sport.be/en/pr1/privacy-policy",
+    termsUrl: "https://mya-sport.be/en/pr1/tos"
+  }
+};
+
+function getFooterBrand(data = {}) {
+  const path = String(data.path || data.displayPath || data.subtitle || data.title || "").toLowerCase();
+
+  return path.startsWith("actionsport") || path.includes("actionsport")
+    ? footerBrands.actionsport
+    : footerBrands.promosport;
+}
+
+function renderFooterBrand(data = {}) {
+  const brand = getFooterBrand(data);
+
+  footerPhone.href = `tel:${brand.phone}`;
+  footerPhoneText.textContent = brand.phone;
+  footerEmail.href = `mailto:${brand.email}`;
+  footerEmailText.textContent = brand.email;
+  footerCopyright.innerHTML = "";
+  footerCopyright.append(`©Copyright 2026, All Rights Reserved by ${brand.name}, `);
+
+  const privacyLink = document.createElement("a");
+  privacyLink.className = "underline lowercase cursor-pointer";
+  privacyLink.href = brand.privacyUrl;
+  privacyLink.textContent = "Privacy Policy";
+
+  const termsLink = document.createElement("a");
+  termsLink.className = "underline lowercase cursor-pointer";
+  termsLink.href = brand.termsUrl;
+  termsLink.textContent = "Terms & Conditions";
+
+  footerCopyright.append(privacyLink, " / ", termsLink);
+}
+
 if (folderId) {
   loadFolderGallery();
 } else if (!albumId) {
@@ -43,6 +96,7 @@ if (folderId) {
 }
 
 function showStartPage(message = "") {
+  renderFooterBrand();
   document.body.classList.add("start-mode");
   headerTitle.textContent = "Gallery";
   headerSubtitle.textContent = "Enter an ImgBB album ID";
@@ -124,6 +178,7 @@ function getDownloadUrl(url, filename) {
 }
 
 function renderGallery(data) {
+  renderFooterBrand(data);
   gallery.innerHTML = "";
 
   if (data.title) {

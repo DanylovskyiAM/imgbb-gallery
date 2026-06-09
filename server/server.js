@@ -721,6 +721,8 @@ app.get("/api/gallery/folders/:id", (req, res) => {
 
   res.json({
     id: folder.id,
+    path: folder.path,
+    displayPath: getFolderDisplayPath(folder, allFolders),
     title: folder.name,
     subtitle: getFolderParentDisplayPath(folder, allFolders) || getFolderDisplayPath(folder, allFolders),
     count: files.length,
