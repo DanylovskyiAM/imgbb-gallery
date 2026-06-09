@@ -538,6 +538,19 @@ body.modal-open {
   cursor: pointer;
 }
 
+.upload-folder-field select:disabled,
+.expiration-field select:disabled {
+  border-color: #d4d4d8;
+  background:
+    linear-gradient(45deg, transparent 50%, #a1a1aa 50%) calc(100% - 16px) 50% / 6px 6px no-repeat,
+    linear-gradient(135deg, #a1a1aa 50%, transparent 50%) calc(100% - 10px) 50% / 6px 6px no-repeat,
+    #f4f4f5;
+  color: #71717b;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
 .upload-form button {
   min-height: 34px;
   border: none;
@@ -1481,6 +1494,36 @@ body.start-mode .album-form {
   margin-right: auto;
 }
 
+.gallery-notice {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 4px;
+  padding: 14px 16px;
+  border: 1px solid #e4e4e7;
+  border-radius: 6px;
+  background: #fff;
+  color: #52525c;
+  font-size: 14px;
+}
+
+.gallery-notice p {
+  margin: 0;
+}
+
+.gallery-notice a {
+  flex-shrink: 0;
+  color: #238de6;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.gallery-notice a:hover {
+  text-decoration: underline;
+}
+
 /* FOOTER LAYOUT */
 .footer {
   background: #fff;
@@ -1708,6 +1751,12 @@ body.start-mode .album-form {
   #gallery {
     gap: 12px;
     padding: 10px 4px;
+  }
+
+  .gallery-notice {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
   }
 
   .card {

@@ -146,6 +146,7 @@ function publicUser(user) {
   return user ? {
     id: user.id,
     username: user.username,
+    role: user.role || "admin",
     preferences: user.preferences && typeof user.preferences === "object" ? user.preferences : {},
     createdAt: user.createdAt
   } : null;
@@ -170,6 +171,7 @@ function createUser(username, password) {
   const user = {
     id: crypto.randomUUID(),
     username: name,
+    role: "admin",
     passwordSalt: passwordHash.salt,
     passwordHash: passwordHash.hash,
     preferences: {},

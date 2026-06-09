@@ -39,6 +39,7 @@ const MAX_PAGES = 25;
 const PORT = process.env.PORT || 3000;
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
+const DEFAULT_UPLOAD_EXPIRATION_SECONDS = 1209600;
 
 const cache = {};
 const SESSION_COOKIE = "mya_admin_session";
@@ -112,6 +113,10 @@ function logAction(req, action, message, details = {}, level = "info", user = re
     console.error("Failed to write app log:", err.message);
     return null;
   }
+}
+
+function isAdminUser(user) {
+  return user?.role === "admin";
 }
 
 function folderLogDetails(folder) {
@@ -706,6 +711,32 @@ function getFolderParentDisplayPath(folder, folders) {
   return parent ? getFolderDisplayPath(parent, folders) : "";
 }
 
+function getFilesAvailability(files) {
+  const firstExpiringFile = files
+    .map(file => ({
+      createdAt: file.createdAt,
+      expirationSeconds: Number(file.expirationSeconds || file.expiration) || 0
+    }))
+    .filter(file => file.createdAt && file.expirationSeconds > 0)
+    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))[0];
+
+  if (!firstExpiringFile) {
+    return null;
+  }
+
+  const uploadedAt = new Date(firstExpiringFile.createdAt);
+
+  if (Number.isNaN(uploadedAt.getTime())) {
+    return null;
+  }
+
+  return {
+    uploadedAt: uploadedAt.toISOString(),
+    expirationSeconds: firstExpiringFile.expirationSeconds,
+    availableUntil: new Date(uploadedAt.getTime() + firstExpiringFile.expirationSeconds * 1000).toISOString()
+  };
+}
+
 app.get("/api/gallery/folders/:id", (req, res) => {
   const folder = db.findFolder(req.params.id);
 
@@ -726,6 +757,7 @@ app.get("/api/gallery/folders/:id", (req, res) => {
     title: folder.name,
     subtitle: getFolderParentDisplayPath(folder, allFolders) || getFolderDisplayPath(folder, allFolders),
     count: files.length,
+    availability: getFilesAvailability(files),
     folders: folders.map(item => ({
       id: item.id,
       name: item.name,
@@ -793,6 +825,7 @@ app.delete("/api/files/:id", requireManageAuth, (req, res) => {
 
 app.post("/api/upload", async (req, res) => {
   const { images, expiration, folderId, folderSlug } = req.body;
+  const auth = getAuth(req);
 
   if (!IMGBB_API_KEY) {
     return res.status(500).json({ error: "IMGBB_API_KEY is not configured on the server" });
@@ -803,7 +836,10 @@ app.post("/api/upload", async (req, res) => {
   }
 
   try {
-    const expirationSeconds = Number(expiration) || null;
+    const requestedExpirationSeconds = Number(expiration) || null;
+    const expirationSeconds = isAdminUser(auth?.user)
+      ? requestedExpirationSeconds
+      : DEFAULT_UPLOAD_EXPIRATION_SECONDS;
     const folder = folderId || folderSlug
       ? db.findFolder(folderId || folderSlug)
       : db.getOrCreateDefaultFolder();
@@ -828,6 +864,7 @@ app.post("/api/upload", async (req, res) => {
         mediumUrl: stored.mediumUrl,
         originalUrl: stored.originalUrl,
         deleteUrl: stored.deleteUrl,
+        expirationSeconds,
         uploadedBy: "manager"
       };
     }));

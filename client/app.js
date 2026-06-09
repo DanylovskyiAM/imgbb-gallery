@@ -44,6 +44,7 @@ const footerBrands = {
     name: "Actionsport",
     phone: "+3227349416",
     email: "info@actionsport.be",
+    bookingUrl: "https://mya-sport.be/en/pr2/home?category=stages+%28holiday+camps%29",
     privacyUrl: "https://mya-sport.be/en/pr2/privacy-policy",
     termsUrl: "https://mya-sport.be/en/pr2/tos"
   },
@@ -51,6 +52,7 @@ const footerBrands = {
     name: "Promosport",
     phone: "+3210459300",
     email: "info@promo-sport.be",
+    bookingUrl: "https://mya-sport.be/en/pr1/home?discipline=&category=stages+%28holiday+camps%29",
     privacyUrl: "https://mya-sport.be/en/pr1/privacy-policy",
     termsUrl: "https://mya-sport.be/en/pr1/tos"
   }
@@ -85,6 +87,49 @@ function renderFooterBrand(data = {}) {
   termsLink.textContent = "Terms & Conditions";
 
   footerCopyright.append(privacyLink, " / ", termsLink);
+}
+
+function formatAvailabilityDate(value) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC"
+  }).format(date);
+}
+
+function renderGalleryNotice(data, filesCount, foldersCount) {
+  const brand = getFooterBrand(data);
+  const notice = document.createElement("section");
+  notice.className = "gallery-notice";
+
+  const message = document.createElement("p");
+
+  if (filesCount > 0) {
+    const availableUntil = formatAvailabilityDate(data.availability?.availableUntil);
+    message.textContent = availableUntil
+      ? `Please note that the files will be accessible until ${availableUntil}`
+      : "Please note that the files will be accessible for a limited time.";
+  } else if (folderId && foldersCount === 0) {
+    message.textContent = "The files are no longer available.";
+  } else {
+    return;
+  }
+
+  const booking = document.createElement("a");
+  booking.href = brand.bookingUrl;
+  booking.target = "_blank";
+  booking.rel = "noopener";
+  booking.textContent = "Book the Next Camp Today";
+
+  notice.append(message, booking);
+  gallery.appendChild(notice);
 }
 
 if (folderId) {
@@ -196,6 +241,7 @@ function renderGallery(data) {
     ? `${folders.length} folders · ${filesCount} files`
     : `${filesCount} files`;
   downloadAllBtn.classList.toggle("hidden", !filesCount);
+  renderGalleryNotice(data, filesCount, folders.length);
 
   folders.forEach((folder) => {
     const card = document.createElement("a");

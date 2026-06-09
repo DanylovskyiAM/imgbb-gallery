@@ -24,6 +24,7 @@ const params = new URLSearchParams(window.location.search);
 const folderParam = params.get("folder");
 const periodParam = params.get("period");
 const preferredPeriodStorageKey = "myaPreferredUploadPeriod";
+const defaultExpirationSeconds = "1209600";
 let uploadedImages = [];
 let currentPreviewIndex = 0;
 let lockedScrollY = 0;
@@ -32,6 +33,12 @@ let folderById = new Map();
 let currentLocation = null;
 let selectedUploadFolderId = "";
 let preferredUploadPeriod = localStorage.getItem(preferredPeriodStorageKey) || "";
+let currentUser = null;
+
+expirationSelect.value = defaultExpirationSeconds;
+expirationSelect.disabled = true;
+
+loadAuthStatus();
 
 if (folderParam) {
   uploadSubtitle.textContent = `Upload to folder: ${folderParam}`;
@@ -43,6 +50,27 @@ if (folderParam) {
 }
 
 updateUploadButtonState();
+
+function isAdminUser(user) {
+  return user?.role === "admin";
+}
+
+async function loadAuthStatus() {
+  try {
+    const response = await fetch(`${apiBase}/api/auth/status`);
+    const data = await response.json();
+
+    currentUser = data.user || null;
+    expirationSelect.disabled = !isAdminUser(currentUser);
+  } catch (err) {
+    currentUser = null;
+    expirationSelect.disabled = true;
+  }
+
+  if (expirationSelect.disabled) {
+    expirationSelect.value = defaultExpirationSeconds;
+  }
+}
 
 async function loadFolderContext(folderId) {
   try {
@@ -429,7 +457,7 @@ uploadForm.onsubmit = async (e) => {
   }
 
   try {
-    const expiration = expirationSelect.value;
+    const expiration = isAdminUser(currentUser) ? expirationSelect.value : defaultExpirationSeconds;
     updateUploadButtonState(true);
     setStatus(`Preparing ${files.length} image(s)...`);
     uploadResults.innerHTML = "";
