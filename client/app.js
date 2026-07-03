@@ -114,10 +114,10 @@ function renderGalleryNotice(data, filesCount, foldersCount) {
   if (filesCount > 0) {
     const availableUntil = formatAvailabilityDate(data.availability?.availableUntil);
     message.textContent = availableUntil
-      ? `Please note that the files will be accessible until ${availableUntil}`
-      : "Please note that the files will be accessible for a limited time.";
+      ? `Veuillez noter que les fichiers seront accessibles jusqu'au ${availableUntil}`
+      : "Veuillez noter que les fichiers seront accessibles pendant une durée limitée.";
   } else if (folderId && foldersCount === 0) {
-    message.textContent = "The files are no longer available.";
+    message.textContent = "Les fichiers ne sont plus disponibles.";
   } else {
     return;
   }
@@ -126,7 +126,7 @@ function renderGalleryNotice(data, filesCount, foldersCount) {
   booking.href = brand.bookingUrl;
   booking.target = "_blank";
   booking.rel = "noopener";
-  booking.textContent = "Book the Next Camp Today";
+  booking.textContent = "Réservez le prochain camp dès aujourd'hui";
 
   notice.append(message, booking);
   gallery.appendChild(notice);
