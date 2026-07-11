@@ -30,6 +30,15 @@ Create a `.env` file in the project root:
 IMGBB_API_KEY=your_imgbb_api_key
 ```
 
+You can also configure multiple ImgBB API keys. The server rotates to another key after
+every 100 uploaded files. When ImgBB returns a rate-limit error, the current key is marked
+blocked, the server logs the blocked key's last four characters, and uploads continue with
+the next available key. The management page shows available keys as `available/total`.
+
+```bash
+IMGBB_API_KEYS=first_key,second_key,third_key
+```
+
 The server loads `.env` automatically in local development.
 
 Do not commit `.env`. It is already listed in `.gitignore`.
@@ -286,7 +295,7 @@ Body:
 }
 ```
 
-Upload requires `IMGBB_API_KEY`.
+Upload requires `IMGBB_API_KEY` or `IMGBB_API_KEYS`.
 
 ## Phone Testing
 
@@ -315,6 +324,8 @@ Set this environment variable in your cloud provider:
 
 ```bash
 IMGBB_API_KEY=your_imgbb_api_key
+# or
+IMGBB_API_KEYS=first_key,second_key,third_key
 ```
 
 Build command:

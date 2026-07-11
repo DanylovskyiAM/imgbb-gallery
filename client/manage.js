@@ -45,6 +45,7 @@ const editFolderForm = document.getElementById("editFolderForm");
 const editFolderName = document.getElementById("editFolderName");
 const editFolderDescription = document.getElementById("editFolderDescription");
 const cancelEditFolder = document.getElementById("cancelEditFolder");
+const adminNotice = document.getElementById("adminNotice");
 
 const apiHost = window.location.hostname || "127.0.0.1";
 const isLocalClient = ["localhost", "127.0.0.1"].includes(apiHost) && window.location.port === "5500";
@@ -66,6 +67,26 @@ let folderStatsCache = new Map();
 let folderDisplayPathCache = new Map();
 let preferredUploadPeriod = localStorage.getItem(preferredPeriodStorageKey) || "";
 let folderViewMode = "active";
+
+function renderAdminNotice(status) {
+  if (!adminNotice) {
+    return;
+  }
+
+  const hasStatus = status?.configured && status.total > 0;
+  const available = Number(status?.available || 0);
+  const total = Number(status?.total || 0);
+  const isGreen = hasStatus && available === total;
+  const isRed = hasStatus && available <= 1;
+
+  adminNotice.classList.toggle("hidden", !hasStatus);
+  adminNotice.classList.toggle("is-green", isGreen);
+  adminNotice.classList.toggle("is-yellow", hasStatus && !isGreen && !isRed);
+  adminNotice.classList.toggle("is-red", isRed);
+  adminNotice.textContent = hasStatus
+    ? `ImgBB API keys available: ${available}/${total}`
+    : "";
+}
 
 function setBulkActionsVisible(isVisible) {
   bulkFileActions.classList.toggle("hidden", !isVisible);
@@ -1144,12 +1165,14 @@ function prevFile() {
 }
 
 async function loadFolders() {
-  const [data, preferencesData] = await Promise.all([
+  const [data, preferencesData, uploadKeyStatus] = await Promise.all([
     api(`/api/folders?state=${folderViewMode}`),
-    api("/api/preferences").catch(() => ({ preferences: {} }))
+    api("/api/preferences").catch(() => ({ preferences: {} })),
+    api("/api/upload/key-status").catch(() => null)
   ]);
 
   folders = data.folders;
+  renderAdminNotice(uploadKeyStatus);
   preferredUploadPeriod = preferencesData.preferences?.preferredUploadPeriod || localStorage.getItem(preferredPeriodStorageKey) || "";
   rebuildFolderIndexes();
   renderPreferredPeriodSelect();

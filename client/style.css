@@ -78,6 +78,33 @@ body.modal-open {
   transform: translateY(-2px);
 }
 
+.admin-notice {
+  width: min(1100px, calc(100% - 32px));
+  margin: 0 auto 14px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  border: 1px solid #16a34a;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.admin-notice.is-yellow {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.admin-notice.is-red {
+  border-color: #dc2626;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
 .folder-card-icon {
   width: 28px;
   height: 28px;

@@ -38,11 +38,18 @@ const BASE = "https://ibb.co";
 const MAX_PAGES = 25;
 const PORT = process.env.PORT || 3000;
 const CACHE_TTL_MS = 5 * 60 * 1000;
-const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
+const IMGBB_API_KEYS = String(process.env.IMGBB_API_KEYS || process.env.IMGBB_API_KEY || "")
+  .split(/[\s,]+/)
+  .map(key => key.trim())
+  .filter(Boolean);
 const DEFAULT_UPLOAD_EXPIRATION_SECONDS = 1209600;
 
 const cache = {};
 const SESSION_COOKIE = "mya_admin_session";
+const IMGBB_UPLOADS_PER_KEY = 100;
+let imgbbApiKeyIndex = 0;
+let imgbbUploadsOnCurrentKey = 0;
+const blockedImgBbKeyIndexes = new Set();
 
 function parseCookies(req) {
   return String(req.headers.cookie || "")
@@ -117,6 +124,143 @@ function logAction(req, action, message, details = {}, level = "info", user = re
 
 function isAdminUser(user) {
   return user?.role === "admin";
+}
+
+function getImgBbKeyStatus() {
+  const blocked = [...blockedImgBbKeyIndexes].sort((a, b) => a - b);
+
+  return {
+    configured: IMGBB_API_KEYS.length > 0,
+    currentIndex: IMGBB_API_KEYS.length ? imgbbApiKeyIndex : -1,
+    total: IMGBB_API_KEYS.length,
+    available: Math.max(0, IMGBB_API_KEYS.length - blocked.length),
+    blocked: blocked.length,
+    blockedKeySuffixes: blocked.map(index => getImgBbKeySuffix(index)),
+    uploadsOnCurrentKey: imgbbUploadsOnCurrentKey,
+    rotateEvery: IMGBB_UPLOADS_PER_KEY
+  };
+}
+
+function getImgBbKeySuffix(index) {
+  return String(IMGBB_API_KEYS[index] || "").slice(-4);
+}
+
+function isImgBbRateLimitError(err) {
+  const code = err.response?.data?.error?.code;
+  const message = String(err.response?.data?.error?.message || err.message || "").toLowerCase();
+
+  return code === 100 || message.includes("rate limit");
+}
+
+function getNextAvailableImgBbKeyIndex(startIndex = imgbbApiKeyIndex) {
+  if (!IMGBB_API_KEYS.length || blockedImgBbKeyIndexes.size >= IMGBB_API_KEYS.length) {
+    return -1;
+  }
+
+  for (let offset = 1; offset <= IMGBB_API_KEYS.length; offset += 1) {
+    const candidateIndex = (startIndex + offset) % IMGBB_API_KEYS.length;
+
+    if (!blockedImgBbKeyIndexes.has(candidateIndex)) {
+      return candidateIndex;
+    }
+  }
+
+  return -1;
+}
+
+function setCurrentImgBbKeyIndex(index) {
+  imgbbApiKeyIndex = index;
+  imgbbUploadsOnCurrentKey = 0;
+}
+
+function rotateImgBbKeyAfterUploadBatch(req) {
+  if (IMGBB_API_KEYS.length < 2 || imgbbUploadsOnCurrentKey < IMGBB_UPLOADS_PER_KEY) {
+    return;
+  }
+
+  const previousIndex = imgbbApiKeyIndex;
+  const nextIndex = getNextAvailableImgBbKeyIndex(previousIndex);
+
+  if (nextIndex < 0 || nextIndex === previousIndex) {
+    imgbbUploadsOnCurrentKey = 0;
+    return;
+  }
+
+  setCurrentImgBbKeyIndex(nextIndex);
+  logAction(
+    req,
+    "upload.key.rotate",
+    `Rotated ImgBB API key after ${IMGBB_UPLOADS_PER_KEY} uploaded files`,
+    {
+      previousKeyNumber: previousIndex + 1,
+      currentKeyNumber: nextIndex + 1,
+      totalKeys: IMGBB_API_KEYS.length,
+      availableKeys: IMGBB_API_KEYS.length - blockedImgBbKeyIndexes.size
+    },
+    "info"
+  );
+}
+
+function blockImgBbKey(req, keyIndex) {
+  if (blockedImgBbKeyIndexes.has(keyIndex)) {
+    return;
+  }
+
+  blockedImgBbKeyIndexes.add(keyIndex);
+  logAction(
+    req,
+    "upload.key.blocked",
+    `ImgBB API key ending in ${getImgBbKeySuffix(keyIndex)} is blocked by rate limit`,
+    {
+      keyNumber: keyIndex + 1,
+      keySuffix: getImgBbKeySuffix(keyIndex),
+      totalKeys: IMGBB_API_KEYS.length,
+      availableKeys: IMGBB_API_KEYS.length - blockedImgBbKeyIndexes.size
+    },
+    "warning"
+  );
+}
+
+async function uploadImageWithImgBbKeyRotation(req, image, expiration) {
+  if (!IMGBB_API_KEYS.length) {
+    throw new Error("IMGBB_API_KEYS or IMGBB_API_KEY is not configured on the server");
+  }
+
+  let attempts = 0;
+
+  while (attempts < IMGBB_API_KEYS.length) {
+    const keyIndex = imgbbApiKeyIndex;
+
+    try {
+      const stored = await imgbbStorage.uploadImage({
+        apiKey: IMGBB_API_KEYS[keyIndex],
+        image,
+        expiration
+      });
+
+      imgbbUploadsOnCurrentKey += 1;
+      rotateImgBbKeyAfterUploadBatch(req);
+
+      return stored;
+    } catch (err) {
+      if (!isImgBbRateLimitError(err)) {
+        throw err;
+      }
+
+      blockImgBbKey(req, keyIndex);
+
+      const nextIndex = getNextAvailableImgBbKeyIndex(keyIndex);
+
+      if (nextIndex < 0) {
+        throw err;
+      }
+
+      setCurrentImgBbKeyIndex(nextIndex);
+      attempts += 1;
+    }
+  }
+
+  throw new Error("All configured ImgBB API keys are rate limited");
 }
 
 function folderLogDetails(folder) {
@@ -850,12 +994,16 @@ app.delete("/api/files/:id", requireManageAuth, (req, res) => {
   res.json({ ok: true });
 });
 
+app.get("/api/upload/key-status", requireManageAuth, (req, res) => {
+  res.json(getImgBbKeyStatus());
+});
+
 app.post("/api/upload", async (req, res) => {
   const { images, expiration, folderId, folderSlug } = req.body;
   const auth = getAuth(req);
 
-  if (!IMGBB_API_KEY) {
-    return res.status(500).json({ error: "IMGBB_API_KEY is not configured on the server" });
+  if (!IMGBB_API_KEYS.length) {
+    return res.status(500).json({ error: "IMGBB_API_KEYS or IMGBB_API_KEY is not configured on the server" });
   }
 
   if (!Array.isArray(images) || images.length === 0) {
@@ -875,14 +1023,12 @@ app.post("/api/upload", async (req, res) => {
       return res.status(404).json({ error: "Folder not found" });
     }
 
-    const storedImages = await Promise.all(images.map(async (image) => {
-      const stored = await imgbbStorage.uploadImage({
-        apiKey: IMGBB_API_KEY,
-        image,
-        expiration: expirationSeconds
-      });
+    const storedImages = [];
 
-      return {
+    for (const image of images) {
+      const stored = await uploadImageWithImgBbKeyRotation(req, image, expirationSeconds);
+
+      storedImages.push({
         folderId: folder.id,
         provider: stored.provider,
         providerFileId: stored.providerFileId,
@@ -893,8 +1039,8 @@ app.post("/api/upload", async (req, res) => {
         deleteUrl: stored.deleteUrl,
         expirationSeconds,
         uploadedBy: "manager"
-      };
-    }));
+      });
+    }
     const uploaded = db.createFiles(storedImages);
 
     logAction(req, "upload.create", `Uploaded ${uploaded.length} image(s) to "${folder.name}"`, {
@@ -908,7 +1054,13 @@ app.post("/api/upload", async (req, res) => {
       images: uploaded
     });
   } catch (err) {
-    res.status(500).json({ error: "Failed to upload images" });
+    const providerMessage = err.response?.data?.error?.message || err.message;
+    const providerStatus = err.response?.status || 500;
+
+    console.error("Failed to upload images:", providerMessage);
+    res.status(providerStatus >= 400 && providerStatus < 500 ? 400 : 502).json({
+      error: providerMessage ? `Failed to upload images: ${providerMessage}` : "Failed to upload images"
+    });
   }
 });
 
