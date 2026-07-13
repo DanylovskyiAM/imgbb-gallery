@@ -1192,6 +1192,36 @@ body.modal-open {
   white-space: nowrap;
 }
 
+.file-status-section {
+  margin-bottom: 12px;
+  border: 1px solid #ececf6;
+  border-radius: 4px;
+  background: white;
+}
+
+.file-status-summary {
+  padding: 10px 10px 10px 6px;
+  font-size: 13px;
+  line-height: 1.25;
+  cursor: pointer;
+}
+
+.file-status-summary::marker {
+  content: "";
+}
+
+.file-status-summary::-webkit-details-marker {
+  display: none;
+}
+
+.file-status-section .manage-file-grid {
+  padding: 0 10px 10px;
+}
+
+.file-status-section .empty-state {
+  margin: 0 10px 10px;
+}
+
 .manage-modal-actions button {
   height: 34px;
   padding: 5px 10px;

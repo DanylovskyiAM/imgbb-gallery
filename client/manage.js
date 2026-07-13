@@ -1091,7 +1091,7 @@ function renderFolderOverview(parentFolder = null) {
 function renderFiles(files) {
   fileList.innerHTML = "";
   fileList.classList.remove("folder-overview-list");
-  fileList.classList.add("manage-file-grid");
+  fileList.classList.remove("manage-file-grid");
   currentFiles = files;
 
   if (!files.length) {
@@ -1099,26 +1099,112 @@ function renderFiles(files) {
     return;
   }
 
-  files.forEach((file, index) => {
-    const item = document.createElement("article");
-    item.className = "card manage-file-card";
+  const approvedFiles = files.filter(file => file.status === "approved");
+  const pendingFiles = files.filter(file => file.status !== "approved");
 
-    const img = document.createElement("img");
-    img.src = file.mediumUrl || file.originalUrl;
-    img.alt = file.title || file.filename || `File ${index + 1}`;
-    img.onclick = () => openModal(index);
+  fileList.append(
+    createFileSection({
+      title: `${approvedFiles.length} ${approvedFiles.length === 1 ? "file" : "files"} already approved`,
+      files: approvedFiles,
+      open: pendingFiles.length === 0,
+      lazy: true
+    }),
+    createFileSection({
+      title: `Pending (${pendingFiles.length} ${pendingFiles.length === 1 ? "file" : "files"})`,
+      files: pendingFiles,
+      open: pendingFiles.length > 0,
+      emptyMessage: "No pending files."
+    })
+  );
+}
 
-    const number = document.createElement("span");
-    number.className = "photo-number";
-    number.textContent = index + 1;
+function createFileSection({ title, files, open, lazy = false, emptyMessage = "No approved files." }) {
+  const section = document.createElement("details");
+  section.className = "file-status-section";
+  section.open = open;
 
-    const status = document.createElement("span");
-    status.className = `file-status file-status-${file.status}`;
-    status.textContent = file.status;
+  const summary = document.createElement("summary");
+  summary.className = "file-status-summary";
 
-    item.append(img, number, status);
-    fileList.appendChild(item);
+  const label = document.createElement("span");
+  label.className = "folder-label";
+
+  const icon = document.createElement("span");
+  icon.className = "folder-icon is-toggle";
+  icon.setAttribute("aria-hidden", "true");
+
+  const titleText = document.createElement("strong");
+  titleText.textContent = title;
+  label.append(icon, titleText);
+  summary.appendChild(label);
+  section.appendChild(summary);
+
+  const updateIcon = () => {
+    icon.textContent = section.open ? "▾" : "▸";
+  };
+  updateIcon();
+
+  if (!files.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty-state";
+    empty.textContent = emptyMessage;
+    section.appendChild(empty);
+    section.addEventListener("toggle", updateIcon);
+    return section;
+  }
+
+  let hasRenderedFiles = false;
+  const renderFileGrid = () => {
+    if (hasRenderedFiles) {
+      return;
+    }
+
+    const grid = document.createElement("div");
+    grid.className = "manage-file-grid";
+
+    files.forEach((file) => {
+      const index = currentFiles.indexOf(file);
+      grid.appendChild(createFileCard(file, index));
+    });
+
+    section.appendChild(grid);
+    hasRenderedFiles = true;
+  };
+
+  section.addEventListener("toggle", () => {
+    updateIcon();
+
+    if (section.open) {
+      renderFileGrid();
+    }
   });
+
+  if (!lazy || open) {
+    renderFileGrid();
+  }
+
+  return section;
+}
+
+function createFileCard(file, index) {
+  const item = document.createElement("article");
+  item.className = "card manage-file-card";
+
+  const img = document.createElement("img");
+  img.src = file.mediumUrl || file.originalUrl;
+  img.alt = file.title || file.filename || `File ${index + 1}`;
+  img.onclick = () => openModal(index);
+
+  const number = document.createElement("span");
+  number.className = "photo-number";
+  number.textContent = index + 1;
+
+  const status = document.createElement("span");
+  status.className = `file-status file-status-${file.status}`;
+  status.textContent = file.status;
+
+  item.append(img, number, status);
+  return item;
 }
 
 function openModal(index) {
