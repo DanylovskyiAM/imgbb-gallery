@@ -126,7 +126,7 @@ function renderGalleryNotice(data, filesCount, foldersCount) {
   booking.href = brand.bookingUrl;
   booking.target = "_blank";
   booking.rel = "noopener";
-  booking.textContent = "Réservez le prochain camp dès aujourd'hui";
+  booking.textContent = "Réservez le prochain stage dès aujourd'hui";
 
   notice.append(message, booking);
   gallery.appendChild(notice);
