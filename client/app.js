@@ -38,6 +38,7 @@ let zoomScale = 1;
 let pinchStartDistance = 0;
 let pinchStartScale = 1;
 let isPinching = false;
+let isDownloadAllInProgress = false;
 
 const footerBrands = {
   actionsport: {
@@ -509,21 +510,75 @@ function downloadImage(url, index, filename) {
 }
 
 // DOWNLOAD ALL (ZIP)
+function setDownloadAllButton(label, disabled = false) {
+  downloadAllBtn.textContent = label;
+  downloadAllBtn.disabled = disabled;
+  downloadAllBtn.setAttribute("aria-busy", String(disabled));
+}
+
+async function addImagesToZip(zip) {
+  const concurrency = Math.min(4, images.length);
+  let nextIndex = 0;
+  let completed = 0;
+  let failed = false;
+
+  const worker = async () => {
+    try {
+      while (!failed && nextIndex < images.length) {
+        const index = nextIndex++;
+        const image = images[index];
+        const response = await fetch(image.original);
+
+        if (!response.ok) {
+          throw new Error(`Could not download image ${index + 1}.`);
+        }
+
+        const blob = await response.blob();
+
+        if (failed) {
+          return;
+        }
+
+        zip.file(image.filename || `image_${index + 1}.jpg`, blob);
+        completed += 1;
+        setDownloadAllButton(`Preparing ${completed} of ${images.length}…`, true);
+      }
+    } catch (err) {
+      failed = true;
+      throw err;
+    }
+  };
+
+  await Promise.all(Array.from({ length: concurrency }, worker));
+}
+
 downloadAllBtn.onclick = async () => {
+  if (isDownloadAllInProgress || !images.length) {
+    return;
+  }
+
+  isDownloadAllInProgress = true;
   const zip = new JSZip();
 
-  await Promise.all(
-    images.map(async (image, i) => {
-      const res = await fetch(image.original);
-      const blob = await res.blob();
-      zip.file(image.filename || `image_${i + 1}.jpg`, blob);
-    })
-  );
+  try {
+    setDownloadAllButton(`Preparing 0 of ${images.length}…`, true);
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    await addImagesToZip(zip);
 
-  const content = await zip.generateAsync({ type: "blob" });
+    const content = await zip.generateAsync({ type: "blob", streamFiles: true }, (metadata) => {
+      setDownloadAllButton(`Creating ZIP ${Math.round(metadata.percent)}%…`, true);
+    });
 
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(content);
-  a.download = "album.zip";
-  a.click();
+    const url = URL.createObjectURL(content);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "album.zip";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  } catch (err) {
+    window.alert(err.message || "Unable to prepare the download. Please try again.");
+  } finally {
+    isDownloadAllInProgress = false;
+    setDownloadAllButton("Download All");
+  }
 };
