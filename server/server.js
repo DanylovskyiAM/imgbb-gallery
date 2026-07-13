@@ -42,7 +42,7 @@ const IMGBB_API_KEYS = String(process.env.IMGBB_API_KEYS || process.env.IMGBB_AP
   .split(/[\s,]+/)
   .map(key => key.trim())
   .filter(Boolean);
-const DEFAULT_UPLOAD_EXPIRATION_SECONDS = 1209600;
+const DEFAULT_UPLOAD_EXPIRATION_SECONDS = 2592000;
 
 const cache = {};
 const SESSION_COOKIE = "mya_admin_session";
