@@ -265,9 +265,10 @@ function readFileAsDataUrl(file) {
   });
 }
 
-function setStatus(message, isError = false) {
+function setStatus(message, isError = false, isSuccess = false) {
   uploadStatus.textContent = message;
   uploadStatus.classList.toggle("is-error", isError);
+  uploadStatus.classList.toggle("is-success", isSuccess);
 }
 
 function renderResults(images) {
@@ -475,7 +476,14 @@ uploadForm.onsubmit = async (e) => {
       renderResults(uploadedImages);
     }
 
-    setStatus(`Uploaded ${uploadedImages.length} image(s).`);
+    const successMessage = uploadedImages.length === 1
+      ? "Success! 1 file has been uploaded and is waiting for approval."
+      : `Success! ${uploadedImages.length} files have been uploaded and are waiting for approval.`;
+    setStatus(
+      successMessage,
+      false,
+      true
+    );
     uploadInput.value = "";
   } catch (err) {
     setStatus(err.message || "Upload failed.", true);
