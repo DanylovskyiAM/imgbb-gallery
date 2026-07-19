@@ -1214,6 +1214,8 @@ body.modal-open {
 }
 
 .file-status-summary {
+  display: block;
+  list-style: none;
   padding: 10px 10px 10px 6px;
   font-size: 13px;
   line-height: 1.25;
