@@ -10,9 +10,11 @@ test("buildTelegramReport includes available keys and pending folders", () => {
   const report = buildTelegramReport({
     keyStatus: { configured: true, available: 2, total: 3 },
     folders: [
-      { id: "root", name: "ActionSport", parentId: null, pendingCount: 0 },
-      { id: "location", name: "Auderghem", parentId: "root", pendingCount: 0 },
-      { id: "period", name: "Summer - Week 5", parentId: "location", pendingCount: 2 }
+      { id: "root", name: "Promosport", parentId: null, pendingCount: 0 },
+      { id: "liege", name: "Liège – Sainte-Véronique", parentId: "root", pendingCount: 0 },
+      { id: "liege-period", name: "Summer - Week 3", parentId: "liege", pendingCount: 70 },
+      { id: "woluwe", name: "Woluwe-Saint-Lambert – Lindthout", parentId: "root", pendingCount: 0 },
+      { id: "woluwe-period", name: "Summer - Week 3", parentId: "woluwe", pendingCount: 58 }
     ],
     manageUrl: "https://gallery.example/manage.html",
     now: new Date("2026-07-24T17:00:00Z"),
@@ -20,8 +22,11 @@ test("buildTelegramReport includes available keys and pending folders", () => {
   });
 
   assert.match(report, /ImgBB API keys: 2\/3 available/);
-  assert.match(report, /Waiting for approval: 2 files/);
-  assert.match(report, /ActionSport \/ Auderghem \/ Summer - Week 5: 2 files/);
+  assert.match(report, /Waiting for approval: 128 files/);
+  assert.match(
+    report,
+    /• Promosport\n••• Summer - Week 3\n••••• Liège – Sainte-Véronique: 70 files\n••••• Woluwe-Saint-Lambert – Lindthout: 58 files/
+  );
   assert.match(report, /https:\/\/gallery\.example\/manage\.html/);
 });
 

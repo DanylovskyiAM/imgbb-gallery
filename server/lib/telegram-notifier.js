@@ -3,9 +3,9 @@ const axios = require("axios");
 const TELEGRAM_MESSAGE_LIMIT = 4000;
 const DEFAULT_TIME_ZONE = "Europe/Kyiv";
 
-function getFolderDisplayPath(folder, folders) {
+function getFolderHierarchy(folder, folders) {
   const folderById = new Map(folders.map(item => [item.id, item]));
-  const segments = [folder.name];
+  const hierarchy = [folder];
   const visited = new Set([folder.id]);
   let parentId = folder.parentId;
 
@@ -17,11 +17,65 @@ function getFolderDisplayPath(folder, folders) {
     }
 
     visited.add(parent.id);
-    segments.unshift(parent.name);
+    hierarchy.unshift(parent);
     parentId = parent.parentId;
   }
 
-  return segments.join(" / ");
+  return hierarchy;
+}
+
+function groupPendingFolders(folders) {
+  const disciplines = new Map();
+
+  folders
+    .filter(folder => Number(folder.pendingCount) > 0)
+    .forEach(folder => {
+      const hierarchy = getFolderHierarchy(folder, folders);
+      const disciplineName = hierarchy[0]?.name || "Other";
+      const periodName = hierarchy.at(-1)?.name || "Other";
+      const locationName = hierarchy.slice(1, -1).map(item => item.name).join(" / ")
+        || "Unassigned location";
+      const count = Number(folder.pendingCount);
+
+      if (!disciplines.has(disciplineName)) {
+        disciplines.set(disciplineName, {
+          name: disciplineName,
+          count: 0,
+          periods: new Map()
+        });
+      }
+
+      const discipline = disciplines.get(disciplineName);
+
+      if (!discipline.periods.has(periodName)) {
+        discipline.periods.set(periodName, {
+          name: periodName,
+          count: 0,
+          locations: new Map()
+        });
+      }
+
+      const period = discipline.periods.get(periodName);
+      const locationCount = period.locations.get(locationName) || 0;
+
+      discipline.count += count;
+      period.count += count;
+      period.locations.set(locationName, locationCount + count);
+    });
+
+  return [...disciplines.values()]
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+    .map(discipline => ({
+      ...discipline,
+      periods: [...discipline.periods.values()]
+        .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+        .map(period => ({
+          ...period,
+          locations: [...period.locations.entries()]
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+        }))
+    }));
 }
 
 function pluralizeFiles(count) {
@@ -43,14 +97,8 @@ function buildTelegramReport({
   now = new Date(),
   timeZone = DEFAULT_TIME_ZONE
 }) {
-  const pendingFolders = folders
-    .filter(folder => Number(folder.pendingCount) > 0)
-    .map(folder => ({
-      count: Number(folder.pendingCount),
-      path: getFolderDisplayPath(folder, folders)
-    }))
-    .sort((a, b) => b.count - a.count || a.path.localeCompare(b.path));
-  const totalPending = pendingFolders.reduce((total, folder) => total + folder.count, 0);
+  const pendingGroups = groupPendingFolders(folders);
+  const totalPending = pendingGroups.reduce((total, discipline) => total + discipline.count, 0);
   const keyLine = keyStatus?.configured
     ? `ImgBB API keys: ${keyStatus.available}/${keyStatus.total} available`
     : "ImgBB API keys: not configured";
@@ -61,10 +109,16 @@ function buildTelegramReport({
     `Waiting for approval: ${pluralizeFiles(totalPending)}`
   ];
 
-  if (pendingFolders.length) {
+  if (pendingGroups.length) {
     lines.push("", "Locations:");
-    pendingFolders.forEach(folder => {
-      lines.push(`• ${folder.path}: ${pluralizeFiles(folder.count)}`);
+    pendingGroups.forEach(discipline => {
+      lines.push(`• ${discipline.name}`);
+      discipline.periods.forEach(period => {
+        lines.push(`••• ${period.name}`);
+        period.locations.forEach(location => {
+          lines.push(`••••• ${location.name}: ${pluralizeFiles(location.count)}`);
+        });
+      });
     });
   } else {
     lines.push("", "No files are waiting for approval.");
