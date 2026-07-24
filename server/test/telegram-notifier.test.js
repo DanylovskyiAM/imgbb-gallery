@@ -25,7 +25,7 @@ test("buildTelegramReport includes available keys and pending folders", () => {
   assert.match(report, /Waiting for approval: 128 files/);
   assert.match(
     report,
-    /• Promosport\n••• Summer - Week 3\n••••• Liège – Sainte-Véronique: 70 files\n••••• Woluwe-Saint-Lambert – Lindthout: 58 files/
+    /• Promosport\n•• Summer - Week 3\n••• Liège – Sainte-Véronique: 70\n••• Woluwe-Saint-Lambert – Lindthout: 58/
   );
   assert.match(report, /https:\/\/gallery\.example\/manage\.html/);
 });

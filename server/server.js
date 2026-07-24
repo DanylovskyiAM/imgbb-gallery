@@ -12,6 +12,10 @@ const {
   buildTelegramReport,
   sendTelegramReport
 } = require("./lib/telegram-notifier");
+const {
+  getFilesAvailability,
+  partitionFilesByAvailability
+} = require("./lib/file-availability");
 
 function loadLocalEnv() {
   const envPath = path.join(__dirname, "../.env");
@@ -905,32 +909,6 @@ function getFolderParentDisplayPath(folder, folders) {
   return parent ? getFolderDisplayPath(parent, folders) : "";
 }
 
-function getFilesAvailability(files) {
-  const firstExpiringFile = files
-    .map(file => ({
-      createdAt: file.createdAt,
-      expirationSeconds: Number(file.expirationSeconds || file.expiration) || 0
-    }))
-    .filter(file => file.createdAt && file.expirationSeconds > 0)
-    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))[0];
-
-  if (!firstExpiringFile) {
-    return null;
-  }
-
-  const uploadedAt = new Date(firstExpiringFile.createdAt);
-
-  if (Number.isNaN(uploadedAt.getTime())) {
-    return null;
-  }
-
-  return {
-    uploadedAt: uploadedAt.toISOString(),
-    expirationSeconds: firstExpiringFile.expirationSeconds,
-    availableUntil: new Date(uploadedAt.getTime() + firstExpiringFile.expirationSeconds * 1000).toISOString()
-  };
-}
-
 app.get("/api/gallery/folders/:id", (req, res) => {
   const folder = db.findFolder(req.params.id);
 
@@ -939,6 +917,11 @@ app.get("/api/gallery/folders/:id", (req, res) => {
   }
 
   const files = db.listFiles(folder.id, "approved");
+  const now = new Date();
+  const {
+    available: availableFiles,
+    expired: expiredFiles
+  } = partitionFilesByAvailability(files, now);
   const allFolders = db.listFolders();
   const folders = allFolders
     .filter(item => item.parentId === folder.id)
@@ -950,20 +933,27 @@ app.get("/api/gallery/folders/:id", (req, res) => {
     displayPath: getFolderDisplayPath(folder, allFolders),
     title: folder.name,
     subtitle: getFolderParentDisplayPath(folder, allFolders) || getFolderDisplayPath(folder, allFolders),
-    count: files.length,
-    availability: getFilesAvailability(files),
-    folders: folders.map(item => ({
-      id: item.id,
-      name: item.name,
-      path: item.path,
-      displayPath: getFolderDisplayPath(item, allFolders),
-      parentDisplayPath: getFolderParentDisplayPath(item, allFolders),
-      description: item.description,
-      filesCount: item.filesCount,
-      approvedCount: item.approvedCount,
-      pendingCount: item.pendingCount
-    })),
-    images: files.map(file => ({
+    count: availableFiles.length,
+    expiredCount: expiredFiles.length,
+    availability: getFilesAvailability(availableFiles),
+    folders: folders.map(item => {
+      const childFiles = db.listFiles(item.id, "approved");
+      const childAvailability = partitionFilesByAvailability(childFiles, now);
+
+      return {
+        id: item.id,
+        name: item.name,
+        path: item.path,
+        displayPath: getFolderDisplayPath(item, allFolders),
+        parentDisplayPath: getFolderParentDisplayPath(item, allFolders),
+        description: item.description,
+        filesCount: item.filesCount,
+        approvedCount: childAvailability.available.length,
+        expiredCount: childAvailability.expired.length,
+        pendingCount: item.pendingCount
+      };
+    }),
+    images: availableFiles.map(file => ({
       id: file.id,
       title: file.title,
       filename: file.filename,

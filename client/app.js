@@ -111,8 +111,13 @@ function renderGalleryNotice(data, filesCount, foldersCount) {
   notice.className = "gallery-notice";
 
   const message = document.createElement("p");
+  const expiredCount = Number(data.expiredCount) || 0;
 
-  if (filesCount > 0) {
+  if (expiredCount > 0) {
+    message.textContent = expiredCount === 1
+      ? "1 fichier a expiré et n’est plus disponible."
+      : `${expiredCount} fichiers ont expiré et ne sont plus disponibles.`;
+  } else if (filesCount > 0) {
     const availableUntil = formatAvailabilityDate(data.availability?.availableUntil);
     message.textContent = availableUntil
       ? `Veuillez noter que les fichiers seront accessibles jusqu'au ${availableUntil}`
