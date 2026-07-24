@@ -1,0 +1,62 @@
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const {
+  buildTelegramReport,
+  sendTelegramReport,
+  splitTelegramMessage
+} = require("../lib/telegram-notifier");
+
+test("buildTelegramReport includes available keys and pending folders", () => {
+  const report = buildTelegramReport({
+    keyStatus: { configured: true, available: 2, total: 3 },
+    folders: [
+      { id: "root", name: "ActionSport", parentId: null, pendingCount: 0 },
+      { id: "location", name: "Auderghem", parentId: "root", pendingCount: 0 },
+      { id: "period", name: "Summer - Week 5", parentId: "location", pendingCount: 2 }
+    ],
+    manageUrl: "https://gallery.example/manage.html",
+    now: new Date("2026-07-24T17:00:00Z"),
+    timeZone: "Europe/Kyiv"
+  });
+
+  assert.match(report, /ImgBB API keys: 2\/3 available/);
+  assert.match(report, /Waiting for approval: 2 files/);
+  assert.match(report, /ActionSport \/ Auderghem \/ Summer - Week 5: 2 files/);
+  assert.match(report, /https:\/\/gallery\.example\/manage\.html/);
+});
+
+test("buildTelegramReport handles an empty approval queue", () => {
+  const report = buildTelegramReport({
+    keyStatus: { configured: true, available: 1, total: 1 },
+    folders: []
+  });
+
+  assert.match(report, /Waiting for approval: 0 files/);
+  assert.match(report, /No files are waiting for approval/);
+});
+
+test("splitTelegramMessage keeps chunks inside the Telegram limit", () => {
+  const message = Array.from({ length: 20 }, (_, index) => `Location ${index}: ${"x".repeat(40)}`).join("\n");
+  const chunks = splitTelegramMessage(message, 120);
+
+  assert.ok(chunks.length > 1);
+  assert.ok(chunks.every(chunk => chunk.length <= 120));
+});
+
+test("sendTelegramReport posts every generated chunk", async () => {
+  const requests = [];
+
+  const result = await sendTelegramReport({
+    botToken: "test-token",
+    chatId: "test-chat",
+    message: "Status message",
+    request: async (...args) => {
+      requests.push(args);
+    }
+  });
+
+  assert.equal(result.messageCount, 1);
+  assert.equal(requests.length, 1);
+  assert.equal(requests[0][1].chat_id, "test-chat");
+  assert.equal(requests[0][1].text, "Status message");
+});

@@ -11,7 +11,8 @@
     "parse:mya-periods": "node scripts/parse-mya-periods.js",
     "convert:mya-periods": "node scripts/convert-mya-periods-text.js",
     "import:mya": "node scripts/import-mya-stages.js",
-    "import:mya-periods": "node scripts/import-mya-periods.js"
+    "import:mya-periods": "node scripts/import-mya-periods.js",
+    "notify:telegram": "node scripts/trigger-telegram-notification.js"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",

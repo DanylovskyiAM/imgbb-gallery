@@ -1,0 +1,10 @@
+[Unit]
+Description=Send the MYA Gallery Telegram status report
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/opt/imgbb-gallery
+ExecStart=/usr/bin/npm run notify:telegram

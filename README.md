@@ -342,6 +342,100 @@ npm start --prefix server
 
 The repository also includes a `Dockerfile` for Docker-based hosts.
 
+### Telegram Status Notifications on Oracle Cloud
+
+The server can send a Telegram report containing:
+
+- available ImgBB API keys;
+- the total number of files waiting for approval;
+- pending counts grouped by full folder location;
+- a link to the management page.
+
+The repository includes an Oracle-friendly systemd timer that sends the report every day
+at `14:00` and `20:00` in the `Europe/Kyiv` timezone.
+
+#### 1. Create the Telegram bot and chat
+
+1. Open `@BotFather` in Telegram and create a bot with `/newbot`.
+2. Copy the bot token.
+3. Open the new bot and send it `/start`.
+4. Open the following URL with the token inserted:
+
+   ```text
+   https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates
+   ```
+
+5. Copy `message.chat.id` from the response. Group chat IDs are usually negative.
+
+#### 2. Configure the application
+
+Generate a private scheduler secret on the Oracle VM:
+
+```bash
+openssl rand -hex 32
+```
+
+Add these values to the project `.env` file:
+
+```bash
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
+TELEGRAM_CRON_SECRET=the_generated_random_secret
+TELEGRAM_TIME_ZONE=Europe/Kyiv
+PUBLIC_BASE_URL=https://your-gallery-domain.example
+```
+
+Keep `.env` readable only by the account that runs the gallery:
+
+```bash
+chmod 600 .env
+```
+
+Restart the gallery server so it loads the new environment variables. Then send a manual
+test report from the project directory:
+
+```bash
+npm run notify:telegram
+```
+
+The command calls the gallery through `127.0.0.1`, so the notification endpoint does not
+need to be exposed through Nginx. If the server uses a port other than `3000`, set `PORT`
+in `.env`. `TELEGRAM_NOTIFY_URL` can override the complete local endpoint URL when needed.
+
+#### 3. Install the Oracle systemd timer
+
+The included templates assume:
+
+- the Oracle VM user is `ubuntu`;
+- the repository is installed at `/opt/imgbb-gallery`;
+- `npm` is located at `/usr/bin/npm`.
+
+If your VM differs, edit `deploy/oracle/mya-gallery-notify.service` before copying it.
+
+```bash
+sudo cp deploy/oracle/mya-gallery-notify.service /etc/systemd/system/
+sudo cp deploy/oracle/mya-gallery-notify.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now mya-gallery-notify.timer
+```
+
+Confirm the next afternoon and evening runs:
+
+```bash
+systemctl list-timers mya-gallery-notify.timer
+```
+
+Run it immediately and inspect its logs:
+
+```bash
+sudo systemctl start mya-gallery-notify.service
+sudo journalctl -u mya-gallery-notify.service --since today
+```
+
+`Persistent=true` means systemd sends a missed report after the VM comes back online.
+The endpoint requires `TELEGRAM_CRON_SECRET`; it does not use or store an administrator
+password. Bot credentials and full ImgBB API keys are never included in the report.
+
 ### Oracle VM with Nginx
 
 If uploads work locally but fail on the Oracle cloud VM for files around `1 MB` or larger, Nginx may be rejecting the request before it reaches Node. Base64 upload JSON is larger than the original image file.

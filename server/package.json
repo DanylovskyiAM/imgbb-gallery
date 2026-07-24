@@ -5,7 +5,8 @@
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon --legacy-watch --ignore data server.js"
+    "dev": "nodemon --legacy-watch --ignore data server.js",
+    "test": "node --test"
   },
   "dependencies": {
     "axios": "1.6.7",

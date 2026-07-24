@@ -2,11 +2,16 @@ const express = require("express");
 const axios = require("axios");
 const cheerio = require("cheerio");
 const cors = require("cors");
+const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
 const zlib = require("zlib");
 const db = require("./lib/db");
 const imgbbStorage = require("./storage/imgbbStorage");
+const {
+  buildTelegramReport,
+  sendTelegramReport
+} = require("./lib/telegram-notifier");
 
 function loadLocalEnv() {
   const envPath = path.join(__dirname, "../.env");
@@ -43,6 +48,11 @@ const IMGBB_API_KEYS = String(process.env.IMGBB_API_KEYS || process.env.IMGBB_AP
   .map(key => key.trim())
   .filter(Boolean);
 const DEFAULT_UPLOAD_EXPIRATION_SECONDS = 2592000;
+const TELEGRAM_BOT_TOKEN = String(process.env.TELEGRAM_BOT_TOKEN || "").trim();
+const TELEGRAM_CHAT_ID = String(process.env.TELEGRAM_CHAT_ID || "").trim();
+const TELEGRAM_CRON_SECRET = String(process.env.TELEGRAM_CRON_SECRET || "").trim();
+const TELEGRAM_TIME_ZONE = String(process.env.TELEGRAM_TIME_ZONE || "Europe/Kyiv").trim();
+const PUBLIC_BASE_URL = String(process.env.PUBLIC_BASE_URL || "").trim().replace(/\/+$/, "");
 
 const cache = {};
 const SESSION_COOKIE = "mya_admin_session";
@@ -97,6 +107,19 @@ function requireManageAuth(req, res, next) {
   }
 
   return res.status(401).json({ error: "Authentication required" });
+}
+
+function hasValidBearerSecret(req, expectedSecret) {
+  const authorization = String(req.headers.authorization || "");
+  const providedSecret = authorization.startsWith("Bearer ")
+    ? authorization.slice(7)
+    : "";
+  const expected = Buffer.from(expectedSecret);
+  const provided = Buffer.from(providedSecret);
+
+  return Boolean(expectedSecret)
+    && expected.length === provided.length
+    && crypto.timingSafeEqual(expected, provided);
 }
 
 function requestIp(req) {
@@ -996,6 +1019,50 @@ app.delete("/api/files/:id", requireManageAuth, (req, res) => {
 
 app.get("/api/upload/key-status", requireManageAuth, (req, res) => {
   res.json(getImgBbKeyStatus());
+});
+
+app.post("/api/notifications/telegram", async (req, res) => {
+  if (!TELEGRAM_CRON_SECRET || !TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+    return res.status(503).json({ error: "Telegram notifications are not configured" });
+  }
+
+  if (!hasValidBearerSecret(req, TELEGRAM_CRON_SECRET)) {
+    return res.status(401).json({ error: "Invalid notification secret" });
+  }
+
+  try {
+    const keyStatus = getImgBbKeyStatus();
+    const folders = db.listFolders();
+    const message = buildTelegramReport({
+      keyStatus,
+      folders,
+      manageUrl: PUBLIC_BASE_URL ? `${PUBLIC_BASE_URL}/manage.html` : "",
+      timeZone: TELEGRAM_TIME_ZONE
+    });
+    const result = await sendTelegramReport({
+      botToken: TELEGRAM_BOT_TOKEN,
+      chatId: TELEGRAM_CHAT_ID,
+      message
+    });
+    const sentAt = new Date().toISOString();
+
+    logAction(req, "notification.telegram", "Sent scheduled Telegram status report", {
+      messageCount: result.messageCount,
+      pendingCount: folders.reduce((total, folder) => total + Number(folder.pendingCount || 0), 0),
+      availableKeys: keyStatus.available,
+      totalKeys: keyStatus.total
+    });
+    res.json({ ok: true, sentAt, messageCount: result.messageCount });
+  } catch (err) {
+    const providerMessage = err.response?.data?.description || err.message;
+
+    console.error("Failed to send Telegram notification:", providerMessage);
+    res.status(502).json({
+      error: providerMessage
+        ? `Failed to send Telegram notification: ${providerMessage}`
+        : "Failed to send Telegram notification"
+    });
+  }
 });
 
 app.post("/api/upload", async (req, res) => {
