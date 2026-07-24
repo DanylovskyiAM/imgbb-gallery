@@ -114,9 +114,9 @@ function buildTelegramReport({
     pendingGroups.forEach(discipline => {
       lines.push(`• ${discipline.name}`);
       discipline.periods.forEach(period => {
-        lines.push(`+ ${period.name}`);
+        lines.push(`•• ${period.name}`);
         period.locations.forEach(location => {
-          lines.push(`-- ${location.name}: ${location.count}`);
+          lines.push(`••• ${location.name}: ${location.count}`);
         });
       });
     });
