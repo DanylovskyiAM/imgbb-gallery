@@ -407,10 +407,10 @@ in `.env`. `TELEGRAM_NOTIFY_URL` can override the complete local endpoint URL wh
 The included templates assume:
 
 - the Oracle VM user is `ubuntu`;
-- the repository is installed at `/opt/imgbb-gallery`;
+- the repository is installed at `/home/ubuntu/imgbb-gallery`;
 - `npm` is located at `/usr/bin/npm`.
 
-If your VM differs, edit `deploy/oracle/mya-gallery-notify.service` before copying it.
+These paths match the current Oracle VM configuration.
 
 ```bash
 sudo cp deploy/oracle/mya-gallery-notify.service /etc/systemd/system/

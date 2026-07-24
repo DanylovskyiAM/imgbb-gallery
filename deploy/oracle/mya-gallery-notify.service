@@ -6,5 +6,5 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 User=ubuntu
-WorkingDirectory=/opt/imgbb-gallery
+WorkingDirectory=/home/ubuntu/imgbb-gallery
 ExecStart=/usr/bin/npm run notify:telegram
