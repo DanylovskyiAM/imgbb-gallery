@@ -131,6 +131,27 @@ function buildTelegramReport({
   return lines.join("\n");
 }
 
+function buildLowKeyAlert({
+  keyStatus,
+  manageUrl = "",
+  now = new Date(),
+  timeZone = DEFAULT_TIME_ZONE
+}) {
+  const lines = [
+    `⚠️ MYA Gallery API key alert — ${formatReportTime(now, timeZone)}`,
+    "",
+    `Only ${keyStatus.available}/${keyStatus.total} ImgBB API keys are available.`,
+    `Rate limited: ${keyStatus.blocked || 0}`,
+    `Invalid: ${keyStatus.invalid || 0}`
+  ];
+
+  if (manageUrl) {
+    lines.push("", `Review: ${manageUrl}`);
+  }
+
+  return lines.join("\n");
+}
+
 function splitTelegramMessage(message, maxLength = TELEGRAM_MESSAGE_LIMIT) {
   const chunks = [];
   let current = "";
@@ -193,6 +214,7 @@ async function sendTelegramReport({
 }
 
 module.exports = {
+  buildLowKeyAlert,
   buildTelegramReport,
   sendTelegramReport,
   splitTelegramMessage

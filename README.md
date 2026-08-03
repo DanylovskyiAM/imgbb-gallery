@@ -46,6 +46,14 @@ one hour. Override the cooldown when needed:
 IMGBB_KEY_COOLDOWN_SECONDS=3600
 ```
 
+When the number of available keys drops to five or fewer, the server sends one immediate
+Telegram alert. It will alert again only after availability recovers above the threshold
+and later drops again. The threshold can be changed with:
+
+```bash
+IMGBB_LOW_KEY_ALERT_THRESHOLD=5
+```
+
 Generic ImgBB code `100` errors, maintenance responses, internal upload errors, and invalid
 image data do not block or rotate API keys.
 

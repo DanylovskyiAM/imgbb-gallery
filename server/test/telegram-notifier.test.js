@@ -1,10 +1,25 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const {
+  buildLowKeyAlert,
   buildTelegramReport,
   sendTelegramReport,
   splitTelegramMessage
 } = require("../lib/telegram-notifier");
+
+test("buildLowKeyAlert reports available, rate-limited, and invalid keys", () => {
+  const alert = buildLowKeyAlert({
+    keyStatus: { available: 5, total: 10, blocked: 4, invalid: 1 },
+    manageUrl: "https://gallery.example/manage.html",
+    now: new Date("2026-08-03T12:00:00Z"),
+    timeZone: "Europe/Kyiv"
+  });
+
+  assert.match(alert, /Only 5\/10 ImgBB API keys are available/);
+  assert.match(alert, /Rate limited: 4/);
+  assert.match(alert, /Invalid: 1/);
+  assert.match(alert, /https:\/\/gallery\.example\/manage\.html/);
+});
 
 test("buildTelegramReport includes available keys and pending folders", () => {
   const report = buildTelegramReport({

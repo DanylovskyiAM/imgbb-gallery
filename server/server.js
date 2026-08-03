@@ -9,6 +9,7 @@ const zlib = require("zlib");
 const db = require("./lib/db");
 const imgbbStorage = require("./storage/imgbbStorage");
 const {
+  buildLowKeyAlert,
   buildTelegramReport,
   sendTelegramReport
 } = require("./lib/telegram-notifier");
@@ -70,8 +71,13 @@ const IMGBB_KEY_COOLDOWN_MS = Math.max(
   60,
   Number(process.env.IMGBB_KEY_COOLDOWN_SECONDS) || 3600
 ) * 1000;
+const IMGBB_LOW_KEY_ALERT_THRESHOLD = Math.max(
+  1,
+  Number(process.env.IMGBB_LOW_KEY_ALERT_THRESHOLD) || 5
+);
 let imgbbApiKeyIndex = 0;
 let imgbbUploadsOnCurrentKey = 0;
+let imgbbLowKeyAlertActive = false;
 const blockedImgBbKeys = new Map();
 const invalidImgBbKeyIndexes = new Set();
 const IMGBB_KEY_CHECK_IMAGE = {
@@ -173,6 +179,17 @@ function clearExpiredImgBbKeyBlocks(referenceTime = Date.now()) {
       blockedImgBbKeys.delete(index);
     }
   });
+
+  if (getImgBbAvailableKeyCount() > IMGBB_LOW_KEY_ALERT_THRESHOLD) {
+    imgbbLowKeyAlertActive = false;
+  }
+}
+
+function getImgBbAvailableKeyCount() {
+  return Math.max(
+    0,
+    IMGBB_API_KEYS.length - blockedImgBbKeys.size - invalidImgBbKeyIndexes.size
+  );
 }
 
 function getImgBbKeyStatus() {
@@ -183,7 +200,7 @@ function getImgBbKeyStatus() {
     configured: IMGBB_API_KEYS.length > 0,
     currentIndex: IMGBB_API_KEYS.length ? imgbbApiKeyIndex : -1,
     total: IMGBB_API_KEYS.length,
-    available: Math.max(0, IMGBB_API_KEYS.length - blocked.length - invalidImgBbKeyIndexes.size),
+    available: getImgBbAvailableKeyCount(),
     blocked: blocked.length,
     invalid: invalidImgBbKeyIndexes.size,
     blockedKeySuffixes: blocked.map(index => getImgBbKeySuffix(index)),
@@ -192,6 +209,46 @@ function getImgBbKeyStatus() {
     rotateEvery: IMGBB_UPLOADS_PER_KEY,
     cooldownSeconds: IMGBB_KEY_COOLDOWN_MS / 1000
   };
+}
+
+function maybeSendImgBbLowKeyAlert(req) {
+  const keyStatus = getImgBbKeyStatus();
+  const canAlert = TELEGRAM_BOT_TOKEN
+    && TELEGRAM_CHAT_ID
+    && keyStatus.total > IMGBB_LOW_KEY_ALERT_THRESHOLD;
+
+  if (!canAlert || keyStatus.available > IMGBB_LOW_KEY_ALERT_THRESHOLD) {
+    return;
+  }
+
+  if (imgbbLowKeyAlertActive) {
+    return;
+  }
+
+  imgbbLowKeyAlertActive = true;
+  const message = buildLowKeyAlert({
+    keyStatus,
+    manageUrl: PUBLIC_BASE_URL ? `${PUBLIC_BASE_URL}/manage.html` : "",
+    timeZone: TELEGRAM_TIME_ZONE
+  });
+
+  sendTelegramReport({
+    botToken: TELEGRAM_BOT_TOKEN,
+    chatId: TELEGRAM_CHAT_ID,
+    message
+  }).then((result) => {
+    logAction(req, "notification.telegram.keys_low", `Sent low ImgBB API key alert (${keyStatus.available}/${keyStatus.total})`, {
+      messageCount: result.messageCount,
+      availableKeys: keyStatus.available,
+      totalKeys: keyStatus.total,
+      blockedKeys: keyStatus.blocked,
+      invalidKeys: keyStatus.invalid,
+      threshold: IMGBB_LOW_KEY_ALERT_THRESHOLD
+    });
+  }).catch((err) => {
+    imgbbLowKeyAlertActive = false;
+    console.error("Failed to send low ImgBB API key alert:", err.response?.data?.description || err.message);
+  });
 }
 
 function getImgBbKeySuffix(index) {
@@ -249,7 +306,7 @@ function rotateImgBbKeyAfterUploadBatch(req) {
   );
 }
 
-function blockImgBbKey(req, keyIndex, err) {
+function blockImgBbKey(req, keyIndex, err, notify = true) {
   if (blockedImgBbKeys.has(keyIndex)) {
     return;
   }
@@ -272,9 +329,13 @@ function blockImgBbKey(req, keyIndex, err) {
     },
     "warning"
   );
+
+  if (notify) {
+    maybeSendImgBbLowKeyAlert(req);
+  }
 }
 
-function markImgBbKeyInvalid(req, keyIndex, err) {
+function markImgBbKeyInvalid(req, keyIndex, err, notify = true) {
   blockedImgBbKeys.delete(keyIndex);
 
   if (invalidImgBbKeyIndexes.has(keyIndex)) {
@@ -295,6 +356,10 @@ function markImgBbKeyInvalid(req, keyIndex, err) {
     },
     "error"
   );
+
+  if (notify) {
+    maybeSendImgBbLowKeyAlert(req);
+  }
 }
 
 async function checkAllImgBbApiKeys(req) {
@@ -324,13 +389,13 @@ async function checkAllImgBbApiKeys(req) {
         if (isImgBbRateLimitError(err)) {
           invalidImgBbKeyIndexes.delete(keyIndex);
           blockedImgBbKeys.delete(keyIndex);
-          blockImgBbKey(req, keyIndex, err);
+          blockImgBbKey(req, keyIndex, err, false);
           results[keyIndex] = { keyIndex, status: "rateLimited" };
           continue;
         }
 
         if (isImgBbInvalidKeyError(err)) {
-          markImgBbKeyInvalid(req, keyIndex, err);
+          markImgBbKeyInvalid(req, keyIndex, err, false);
           results[keyIndex] = { keyIndex, status: "invalid" };
           continue;
         }
@@ -352,6 +417,7 @@ async function checkAllImgBbApiKeys(req) {
   };
 
   await Promise.all([checkNextKey(), checkNextKey()]);
+  maybeSendImgBbLowKeyAlert(req);
   const check = {
     checkedAt: new Date().toISOString(),
     working: results.filter(result => result.status === "working").length,
