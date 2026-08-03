@@ -39,6 +39,20 @@ the next available key. The management page shows available keys as `available/t
 IMGBB_API_KEYS=first_key,second_key,third_key
 ```
 
+Keys that return an explicit rate-limit response are skipped temporarily and retried after
+one hour. Override the cooldown when needed:
+
+```bash
+IMGBB_KEY_COOLDOWN_SECONDS=3600
+```
+
+Generic ImgBB code `100` errors, maintenance responses, internal upload errors, and invalid
+image data do not block or rotate API keys.
+
+The management-page **Refresh** button performs a real health check by uploading one 1×1
+PNG per configured key. These check images are not added to the gallery database and expire
+from ImgBB after 60 seconds.
+
 The server loads `.env` automatically in local development.
 
 Do not commit `.env`. It is already listed in `.gitignore`.

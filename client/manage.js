@@ -46,6 +46,8 @@ const editFolderName = document.getElementById("editFolderName");
 const editFolderDescription = document.getElementById("editFolderDescription");
 const cancelEditFolder = document.getElementById("cancelEditFolder");
 const adminNotice = document.getElementById("adminNotice");
+const adminNoticeText = document.getElementById("adminNoticeText");
+const refreshApiKeysBtn = document.getElementById("refreshApiKeysBtn");
 
 const apiHost = window.location.hostname || "127.0.0.1";
 const isLocalClient = ["localhost", "127.0.0.1"].includes(apiHost) && window.location.port === "5500";
@@ -69,23 +71,55 @@ let preferredUploadPeriod = localStorage.getItem(preferredPeriodStorageKey) || "
 let folderViewMode = "active";
 
 function renderAdminNotice(status) {
-  if (!adminNotice) {
+  if (!adminNotice || !adminNoticeText) {
     return;
   }
 
   const hasStatus = status?.configured && status.total > 0;
-  const available = Number(status?.available || 0);
   const total = Number(status?.total || 0);
+  const check = status?.check;
+  const available = Number(check?.working ?? status?.available ?? 0);
+  const unknown = Number(check?.unknown || 0);
+  const invalid = Number(check?.invalid ?? status?.invalid ?? 0);
+  const rateLimited = Number(check?.rateLimited ?? status?.blocked ?? 0);
   const isGreen = hasStatus && available === total;
-  const isRed = hasStatus && available <= 1;
+  const isRed = hasStatus && !unknown && available <= 1;
 
   adminNotice.classList.toggle("hidden", !hasStatus);
   adminNotice.classList.toggle("is-green", isGreen);
   adminNotice.classList.toggle("is-yellow", hasStatus && !isGreen && !isRed);
   adminNotice.classList.toggle("is-red", isRed);
-  adminNotice.textContent = hasStatus
-    ? `ImgBB API keys available: ${available}/${total}`
-    : "";
+  refreshApiKeysBtn.classList.toggle("hidden", !hasStatus);
+
+  if (!hasStatus) {
+    adminNoticeText.textContent = "";
+  } else if (check) {
+    const details = [];
+
+    if (rateLimited) details.push(`${rateLimited} rate limited`);
+    if (invalid) details.push(`${invalid} invalid`);
+    if (unknown) details.push(`${unknown} could not be tested`);
+
+    adminNoticeText.textContent = `ImgBB API keys verified: ${available}/${total} working${details.length ? ` · ${details.join(" · ")}` : ""}`;
+  } else {
+    adminNoticeText.textContent = `ImgBB API keys available: ${available}/${total}`;
+  }
+}
+
+async function refreshApiKeyStatus() {
+  refreshApiKeysBtn.disabled = true;
+  adminNoticeText.textContent = "Testing all ImgBB API keys…";
+
+  try {
+    const status = await api("/api/upload/key-status/refresh", { method: "POST" });
+    renderAdminNotice(status);
+  } catch (err) {
+    adminNotice.classList.remove("is-green", "is-yellow");
+    adminNotice.classList.add("is-red");
+    adminNoticeText.textContent = err.message || "Failed to test ImgBB API keys.";
+  } finally {
+    refreshApiKeysBtn.disabled = false;
+  }
 }
 
 function setBulkActionsVisible(isVisible) {
@@ -1383,6 +1417,7 @@ preferredPeriodSelect.onchange = async () => {
 
 exportDbBtn.onclick = openExportModal;
 logoutBtn.onclick = logout;
+refreshApiKeysBtn.onclick = refreshApiKeyStatus;
 cancelExport.onclick = closeExportModal;
 
 exportBackupBtn.onclick = () => {

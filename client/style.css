@@ -79,6 +79,10 @@ body.modal-open {
 }
 
 .admin-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   width: min(1100px, calc(100% - 32px));
   margin: 0 auto 14px;
   padding: 12px 14px;
@@ -91,6 +95,31 @@ body.modal-open {
   line-height: 1.4;
   text-align: left;
   box-sizing: border-box;
+}
+
+.admin-notice button {
+  min-height: 30px;
+  padding: 4px 10px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.admin-notice button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.admin-notice button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.admin-notice.hidden {
+  display: none;
 }
 
 .admin-notice.is-yellow {

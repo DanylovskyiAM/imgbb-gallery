@@ -16,6 +16,11 @@ const {
   getFilesAvailability,
   partitionFilesByAvailability
 } = require("./lib/file-availability");
+const {
+  getImgBbErrorDetails,
+  isImgBbInvalidKeyError,
+  isImgBbRateLimitError
+} = require("./lib/imgbb-errors");
 
 function loadLocalEnv() {
   const envPath = path.join(__dirname, "../.env");
@@ -61,9 +66,18 @@ const PUBLIC_BASE_URL = String(process.env.PUBLIC_BASE_URL || "").trim().replace
 const cache = {};
 const SESSION_COOKIE = "mya_admin_session";
 const IMGBB_UPLOADS_PER_KEY = 100;
+const IMGBB_KEY_COOLDOWN_MS = Math.max(
+  60,
+  Number(process.env.IMGBB_KEY_COOLDOWN_SECONDS) || 3600
+) * 1000;
 let imgbbApiKeyIndex = 0;
 let imgbbUploadsOnCurrentKey = 0;
-const blockedImgBbKeyIndexes = new Set();
+const blockedImgBbKeys = new Map();
+const invalidImgBbKeyIndexes = new Set();
+const IMGBB_KEY_CHECK_IMAGE = {
+  name: "mya-api-key-check.png",
+  data: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII="
+};
 
 function parseCookies(req) {
   return String(req.headers.cookie || "")
@@ -153,18 +167,30 @@ function isAdminUser(user) {
   return user?.role === "admin";
 }
 
+function clearExpiredImgBbKeyBlocks(referenceTime = Date.now()) {
+  blockedImgBbKeys.forEach((block, index) => {
+    if (block.blockedUntil <= referenceTime) {
+      blockedImgBbKeys.delete(index);
+    }
+  });
+}
+
 function getImgBbKeyStatus() {
-  const blocked = [...blockedImgBbKeyIndexes].sort((a, b) => a - b);
+  clearExpiredImgBbKeyBlocks();
+  const blocked = [...blockedImgBbKeys.keys()].sort((a, b) => a - b);
 
   return {
     configured: IMGBB_API_KEYS.length > 0,
     currentIndex: IMGBB_API_KEYS.length ? imgbbApiKeyIndex : -1,
     total: IMGBB_API_KEYS.length,
-    available: Math.max(0, IMGBB_API_KEYS.length - blocked.length),
+    available: Math.max(0, IMGBB_API_KEYS.length - blocked.length - invalidImgBbKeyIndexes.size),
     blocked: blocked.length,
+    invalid: invalidImgBbKeyIndexes.size,
     blockedKeySuffixes: blocked.map(index => getImgBbKeySuffix(index)),
+    blockedUntil: blocked.map(index => new Date(blockedImgBbKeys.get(index).blockedUntil).toISOString()),
     uploadsOnCurrentKey: imgbbUploadsOnCurrentKey,
-    rotateEvery: IMGBB_UPLOADS_PER_KEY
+    rotateEvery: IMGBB_UPLOADS_PER_KEY,
+    cooldownSeconds: IMGBB_KEY_COOLDOWN_MS / 1000
   };
 }
 
@@ -172,22 +198,17 @@ function getImgBbKeySuffix(index) {
   return String(IMGBB_API_KEYS[index] || "").slice(-4);
 }
 
-function isImgBbRateLimitError(err) {
-  const code = err.response?.data?.error?.code;
-  const message = String(err.response?.data?.error?.message || err.message || "").toLowerCase();
-
-  return code === 100 || message.includes("rate limit");
-}
-
 function getNextAvailableImgBbKeyIndex(startIndex = imgbbApiKeyIndex) {
-  if (!IMGBB_API_KEYS.length || blockedImgBbKeyIndexes.size >= IMGBB_API_KEYS.length) {
+  clearExpiredImgBbKeyBlocks();
+
+  if (!IMGBB_API_KEYS.length || blockedImgBbKeys.size + invalidImgBbKeyIndexes.size >= IMGBB_API_KEYS.length) {
     return -1;
   }
 
   for (let offset = 1; offset <= IMGBB_API_KEYS.length; offset += 1) {
     const candidateIndex = (startIndex + offset) % IMGBB_API_KEYS.length;
 
-    if (!blockedImgBbKeyIndexes.has(candidateIndex)) {
+    if (!blockedImgBbKeys.has(candidateIndex) && !invalidImgBbKeyIndexes.has(candidateIndex)) {
       return candidateIndex;
     }
   }
@@ -222,18 +243,21 @@ function rotateImgBbKeyAfterUploadBatch(req) {
       previousKeyNumber: previousIndex + 1,
       currentKeyNumber: nextIndex + 1,
       totalKeys: IMGBB_API_KEYS.length,
-      availableKeys: IMGBB_API_KEYS.length - blockedImgBbKeyIndexes.size
+      availableKeys: IMGBB_API_KEYS.length - blockedImgBbKeys.size - invalidImgBbKeyIndexes.size
     },
     "info"
   );
 }
 
-function blockImgBbKey(req, keyIndex) {
-  if (blockedImgBbKeyIndexes.has(keyIndex)) {
+function blockImgBbKey(req, keyIndex, err) {
+  if (blockedImgBbKeys.has(keyIndex)) {
     return;
   }
 
-  blockedImgBbKeyIndexes.add(keyIndex);
+  const errorDetails = getImgBbErrorDetails(err);
+  const blockedUntil = Date.now() + IMGBB_KEY_COOLDOWN_MS;
+
+  blockedImgBbKeys.set(keyIndex, { blockedUntil });
   logAction(
     req,
     "upload.key.blocked",
@@ -242,10 +266,111 @@ function blockImgBbKey(req, keyIndex) {
       keyNumber: keyIndex + 1,
       keySuffix: getImgBbKeySuffix(keyIndex),
       totalKeys: IMGBB_API_KEYS.length,
-      availableKeys: IMGBB_API_KEYS.length - blockedImgBbKeyIndexes.size
+      availableKeys: IMGBB_API_KEYS.length - blockedImgBbKeys.size - invalidImgBbKeyIndexes.size,
+      blockedUntil: new Date(blockedUntil).toISOString(),
+      ...errorDetails
     },
     "warning"
   );
+}
+
+function markImgBbKeyInvalid(req, keyIndex, err) {
+  blockedImgBbKeys.delete(keyIndex);
+
+  if (invalidImgBbKeyIndexes.has(keyIndex)) {
+    return;
+  }
+
+  invalidImgBbKeyIndexes.add(keyIndex);
+  logAction(
+    req,
+    "upload.key.invalid",
+    `ImgBB API key ending in ${getImgBbKeySuffix(keyIndex)} is invalid`,
+    {
+      keyNumber: keyIndex + 1,
+      keySuffix: getImgBbKeySuffix(keyIndex),
+      totalKeys: IMGBB_API_KEYS.length,
+      availableKeys: IMGBB_API_KEYS.length - blockedImgBbKeys.size - invalidImgBbKeyIndexes.size,
+      ...getImgBbErrorDetails(err)
+    },
+    "error"
+  );
+}
+
+async function checkAllImgBbApiKeys(req) {
+  const results = new Array(IMGBB_API_KEYS.length);
+  let nextKeyIndex = 0;
+
+  const checkNextKey = async () => {
+    while (nextKeyIndex < IMGBB_API_KEYS.length) {
+      const keyIndex = nextKeyIndex;
+      const apiKey = IMGBB_API_KEYS[keyIndex];
+      nextKeyIndex += 1;
+
+      try {
+        await imgbbStorage.uploadImage({
+          apiKey,
+          image: {
+            ...IMGBB_KEY_CHECK_IMAGE,
+            name: `mya-api-key-check-${keyIndex + 1}.png`
+          },
+          expiration: 60
+        });
+
+        blockedImgBbKeys.delete(keyIndex);
+        invalidImgBbKeyIndexes.delete(keyIndex);
+        results[keyIndex] = { keyIndex, status: "working" };
+      } catch (err) {
+        if (isImgBbRateLimitError(err)) {
+          invalidImgBbKeyIndexes.delete(keyIndex);
+          blockedImgBbKeys.delete(keyIndex);
+          blockImgBbKey(req, keyIndex, err);
+          results[keyIndex] = { keyIndex, status: "rateLimited" };
+          continue;
+        }
+
+        if (isImgBbInvalidKeyError(err)) {
+          markImgBbKeyInvalid(req, keyIndex, err);
+          results[keyIndex] = { keyIndex, status: "invalid" };
+          continue;
+        }
+
+        const error = getImgBbErrorDetails(err);
+        results[keyIndex] = {
+          keyIndex,
+          status: "unknown",
+          error
+        };
+
+        logAction(req, "upload.key.check_failed", `Could not verify ImgBB API key ending in ${getImgBbKeySuffix(keyIndex)}`, {
+          keyNumber: keyIndex + 1,
+          keySuffix: getImgBbKeySuffix(keyIndex),
+          ...error
+        }, "warning");
+      }
+    }
+  };
+
+  await Promise.all([checkNextKey(), checkNextKey()]);
+  const check = {
+    checkedAt: new Date().toISOString(),
+    working: results.filter(result => result.status === "working").length,
+    rateLimited: results.filter(result => result.status === "rateLimited").length,
+    invalid: results.filter(result => result.status === "invalid").length,
+    unknown: results.filter(result => result.status === "unknown").length,
+    rateLimitedKeySuffixes: results
+      .filter(result => result.status === "rateLimited")
+      .map(result => getImgBbKeySuffix(result.keyIndex)),
+    invalidKeySuffixes: results
+      .filter(result => result.status === "invalid")
+      .map(result => getImgBbKeySuffix(result.keyIndex)),
+    unknownKeySuffixes: results
+      .filter(result => result.status === "unknown")
+      .map(result => getImgBbKeySuffix(result.keyIndex))
+  };
+
+  logAction(req, "upload.keys.checked", `Checked ${IMGBB_API_KEYS.length} ImgBB API key(s)`, check);
+  return check;
 }
 
 async function uploadImageWithImgBbKeyRotation(req, image, expiration) {
@@ -256,6 +381,23 @@ async function uploadImageWithImgBbKeyRotation(req, image, expiration) {
   let attempts = 0;
 
   while (attempts < IMGBB_API_KEYS.length) {
+    clearExpiredImgBbKeyBlocks();
+
+    if (blockedImgBbKeys.has(imgbbApiKeyIndex) || invalidImgBbKeyIndexes.has(imgbbApiKeyIndex)) {
+      const nextIndex = getNextAvailableImgBbKeyIndex(imgbbApiKeyIndex);
+
+      if (nextIndex < 0) {
+        const allRateLimited = invalidImgBbKeyIndexes.size === 0;
+        const err = new Error(allRateLimited
+          ? "All configured ImgBB API keys are temporarily rate limited"
+          : "No usable ImgBB API keys are available");
+        err.status = allRateLimited ? 429 : 503;
+        throw err;
+      }
+
+      setCurrentImgBbKeyIndex(nextIndex);
+    }
+
     const keyIndex = imgbbApiKeyIndex;
 
     try {
@@ -274,7 +416,7 @@ async function uploadImageWithImgBbKeyRotation(req, image, expiration) {
         throw err;
       }
 
-      blockImgBbKey(req, keyIndex);
+      blockImgBbKey(req, keyIndex, err);
 
       const nextIndex = getNextAvailableImgBbKeyIndex(keyIndex);
 
@@ -1011,6 +1153,23 @@ app.get("/api/upload/key-status", requireManageAuth, (req, res) => {
   res.json(getImgBbKeyStatus());
 });
 
+app.post("/api/upload/key-status/refresh", requireManageAuth, async (req, res) => {
+  if (!IMGBB_API_KEYS.length) {
+    return res.status(503).json({ error: "IMGBB_API_KEYS or IMGBB_API_KEY is not configured on the server" });
+  }
+
+  try {
+    const check = await checkAllImgBbApiKeys(req);
+
+    res.json({
+      ...getImgBbKeyStatus(),
+      check
+    });
+  } catch (err) {
+    res.status(502).json({ error: err.message || "Failed to check ImgBB API keys" });
+  }
+});
+
 app.post("/api/notifications/telegram", async (req, res) => {
   if (!TELEGRAM_CRON_SECRET || !TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
     return res.status(503).json({ error: "Telegram notifications are not configured" });
@@ -1111,11 +1270,21 @@ app.post("/api/upload", async (req, res) => {
       images: uploaded
     });
   } catch (err) {
-    const providerMessage = err.response?.data?.error?.message || err.message;
-    const providerStatus = err.response?.status || 500;
+    const errorDetails = getImgBbErrorDetails(err);
+    const providerMessage = errorDetails.providerMessage;
+    const providerStatus = errorDetails.providerStatus || 500;
 
     console.error("Failed to upload images:", providerMessage);
-    res.status(providerStatus >= 400 && providerStatus < 500 ? 400 : 502).json({
+    logAction(req, "upload.failed", `ImgBB upload failed: ${providerMessage}`, {
+      folderId: folderId || folderSlug || "",
+      rateLimited: isImgBbRateLimitError(err),
+      ...errorDetails
+    }, "error", auth?.user);
+    const responseStatus = providerStatus === 429
+      ? 429
+      : (providerStatus >= 400 && providerStatus < 500 ? 400 : 502);
+
+    res.status(responseStatus).json({
       error: providerMessage ? `Failed to upload images: ${providerMessage}` : "Failed to upload images"
     });
   }
