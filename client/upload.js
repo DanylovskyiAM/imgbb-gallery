@@ -439,7 +439,10 @@ async function uploadImage(image, expiration) {
     throw new Error(data.error || "Upload failed.");
   }
 
-  return data.images[0];
+  return {
+    image: data.images[0] || null,
+    failedFiles: Array.isArray(data.failedFiles) ? data.failedFiles : []
+  };
 }
 
 uploadForm.onsubmit = async (e) => {
@@ -465,25 +468,35 @@ uploadForm.onsubmit = async (e) => {
 
     uploadedImages = [];
     renderResults(uploadedImages);
+    const failedFileNames = [];
 
     for (const [index, file] of files.entries()) {
-      setStatus(`Preparing ${index + 1} of ${files.length}: ${file.name}`);
-      const image = await readFileAsDataUrl(file);
+      try {
+        setStatus(`Preparing ${index + 1} of ${files.length}: ${file.name}`);
+        const image = await readFileAsDataUrl(file);
 
-      setStatus(`Uploading ${index + 1} of ${files.length}: ${file.name}`);
-      const uploadedImage = await uploadImage(image, expiration);
-      uploadedImages.push(uploadedImage);
-      renderResults(uploadedImages);
+        setStatus(`Uploading ${index + 1} of ${files.length}: ${file.name}`);
+        const result = await uploadImage(image, expiration);
+
+        if (result.image) {
+          uploadedImages.push(result.image);
+          renderResults(uploadedImages);
+        }
+
+        failedFileNames.push(...result.failedFiles);
+      } catch (err) {
+        failedFileNames.push(file.name);
+      }
     }
 
     const successMessage = uploadedImages.length === 1
       ? "Success! 1 file has been uploaded and is waiting for approval."
       : `Success! ${uploadedImages.length} files have been uploaded and are waiting for approval.`;
-    setStatus(
-      successMessage,
-      false,
-      true
-    );
+    const uniqueFailedFileNames = [...new Set(failedFileNames)];
+    const failureMessage = uniqueFailedFileNames.length
+      ? ` Files not uploaded correctly: ${uniqueFailedFileNames.join(", ")}.`
+      : "";
+    setStatus(successMessage + failureMessage, Boolean(uniqueFailedFileNames.length), !uniqueFailedFileNames.length);
     uploadInput.value = "";
   } catch (err) {
     setStatus(err.message || "Upload failed.", true);

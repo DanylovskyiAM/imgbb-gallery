@@ -648,6 +648,23 @@ async function partitionStoredImagesByAvailability(files) {
   }, { available: [], unavailable: [] });
 }
 
+async function removeStoredImgBbImage(deleteUrl) {
+  if (!deleteUrl || !String(deleteUrl).startsWith("https://ibb.co/")) {
+    return;
+  }
+
+  try {
+    await axios.get(deleteUrl, {
+      timeout: 10000,
+      maxRedirects: 3,
+      validateStatus: () => true,
+      headers: { "User-Agent": "Mozilla/5.0" }
+    });
+  } catch (err) {
+    console.error("Failed to remove unavailable ImgBB upload:", err.message);
+  }
+}
+
 function crc32(buffer) {
   let crc = 0 ^ -1;
 
@@ -1380,9 +1397,21 @@ app.post("/api/upload", async (req, res) => {
     }
 
     const storedImages = [];
+    const failedFiles = [];
 
     for (const image of images) {
-      const stored = await uploadImageWithImgBbKeyRotation(req, image, expirationSeconds);
+      let stored = await uploadImageWithImgBbKeyRotation(req, image, expirationSeconds);
+
+      if (!await isStoredImageAvailable(stored)) {
+        await removeStoredImgBbImage(stored.deleteUrl);
+        stored = await uploadImageWithImgBbKeyRotation(req, image, expirationSeconds);
+
+        if (!await isStoredImageAvailable(stored)) {
+          await removeStoredImgBbImage(stored.deleteUrl);
+          failedFiles.push(image.name || "Unnamed file");
+          continue;
+        }
+      }
 
       storedImages.push({
         folderId: folder.id,
@@ -1402,12 +1431,14 @@ app.post("/api/upload", async (req, res) => {
     logAction(req, "upload.create", `Uploaded ${uploaded.length} image(s) to "${folder.name}"`, {
       ...folderLogDetails(folder),
       count: uploaded.length,
-      expiration: expirationSeconds
+      expiration: expirationSeconds,
+      failedFiles
     });
     res.json({
       folder,
       count: uploaded.length,
-      images: uploaded
+      images: uploaded,
+      failedFiles
     });
   } catch (err) {
     const errorDetails = getImgBbErrorDetails(err);

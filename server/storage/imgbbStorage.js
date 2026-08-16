@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 async function uploadImage({ apiKey, image, expiration }) {
-  const base64 = String(image.data || "").replace(/^data:image\/[a-zA-Z0-9.+-]+;base64,/, "");
+  const base64 = String(image.data || "").replace(/^data:[^;,]+;base64,/i, "");
   const body = new URLSearchParams();
   body.set("image", base64);
 
