@@ -84,12 +84,15 @@ function isLateUpload(row) {
   return new Date(row.firstUploadedAt) > deadline;
 }
 
-function getCompletionMetrics(locationRow, periods) {
+function getCompletionMetrics(locationRow, periods, today) {
   let applicablePeriods = 0;
   let uploadedPeriods = 0;
   let hasLateUpload = false;
 
   periods.forEach(period => {
+    // Keep upcoming periods visible in the matrix, but do not count them yet.
+    if (period.startDate && period.startDate > today) return;
+
     const row = locationRow.periods.get(period.key);
 
     if (!row) return;
@@ -111,6 +114,7 @@ function renderCompletionMatrix() {
   const query = searchInput.value.trim().toLowerCase();
   const location = locationFilter.value;
   const company = companyFilter.value;
+  const today = new Date().toISOString().slice(0, 10);
   const filteredCompletionRows = completionRows
     .filter(row => !location || row.location === location)
     .filter(row => !company || row.company === company)
@@ -143,7 +147,7 @@ function renderCompletionMatrix() {
 
   const locationRows = [...locations.values()].sort((a, b) => {
     if (sortSelect.value === "completion-desc") {
-      const difference = getCompletionMetrics(b, periods).percent - getCompletionMetrics(a, periods).percent;
+      const difference = getCompletionMetrics(b, periods, today).percent - getCompletionMetrics(a, periods, today).percent;
       if (difference) return difference;
     }
 
@@ -164,7 +168,7 @@ function renderCompletionMatrix() {
       : `${locationRow.company} · ${locationRow.location}`;
     tr.appendChild(locationCell);
 
-    const metrics = getCompletionMetrics(locationRow, periods);
+    const metrics = getCompletionMetrics(locationRow, periods, today);
     periods.forEach(period => {
       const cell = document.createElement("td");
       const row = locationRow.periods.get(period.key);

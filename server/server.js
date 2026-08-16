@@ -1077,6 +1077,26 @@ app.get("/api/logs", requireManageAuth, (req, res) => {
   });
 });
 
+function getPeriodStartDate(description) {
+  const value = String(description || "");
+  const yearFirst = value.match(/\b(\d{4})[/-](\d{1,2})[/-](\d{1,2})\b/);
+  const dayFirst = value.match(/\b(\d{1,2})[/-](\d{1,2})[/-](\d{4})\b/);
+  const parts = yearFirst
+    ? [yearFirst[1], yearFirst[2], yearFirst[3]]
+    : dayFirst ? [dayFirst[3], dayFirst[2], dayFirst[1]] : null;
+
+  if (!parts) return "";
+
+  const [year, month, day] = parts.map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
+    return "";
+  }
+
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
 app.get("/api/statistics", requireManageAuth, (req, res) => {
   const folders = db.listFolders();
   const filesByFolderId = new Map();
@@ -1116,10 +1136,7 @@ app.get("/api/statistics", requireManageAuth, (req, res) => {
       const files = filesByFolderId.get(folder.id) || [];
       const locationFolder = folderById.get(folder.parentId);
       const companyFolder = locationFolder?.parentId ? folderById.get(locationFolder.parentId) : null;
-      const startDateMatch = String(folder.description || "").match(/\b(\d{4})[/-](\d{2})[/-](\d{2})\b/);
-      const startDate = startDateMatch
-        ? `${startDateMatch[1]}-${startDateMatch[2]}-${startDateMatch[3]}`
-        : "";
+      const startDate = getPeriodStartDate(folder.description);
       const uploadDates = files.map(file => file.createdAt).filter(Boolean).sort();
 
       return {
