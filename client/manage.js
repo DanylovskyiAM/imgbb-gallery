@@ -12,6 +12,7 @@ const fileList = document.getElementById("fileList");
 const filesTitle = document.getElementById("filesTitle");
 const filesSubtitle = document.getElementById("filesSubtitle");
 const bulkFileActions = document.getElementById("bulkFileActions");
+const checkAvailabilityBtn = document.getElementById("checkAvailabilityBtn");
 const approveAllBtn = document.getElementById("approveAllBtn");
 const modal = document.getElementById("modal");
 const modalImg = document.getElementById("modal-img");
@@ -124,16 +125,19 @@ async function refreshApiKeyStatus() {
 
 function setBulkActionsVisible(isVisible) {
   bulkFileActions.classList.toggle("hidden", !isVisible);
+  checkAvailabilityBtn.disabled = !isVisible;
   approveAllBtn.disabled = !isVisible;
 }
 
 function setBulkActionsEnabled(isEnabled) {
+  checkAvailabilityBtn.disabled = !isEnabled;
   approveAllBtn.disabled = !isEnabled;
 }
 
 function updateBulkActionsForFiles(files) {
   const hasPendingFiles = files.some(file => file.status !== "approved");
 
+  checkAvailabilityBtn.disabled = !selectedFolder;
   approveAllBtn.disabled = !hasPendingFiles;
 }
 
@@ -146,7 +150,7 @@ async function refreshSelectedLeafFolder(expectedFiles = null) {
   const selectedFolderId = selectedFolder.id;
   const filesData = expectedFiles
     ? { files: expectedFiles, invalidFileIds: [] }
-    : await api(`/api/folders/${selectedFolderId}/files?status=all&validate=1`);
+    : await api(`/api/folders/${selectedFolderId}/files?status=all`);
   const foldersData = await api("/api/folders");
 
   folders = foldersData.folders;
@@ -158,10 +162,8 @@ async function refreshSelectedLeafFolder(expectedFiles = null) {
   filesTitle.textContent = "Files:";
   renderFilesBreadcrumb(selectedFolder);
   setBulkActionsVisible(true);
-  const invalidFileIds = filesData.invalidFileIds || [];
-  const visibleFiles = filesData.files.filter(file => !invalidFileIds.includes(file.id));
-  renderFiles(filesData.files, invalidFileIds);
-  updateBulkActionsForFiles(visibleFiles);
+  renderFiles(filesData.files);
+  updateBulkActionsForFiles(filesData.files);
 }
 
 function syncFolderStatsFromFiles(folderId, files) {
@@ -1422,11 +1424,9 @@ async function loadFiles(folder) {
   setBulkActionsVisible(true);
   setBulkActionsEnabled(false);
 
-  const data = await api(`/api/folders/${folder.id}/files?status=all&validate=1`);
-  const invalidFileIds = data.invalidFileIds || [];
-  const visibleFiles = data.files.filter(file => !invalidFileIds.includes(file.id));
-  renderFiles(data.files, invalidFileIds);
-  updateBulkActionsForFiles(visibleFiles);
+  const data = await api(`/api/folders/${folder.id}/files?status=all`);
+  renderFiles(data.files);
+  updateBulkActionsForFiles(data.files);
 }
 
 addFolderForm.onsubmit = async (e) => {
@@ -1565,6 +1565,26 @@ approveAllBtn.onclick = async () => {
 
   await loadFolders();
   await loadFiles(selectedFolder);
+};
+
+checkAvailabilityBtn.onclick = async () => {
+  if (!selectedFolder) {
+    return;
+  }
+
+  checkAvailabilityBtn.disabled = true;
+
+  try {
+    const data = await api(`/api/folders/${selectedFolder.id}/files?status=all&validate=1`);
+    const invalidFileIds = data.invalidFileIds || [];
+    const visibleFiles = data.files.filter(file => !invalidFileIds.includes(file.id));
+
+    renderFiles(data.files, invalidFileIds);
+    updateBulkActionsForFiles(visibleFiles);
+  } catch (err) {
+    window.alert(err.message || "Failed to check file availability.");
+    updateBulkActionsForFiles(currentFiles);
+  }
 };
 
 async function deleteFilesInSection(files, sectionLabel, button) {
