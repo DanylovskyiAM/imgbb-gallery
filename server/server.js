@@ -65,6 +65,7 @@ const TELEGRAM_TIME_ZONE = String(process.env.TELEGRAM_TIME_ZONE || "Europe/Kyiv
 const PUBLIC_BASE_URL = String(process.env.PUBLIC_BASE_URL || "").trim().replace(/\/+$/, "");
 
 const cache = {};
+const imageAvailabilityCache = new Map();
 const SESSION_COOKIE = "mya_admin_session";
 const IMGBB_UPLOADS_PER_KEY = 100;
 const IMGBB_KEY_COOLDOWN_MS = Math.max(
@@ -593,6 +594,60 @@ function isAllowedImageUrl(url) {
   }
 }
 
+async function isStoredImageAvailable(file) {
+  const url = file.originalUrl || file.mediumUrl;
+
+  if (!url || !isAllowedImageUrl(url)) {
+    return false;
+  }
+
+  const cached = imageAvailabilityCache.get(url);
+
+  if (cached && Date.now() - cached.checkedAt < CACHE_TTL_MS) {
+    return cached.available;
+  }
+
+  let available = false;
+
+  try {
+    const response = await axios.head(url, {
+      timeout: 10000,
+      maxRedirects: 3,
+      validateStatus: () => true,
+      headers: { "User-Agent": "Mozilla/5.0" }
+    });
+    const contentType = String(response.headers["content-type"] || "").toLowerCase();
+
+    available = response.status >= 200
+      && response.status < 300
+      && contentType.startsWith("image/");
+  } catch (err) {
+    available = false;
+  }
+
+  imageAvailabilityCache.set(url, { available, checkedAt: Date.now() });
+  return available;
+}
+
+async function partitionStoredImagesByAvailability(files) {
+  const valid = Array(files.length).fill(false);
+  let nextIndex = 0;
+
+  async function worker() {
+    while (nextIndex < files.length) {
+      const index = nextIndex++;
+      valid[index] = await isStoredImageAvailable(files[index]);
+    }
+  }
+
+  await Promise.all(Array.from({ length: Math.min(8, files.length) }, worker));
+
+  return files.reduce((result, file, index) => {
+    result[valid[index] ? "available" : "unavailable"].push(file);
+    return result;
+  }, { available: [], unavailable: [] });
+}
+
 function crc32(buffer) {
   let crc = 0 ^ -1;
 
@@ -1034,20 +1089,29 @@ app.post("/api/folders/:id/restore", requireManageAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-app.get("/api/folders/:id/files", requireManageAuth, (req, res) => {
+app.get("/api/folders/:id/files", requireManageAuth, async (req, res) => {
   const folder = db.findFolder(req.params.id);
 
   if (!folder) {
     return res.status(404).json({ error: "Folder not found" });
   }
 
+  const files = db.listFiles(folder.id, req.query.status || "all");
+
+  if (req.query.validate !== "1") {
+    return res.json({ folder, files });
+  }
+
+  const { unavailable } = await partitionStoredImagesByAvailability(files);
+
   res.json({
     folder,
-    files: db.listFiles(folder.id, req.query.status || "all")
+    files,
+    invalidFileIds: unavailable.map(file => file.id)
   });
 });
 
-app.post("/api/folders/:id/files/approve-all", requireManageAuth, (req, res) => {
+app.post("/api/folders/:id/files/approve-all", requireManageAuth, async (req, res) => {
   const folder = db.findFolder(req.params.id);
 
   if (!folder) {
@@ -1055,18 +1119,28 @@ app.post("/api/folders/:id/files/approve-all", requireManageAuth, (req, res) => 
   }
 
   const recursive = req.query.recursive === "1";
-  const count = recursive
-    ? db.approveFolderTreeFiles(folder.id)
-    : db.approveFolderFiles(folder.id);
+  const folders = recursive
+    ? db.listFolders().filter(item => item.id === folder.id || item.path.startsWith(`${folder.path}/`))
+    : [folder];
+  const pendingFiles = folders.flatMap(item => db.listFiles(item.id, "all"))
+    .filter(file => file.status !== "approved");
+  const { available, unavailable } = await partitionStoredImagesByAvailability(pendingFiles);
+
+  available.forEach(file => {
+    db.updateFile(file.id, { status: "approved", approvedBy: "admin" });
+  });
+  const count = available.length;
 
   logAction(req, "files.approve_all", `Approved ${count} waiting file(s) in "${folder.name}"`, {
     ...folderLogDetails(folder),
     recursive,
-    count
+    count,
+    unavailableCount: unavailable.length
   });
   res.json({
     ok: true,
-    count
+    count,
+    unavailableCount: unavailable.length
   });
 });
 

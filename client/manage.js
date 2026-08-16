@@ -13,7 +13,6 @@ const filesTitle = document.getElementById("filesTitle");
 const filesSubtitle = document.getElementById("filesSubtitle");
 const bulkFileActions = document.getElementById("bulkFileActions");
 const approveAllBtn = document.getElementById("approveAllBtn");
-const deleteAllBtn = document.getElementById("deleteAllBtn");
 const modal = document.getElementById("modal");
 const modalImg = document.getElementById("modal-img");
 const closeBtn = document.getElementById("close");
@@ -125,20 +124,16 @@ async function refreshApiKeyStatus() {
 function setBulkActionsVisible(isVisible) {
   bulkFileActions.classList.toggle("hidden", !isVisible);
   approveAllBtn.disabled = !isVisible;
-  deleteAllBtn.disabled = !isVisible;
 }
 
 function setBulkActionsEnabled(isEnabled) {
   approveAllBtn.disabled = !isEnabled;
-  deleteAllBtn.disabled = !isEnabled;
 }
 
 function updateBulkActionsForFiles(files) {
-  const hasFiles = files.length > 0;
   const hasPendingFiles = files.some(file => file.status !== "approved");
 
   approveAllBtn.disabled = !hasPendingFiles;
-  deleteAllBtn.disabled = !hasFiles;
 }
 
 async function refreshSelectedLeafFolder(expectedFiles = null) {
@@ -149,8 +144,8 @@ async function refreshSelectedLeafFolder(expectedFiles = null) {
 
   const selectedFolderId = selectedFolder.id;
   const filesData = expectedFiles
-    ? { files: expectedFiles }
-    : await api(`/api/folders/${selectedFolderId}/files?status=all`);
+    ? { files: expectedFiles, invalidFileIds: [] }
+    : await api(`/api/folders/${selectedFolderId}/files?status=all&validate=1`);
   const foldersData = await api("/api/folders");
 
   folders = foldersData.folders;
@@ -162,8 +157,10 @@ async function refreshSelectedLeafFolder(expectedFiles = null) {
   filesTitle.textContent = "Files:";
   renderFilesBreadcrumb(selectedFolder);
   setBulkActionsVisible(true);
-  renderFiles(filesData.files);
-  updateBulkActionsForFiles(filesData.files);
+  const invalidFileIds = filesData.invalidFileIds || [];
+  const visibleFiles = filesData.files.filter(file => !invalidFileIds.includes(file.id));
+  renderFiles(filesData.files, invalidFileIds);
+  updateBulkActionsForFiles(visibleFiles);
 }
 
 function syncFolderStatsFromFiles(folderId, files) {
@@ -1122,37 +1119,49 @@ function renderFolderOverview(parentFolder = null) {
   fileList.appendChild(panel);
 }
 
-function renderFiles(files) {
+function renderFiles(files, invalidFileIds = []) {
   fileList.innerHTML = "";
   fileList.classList.remove("folder-overview-list");
   fileList.classList.remove("manage-file-grid");
-  currentFiles = files;
+  const invalidFileIdSet = new Set(invalidFileIds);
+  const visibleFiles = files.filter(file => !invalidFileIdSet.has(file.id));
+  currentFiles = visibleFiles;
 
-  if (!files.length) {
+  if (!visibleFiles.length && !invalidFileIds.length) {
     fileList.innerHTML = '<p class="empty-state">No files in this folder.</p>';
     return;
   }
 
-  const approvedFiles = files.filter(file => file.status === "approved");
-  const pendingFiles = files.filter(file => file.status !== "approved");
+  const approvedFiles = visibleFiles.filter(file => file.status === "approved");
+  const pendingFiles = visibleFiles.filter(file => file.status !== "approved");
+  const approvedCount = files.filter(file => file.status === "approved").length;
+  const pendingCount = files.filter(file => file.status !== "approved").length;
+  const unavailableApprovedFiles = files.filter(file => (
+    file.status === "approved" && invalidFileIdSet.has(file.id)
+  ));
+  const unavailablePendingFiles = files.filter(file => (
+    file.status !== "approved" && invalidFileIdSet.has(file.id)
+  ));
 
   fileList.append(
     createFileSection({
-      title: `${approvedFiles.length} ${approvedFiles.length === 1 ? "file" : "files"} already approved`,
+      title: `${approvedCount}${unavailableApprovedFiles.length ? ` (-${unavailableApprovedFiles.length})` : ""} ${approvedCount === 1 ? "file" : "files"} already approved`,
       files: approvedFiles,
-      open: pendingFiles.length === 0,
-      lazy: true
+      open: pendingFiles.length === 0 || unavailableApprovedFiles.length > 0,
+      lazy: true,
+      unavailableFiles: unavailableApprovedFiles
     }),
     createFileSection({
-      title: `Pending (${pendingFiles.length} ${pendingFiles.length === 1 ? "file" : "files"})`,
+      title: `Pending (${pendingCount}${unavailablePendingFiles.length ? ` (-${unavailablePendingFiles.length})` : ""} ${pendingCount === 1 ? "file" : "files"})`,
       files: pendingFiles,
-      open: pendingFiles.length > 0,
-      emptyMessage: "No pending files."
+      open: pendingFiles.length > 0 || unavailablePendingFiles.length > 0,
+      emptyMessage: "No pending files.",
+      unavailableFiles: unavailablePendingFiles
     })
   );
 }
 
-function createFileSection({ title, files, open, lazy = false, emptyMessage = "No approved files." }) {
+function createFileSection({ title, files, open, lazy = false, emptyMessage = "No approved files.", unavailableFiles = [] }) {
   const section = document.createElement("details");
   section.className = "file-status-section";
   section.open = open;
@@ -1177,6 +1186,22 @@ function createFileSection({ title, files, open, lazy = false, emptyMessage = "N
     icon.textContent = section.open ? "▾" : "▸";
   };
   updateIcon();
+
+  if (unavailableFiles.length > 0) {
+    const notice = document.createElement("div");
+    notice.className = "file-unavailable-notice";
+
+    const message = document.createElement("span");
+    message.textContent = `${unavailableFiles.length} ${unavailableFiles.length === 1 ? "file is" : "files are"} no longer available and hidden from this list.`;
+
+    const deleteUnavailableBtn = createActionButton("Delete all unavailable files", () => {
+      deleteFilesInSection(unavailableFiles, "unavailable", deleteUnavailableBtn);
+    });
+    deleteUnavailableBtn.classList.add("danger-action");
+
+    notice.append(message, deleteUnavailableBtn);
+    section.appendChild(notice);
+  }
 
   if (!files.length) {
     const empty = document.createElement("p");
@@ -1350,9 +1375,11 @@ async function loadFiles(folder) {
   setBulkActionsVisible(true);
   setBulkActionsEnabled(false);
 
-  const data = await api(`/api/folders/${folder.id}/files?status=all`);
-  renderFiles(data.files);
-  updateBulkActionsForFiles(data.files);
+  const data = await api(`/api/folders/${folder.id}/files?status=all&validate=1`);
+  const invalidFileIds = data.invalidFileIds || [];
+  const visibleFiles = data.files.filter(file => !invalidFileIds.includes(file.id));
+  renderFiles(data.files, invalidFileIds);
+  updateBulkActionsForFiles(visibleFiles);
 }
 
 addFolderForm.onsubmit = async (e) => {
@@ -1489,41 +1516,28 @@ approveAllBtn.onclick = async () => {
     await Promise.all(pendingFiles.map(file => api(`/api/files/${file.id}/approve`, { method: "POST" })));
   }
 
-  const approvedFiles = currentFiles.map(file => ({
-    ...file,
-    status: "approved"
-  }));
-
-  syncFolderStatsFromFiles(selectedFolder.id, approvedFiles);
-  rebuildFolderIndexes();
-  selectedFolder = folderById.get(selectedFolder.id) || selectedFolder;
-  renderFolders();
-  renderFiles(approvedFiles);
-  updateBulkActionsForFiles(approvedFiles);
-  await refreshSelectedLeafFolder(approvedFiles);
+  await loadFolders();
+  await loadFiles(selectedFolder);
 };
 
-deleteAllBtn.onclick = async () => {
-  if (!selectedFolder || !currentFiles.length || !window.confirm(`Delete all files in ${selectedFolder.path}?`)) {
+async function deleteFilesInSection(files, sectionLabel, button) {
+  if (!selectedFolder || !files.length || !window.confirm(`Delete all ${sectionLabel} files in ${selectedFolder.path}?`)) {
     return;
   }
 
-  deleteAllBtn.disabled = true;
+  button.disabled = true;
 
   try {
-    await api(`/api/folders/${selectedFolder.id}/files`, { method: "DELETE" });
+    await Promise.all(files.map(file => api(`/api/files/${file.id}`, { method: "DELETE" })));
   } catch (err) {
-    await Promise.all(currentFiles.map(file => api(`/api/files/${file.id}`, { method: "DELETE" })));
+    button.disabled = false;
+    window.alert(err.message || `Failed to delete ${sectionLabel} files.`);
+    return;
   }
 
-  syncFolderStatsFromFiles(selectedFolder.id, []);
-  rebuildFolderIndexes();
-  selectedFolder = folderById.get(selectedFolder.id) || selectedFolder;
-  renderFolders();
-  renderFiles([]);
-  updateBulkActionsForFiles([]);
-  await refreshSelectedLeafFolder([]);
-};
+  await loadFiles(selectedFolder);
+  await loadFolders();
+}
 
 editFolderForm.onsubmit = async (e) => {
   e.preventDefault();
