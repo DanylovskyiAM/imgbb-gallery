@@ -347,6 +347,19 @@ function createActionButton(text, onClick, options = {}) {
   return button;
 }
 
+function setButtonBusy(button, label) {
+  const originalLabel = button.textContent;
+  button.disabled = true;
+  button.textContent = label;
+  button.setAttribute("aria-busy", "true");
+
+  return () => {
+    button.disabled = false;
+    button.textContent = originalLabel;
+    button.removeAttribute("aria-busy");
+  };
+}
+
 function getDownloadUrl(url, filename) {
   const downloadUrl = new URL("/api/download", apiBase);
   downloadUrl.searchParams.set("url", url);
@@ -1111,7 +1124,7 @@ function renderFolderOverview(parentFolder = null) {
   title.innerHTML = `<strong>${overviewItems.length} folders</strong><span>${totalPending} waiting files</span>`;
 
   const approveAllWaiting = createActionButton("Approve all waiting", async () => {
-    approveAllWaiting.disabled = true;
+    const resetButton = setButtonBusy(approveAllWaiting, "Approving…");
 
     try {
       for (const item of overviewItems) {
@@ -1122,8 +1135,9 @@ function renderFolderOverview(parentFolder = null) {
 
       renderFolderOverview(parentFolder ? folderById.get(parentFolder.id) || parentFolder : null);
     } catch (err) {
-      approveAllWaiting.disabled = false;
       window.alert(err.message || "Failed to approve waiting files.");
+    } finally {
+      resetButton();
     }
   }, { disabled: totalPending === 0 });
 
@@ -1554,17 +1568,23 @@ approveAllBtn.onclick = async () => {
     return;
   }
 
-  approveAllBtn.disabled = true;
+  const resetButton = setButtonBusy(approveAllBtn, "Approving…");
 
   try {
-    await api(`/api/folders/${selectedFolder.id}/files/approve-all`, { method: "POST" });
-  } catch (err) {
-    const pendingFiles = currentFiles.filter(file => file.status !== "approved");
-    await Promise.all(pendingFiles.map(file => api(`/api/files/${file.id}/approve`, { method: "POST" })));
-  }
+    try {
+      await api(`/api/folders/${selectedFolder.id}/files/approve-all`, { method: "POST" });
+    } catch (err) {
+      const pendingFiles = currentFiles.filter(file => file.status !== "approved");
+      await Promise.all(pendingFiles.map(file => api(`/api/files/${file.id}/approve`, { method: "POST" })));
+    }
 
-  await loadFolders();
-  await loadFiles(selectedFolder);
+    await loadFolders();
+    await loadFiles(selectedFolder);
+  } catch (err) {
+    window.alert(err.message || "Failed to approve waiting files.");
+  } finally {
+    resetButton();
+  }
 };
 
 checkAvailabilityBtn.onclick = async () => {
@@ -1572,7 +1592,7 @@ checkAvailabilityBtn.onclick = async () => {
     return;
   }
 
-  checkAvailabilityBtn.disabled = true;
+  const resetButton = setButtonBusy(checkAvailabilityBtn, "Checking…");
 
   try {
     const data = await api(`/api/folders/${selectedFolder.id}/files?status=all&validate=1`);
@@ -1584,6 +1604,8 @@ checkAvailabilityBtn.onclick = async () => {
   } catch (err) {
     window.alert(err.message || "Failed to check file availability.");
     updateBulkActionsForFiles(currentFiles);
+  } finally {
+    resetButton();
   }
 };
 
