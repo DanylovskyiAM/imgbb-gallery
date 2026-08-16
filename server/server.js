@@ -1079,10 +1079,16 @@ app.get("/api/logs", requireManageAuth, (req, res) => {
 
 app.get("/api/statistics", requireManageAuth, (req, res) => {
   const folders = db.listFolders();
+  const filesByFolderId = new Map();
+  db.listAllFiles("all").forEach(file => {
+    const files = filesByFolderId.get(file.folderId) || [];
+    files.push(file);
+    filesByFolderId.set(file.folderId, files);
+  });
   const folderById = new Map(folders.map(folder => [folder.id, folder]));
   const childFolderIds = new Set(folders.map(folder => folder.parentId).filter(Boolean));
   const rows = folders.map(folder => {
-    const files = db.listFiles(folder.id, "all");
+    const files = filesByFolderId.get(folder.id) || [];
 
     if (!files.length) return null;
 
@@ -1107,7 +1113,7 @@ app.get("/api/statistics", requireManageAuth, (req, res) => {
   const completionRows = folders
     .filter(folder => folder.parentId && !childFolderIds.has(folder.id))
     .map(folder => {
-      const files = db.listFiles(folder.id, "all");
+      const files = filesByFolderId.get(folder.id) || [];
       const locationFolder = folderById.get(folder.parentId);
       const companyFolder = locationFolder?.parentId ? folderById.get(locationFolder.parentId) : null;
       const startDateMatch = String(folder.description || "").match(/\b(\d{4})[/-](\d{2})[/-](\d{2})\b/);

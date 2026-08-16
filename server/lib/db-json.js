@@ -652,6 +652,12 @@ function listFiles(folderId, status = "approved") {
   });
 }
 
+function listAllFiles(status = "all") {
+  const db = readDb();
+
+  return db.files.filter(file => status === "all" || file.status === status);
+}
+
 function updateFile(id, updates) {
   const db = readDb();
   const file = db.files.find(item => item.id === id);
@@ -875,6 +881,7 @@ module.exports = {
   getOrCreateDefaultFolder,
   hasUsers,
   listFiles,
+  listAllFiles,
   listFolders,
   listLogs,
   approveFolderFiles,

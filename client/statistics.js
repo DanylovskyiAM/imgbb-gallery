@@ -27,6 +27,11 @@ function formatDate(value) {
   }).format(date);
 }
 
+function getTimestamp(value) {
+  const timestamp = Date.parse(value || "");
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
 function renderStatistics() {
   const query = searchInput.value.trim().toLowerCase();
   const location = locationFilter.value;
@@ -40,10 +45,10 @@ function renderStatistics() {
     .filter(row => !query || `${row.company} ${row.location} ${row.period}`.toLowerCase().includes(query))
     .sort((left, right) => {
       const leftValue = sortKey === "uploadedAt"
-        ? Date.parse(left.uploadedAt || 0)
+        ? getTimestamp(left.uploadedAt)
         : (sortKey === "completion" ? `${left.company} ${left.location}` : left[sortKey]);
       const rightValue = sortKey === "uploadedAt"
-        ? Date.parse(right.uploadedAt || 0)
+        ? getTimestamp(right.uploadedAt)
         : (sortKey === "completion" ? `${right.company} ${right.location}` : right[sortKey]);
       return typeof leftValue === "string"
         ? multiplier * leftValue.localeCompare(rightValue)
