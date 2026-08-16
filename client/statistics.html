@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Statistics</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="statistics-page">
+<header class="header">
+  <div class="container header-inner">
+    <section class="page-header">
+      <h2>Upload Statistics</h2>
+      <h3>Files by location and period</h3>
+    </section>
+    <div class="header-actions manage-header-actions">
+      <a class="header-link" href="/manage.html">Back to management</a>
+    </div>
+  </div>
+</header>
+
+<main class="main statistics-main">
+  <section class="statistics-panel">
+    <div class="statistics-filters">
+      <label>
+        Search
+        <input id="statisticsSearch" type="search" placeholder="Location or period" />
+      </label>
+      <label>
+        Company
+        <select id="statisticsCompanyFilter"><option value="">All companies</option></select>
+      </label>
+      <label>
+        Location
+        <select id="statisticsLocationFilter"><option value="">All locations</option></select>
+      </label>
+      <label>
+        Status
+        <select id="statisticsStatusFilter">
+          <option value="all">All files</option>
+          <option value="approved">Approved files</option>
+          <option value="pending">Pending files</option>
+        </select>
+      </label>
+      <label>
+        Sort by
+        <select id="statisticsSort">
+          <option value="uploadedAt-desc">Last upload (newest)</option>
+          <option value="uploadedAt-asc">Last upload (oldest)</option>
+          <option value="total-desc">Total files (high to low)</option>
+          <option value="total-asc">Total files (low to high)</option>
+          <option value="completion-desc">Completion percent (high to low)</option>
+          <option value="location-asc">Location (A–Z)</option>
+          <option value="period-asc">Period (A–Z)</option>
+        </select>
+      </label>
+    </div>
+    <p id="statisticsSummary" class="statistics-summary" aria-live="polite"></p>
+    <div class="statistics-table-wrap">
+      <table class="statistics-table">
+        <thead><tr><th>Company</th><th>Location</th><th>Period</th><th>Total</th><th>Approved</th><th>Pending</th><th>Last upload</th></tr></thead>
+        <tbody id="statisticsTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="statistics-panel upload-completion-panel">
+    <div class="statistics-section-heading">
+      <div>
+        <h3>Upload completion by location</h3>
+        <p>Green: uploaded within 14 days of the period start. Yellow: uploaded later. Red: no files uploaded.</p>
+      </div>
+      <span id="completionSummary" class="statistics-summary"></span>
+    </div>
+    <div class="statistics-table-wrap">
+      <table class="statistics-table completion-table">
+        <thead id="completionTableHead"></thead>
+        <tbody id="completionTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script src="statistics.js"></script>
+</body>
+</html>

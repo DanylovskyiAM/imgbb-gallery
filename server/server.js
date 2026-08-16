@@ -1020,6 +1020,58 @@ app.get("/api/logs", requireManageAuth, (req, res) => {
   });
 });
 
+app.get("/api/statistics", requireManageAuth, (req, res) => {
+  const folders = db.listFolders();
+  const folderById = new Map(folders.map(folder => [folder.id, folder]));
+  const childFolderIds = new Set(folders.map(folder => folder.parentId).filter(Boolean));
+  const rows = folders.map(folder => {
+    const files = db.listFiles(folder.id, "all");
+
+    if (!files.length) return null;
+
+    const locationFolder = folder.parentId ? folderById.get(folder.parentId) : null;
+    const companyFolder = locationFolder?.parentId ? folderById.get(locationFolder.parentId) : null;
+    const uploadedAt = files
+      .map(file => file.createdAt)
+      .filter(Boolean)
+      .sort((a, b) => new Date(b) - new Date(a))[0] || null;
+
+    return {
+      company: companyFolder?.name || "—",
+      location: locationFolder?.name || "—",
+      period: folder.name,
+      total: files.length,
+      approved: files.filter(file => file.status === "approved").length,
+      pending: files.filter(file => file.status !== "approved").length,
+      uploadedAt
+    };
+  }).filter(Boolean);
+
+  const completionRows = folders
+    .filter(folder => folder.parentId && !childFolderIds.has(folder.id))
+    .map(folder => {
+      const files = db.listFiles(folder.id, "all");
+      const locationFolder = folderById.get(folder.parentId);
+      const companyFolder = locationFolder?.parentId ? folderById.get(locationFolder.parentId) : null;
+      const startDateMatch = String(folder.description || "").match(/\b(\d{4})[/-](\d{2})[/-](\d{2})\b/);
+      const startDate = startDateMatch
+        ? `${startDateMatch[1]}-${startDateMatch[2]}-${startDateMatch[3]}`
+        : "";
+      const uploadDates = files.map(file => file.createdAt).filter(Boolean).sort();
+
+      return {
+        company: companyFolder?.name || "—",
+        location: locationFolder?.name || "—",
+        period: folder.name,
+        startDate,
+        total: files.length,
+        firstUploadedAt: uploadDates[0] || null
+      };
+    });
+
+  res.json({ rows, completionRows });
+});
+
 app.delete("/api/logs", requireManageAuth, (req, res) => {
   const count = db.clearLogs();
 
@@ -1463,6 +1515,10 @@ app.post("/api/upload", async (req, res) => {
 
 app.get("/manage.html", requireManageAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "../client/manage.html"));
+});
+
+app.get("/statistics.html", requireManageAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/statistics.html"));
 });
 
 app.use(express.static(path.join(__dirname, "../client")));
