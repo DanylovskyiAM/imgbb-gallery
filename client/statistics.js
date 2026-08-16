@@ -80,7 +80,7 @@ function isLateUpload(row) {
   if (!row.firstUploadedAt || !row.startDate) return false;
 
   const deadline = new Date(`${row.startDate}T00:00:00Z`);
-  deadline.setUTCDate(deadline.getUTCDate() + 14);
+  deadline.setUTCDate(deadline.getUTCDate() + 7);
   return new Date(row.firstUploadedAt) > deadline;
 }
 
@@ -137,7 +137,7 @@ function renderCompletionMatrix() {
 
   completionTableHead.innerHTML = "";
   const headRow = document.createElement("tr");
-  ["Location", ...periods.map(period => period.name), "Percent"].forEach(label => {
+  ["Location", "Percent", ...periods.map(period => period.name)].forEach(label => {
     const cell = document.createElement("th");
     cell.textContent = label;
     headRow.appendChild(cell);
@@ -169,13 +169,22 @@ function renderCompletionMatrix() {
     tr.appendChild(locationCell);
 
     const metrics = getCompletionMetrics(locationRow, periods, today);
+    const percentCell = document.createElement("td");
+    percentCell.textContent = `${metrics.percent}%`;
+    percentCell.className = metrics.percent === 100
+      ? (metrics.hasLateUpload ? "completion-late" : "completion-on-time")
+      : "completion-missing";
+    tr.appendChild(percentCell);
+
     periods.forEach(period => {
       const cell = document.createElement("td");
       const row = locationRow.periods.get(period.key);
 
       if (row) {
         cell.textContent = row.total;
-        if (row.total === 0) {
+        if (row.total === 0 && period.startDate && period.startDate > today) {
+          cell.className = "completion-future";
+        } else if (row.total === 0) {
           cell.className = "completion-missing";
         } else if (isLateUpload(row)) {
           cell.className = "completion-late";
@@ -186,13 +195,6 @@ function renderCompletionMatrix() {
 
       tr.appendChild(cell);
     });
-
-    const percentCell = document.createElement("td");
-    percentCell.textContent = `${metrics.percent}%`;
-    percentCell.className = metrics.percent === 100
-      ? (metrics.hasLateUpload ? "completion-late" : "completion-on-time")
-      : "completion-missing";
-    tr.appendChild(percentCell);
     completionTableBody.appendChild(tr);
   });
 }

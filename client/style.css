@@ -221,6 +221,7 @@ body.modal-open {
 .completion-on-time { color: #15803d; background: #f0fdf4; }
 .completion-late { color: #a16207; background: #fefce8; }
 .completion-missing { color: #b91c1c; background: #fef2f2; }
+.completion-future { color: #71717b; background: #f4f4f5; }
 
 @media (max-width: 980px) {
   .statistics-filters { grid-template-columns: 1fr 1fr; }
