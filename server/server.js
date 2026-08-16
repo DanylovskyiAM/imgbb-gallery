@@ -665,6 +665,24 @@ async function removeStoredImgBbImage(deleteUrl) {
   }
 }
 
+async function fetchStoredImage(url) {
+  const response = await axios.get(url, {
+    responseType: "stream",
+    timeout: 15000,
+    maxRedirects: 3,
+    validateStatus: () => true,
+    headers: { "User-Agent": "Mozilla/5.0" }
+  });
+  const contentType = String(response.headers["content-type"] || "").toLowerCase();
+
+  if (response.status >= 200 && response.status < 300 && contentType.startsWith("image/")) {
+    return response;
+  }
+
+  response.data.destroy();
+  return null;
+}
+
 function crc32(buffer) {
   let crc = 0 ^ -1;
 
@@ -889,6 +907,36 @@ app.get("/api/download", async (req, res) => {
     image.data.pipe(res);
   } catch (err) {
     res.status(500).json({ error: "Failed to download image" });
+  }
+});
+
+app.get("/api/managed-image", requireManageAuth, async (req, res) => {
+  const primaryUrl = String(req.query.url || "");
+  const fallbackUrl = String(req.query.fallback || "");
+  const urls = [...new Set([primaryUrl, fallbackUrl].filter(isAllowedImageUrl))];
+
+  if (!urls.length) {
+    return res.status(400).json({ error: "Invalid image URL" });
+  }
+
+  try {
+    for (const url of urls) {
+      const image = await fetchStoredImage(url);
+
+      if (!image) {
+        continue;
+      }
+
+      res.setHeader("Content-Type", image.headers["content-type"] || "image/jpeg");
+      res.setHeader("Cache-Control", "private, max-age=300");
+      image.data.pipe(res);
+      return;
+    }
+
+    return res.status(404).json({ error: "Image is unavailable" });
+  } catch (err) {
+    console.error("Failed to load managed image:", err.message);
+    return res.status(502).json({ error: "Failed to load image" });
   }
 });
 

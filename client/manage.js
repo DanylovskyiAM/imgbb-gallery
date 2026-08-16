@@ -58,6 +58,7 @@ let selectedFolder = null;
 let currentFiles = [];
 let currentFileIndex = 0;
 let lockedScrollY = 0;
+let imageObserver = null;
 let editingFolder = null;
 let addingParentId = null;
 const collapsedFolderIds = new Set();
@@ -353,6 +354,50 @@ function getDownloadUrl(url, filename) {
   }
 
   return downloadUrl.toString();
+}
+
+function getManagedImageUrl(file) {
+  const imageUrl = new URL("/api/managed-image", apiBase);
+  const thumbnailUrl = file.mediumUrl || file.originalUrl;
+  const originalUrl = file.originalUrl || thumbnailUrl;
+
+  imageUrl.searchParams.set("url", thumbnailUrl);
+  imageUrl.searchParams.set("fallback", originalUrl);
+  return imageUrl.toString();
+}
+
+function loadManagedThumbnail(img) {
+  const src = img.dataset.src;
+
+  if (!src) {
+    return;
+  }
+
+  img.onload = () => img.closest(".card")?.classList.add("is-loaded");
+  img.src = src;
+  img.removeAttribute("data-src");
+}
+
+function setupManagedLazyLoading(container) {
+  imageObserver?.disconnect();
+  const images = container.querySelectorAll(".manage-lazy-image");
+
+  if (!("IntersectionObserver" in window)) {
+    images.forEach(loadManagedThumbnail);
+    return;
+  }
+
+  imageObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) {
+        return;
+      }
+
+      loadManagedThumbnail(entry.target);
+      observer.unobserve(entry.target);
+    });
+  }, { rootMargin: "300px 0px", threshold: 0.01 });
+  images.forEach(image => imageObserver.observe(image));
 }
 
 function hasDuplicateFolderName(name, parentId) {
@@ -1227,6 +1272,7 @@ function createFileSection({ title, files, open, lazy = false, emptyMessage = "N
     });
 
     section.appendChild(grid);
+    setupManagedLazyLoading(grid);
     hasRenderedFiles = true;
   };
 
@@ -1250,7 +1296,8 @@ function createFileCard(file, index) {
   item.className = "card manage-file-card";
 
   const img = document.createElement("img");
-  img.src = file.mediumUrl || file.originalUrl;
+  img.className = "manage-lazy-image";
+  img.dataset.src = getManagedImageUrl(file);
   img.alt = file.title || file.filename || `File ${index + 1}`;
   img.onclick = () => openModal(index);
 
@@ -1290,7 +1337,7 @@ function updateModal() {
     return;
   }
 
-  modalImg.src = file.mediumUrl || file.originalUrl;
+  modalImg.src = getManagedImageUrl(file);
   modalImg.alt = file.title || file.filename || `File ${currentFileIndex + 1}`;
   counter.innerText = `${currentFileIndex + 1} / ${currentFiles.length}`;
   downloadBtn.href = getDownloadUrl(file.originalUrl, file.filename);
