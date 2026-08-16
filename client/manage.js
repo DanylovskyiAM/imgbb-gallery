@@ -1192,14 +1192,14 @@ function renderFiles(files, invalidFileIds = []) {
 
   fileList.append(
     createFileSection({
-      title: `${approvedCount}${unavailableApprovedFiles.length ? ` (-${unavailableApprovedFiles.length})` : ""} ${approvedCount === 1 ? "file" : "files"} already approved`,
+      title: `${approvedCount} ${approvedCount === 1 ? "file" : "files"} already approved${unavailableApprovedFiles.length ? ` (${unavailableApprovedFiles.length} not available)` : ""}`,
       files: approvedFiles,
       open: pendingFiles.length === 0 || unavailableApprovedFiles.length > 0,
       lazy: true,
       unavailableFiles: unavailableApprovedFiles
     }),
     createFileSection({
-      title: `Pending (${pendingCount}${unavailablePendingFiles.length ? ` (-${unavailablePendingFiles.length})` : ""} ${pendingCount === 1 ? "file" : "files"})`,
+      title: `Pending ${pendingCount} ${pendingCount === 1 ? "file" : "files"}${unavailablePendingFiles.length ? ` (${unavailablePendingFiles.length} not available)` : ""}`,
       files: pendingFiles,
       open: pendingFiles.length > 0 || unavailablePendingFiles.length > 0,
       emptyMessage: "No pending files.",

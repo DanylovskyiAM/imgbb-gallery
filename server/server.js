@@ -594,9 +594,7 @@ function isAllowedImageUrl(url) {
   }
 }
 
-async function isStoredImageAvailable(file) {
-  const url = file.originalUrl || file.mediumUrl;
-
+async function isImageUrlAvailable(url) {
   if (!url || !isAllowedImageUrl(url)) {
     return false;
   }
@@ -627,6 +625,17 @@ async function isStoredImageAvailable(file) {
 
   imageAvailabilityCache.set(url, { available, checkedAt: Date.now() });
   return available;
+}
+
+async function isStoredImageAvailable(file) {
+  const thumbnailUrl = file.mediumUrl || file.originalUrl;
+  const originalUrl = file.originalUrl || thumbnailUrl;
+
+  if (await isImageUrlAvailable(thumbnailUrl)) {
+    return true;
+  }
+
+  return originalUrl !== thumbnailUrl && isImageUrlAvailable(originalUrl);
 }
 
 async function partitionStoredImagesByAvailability(files) {
