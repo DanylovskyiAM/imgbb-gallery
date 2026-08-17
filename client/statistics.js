@@ -106,7 +106,8 @@ function getCompletionMetrics(locationRow, periods, today) {
 
   return {
     percent: applicablePeriods ? Math.round((uploadedPeriods / applicablePeriods) * 100) : 0,
-    hasLateUpload
+    hasLateUpload,
+    hasApplicablePeriods: applicablePeriods > 0
   };
 }
 
@@ -171,7 +172,9 @@ function renderCompletionMatrix() {
     const metrics = getCompletionMetrics(locationRow, periods, today);
     const percentCell = document.createElement("td");
     percentCell.textContent = `${metrics.percent}%`;
-    percentCell.className = metrics.percent === 100
+    percentCell.className = !metrics.hasApplicablePeriods
+      ? "completion-future"
+      : metrics.percent === 100
       ? (metrics.hasLateUpload ? "completion-late" : "completion-on-time")
       : "completion-missing";
     tr.appendChild(percentCell);
