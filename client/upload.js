@@ -250,7 +250,8 @@ function updateSelectedUploadFolder() {
 }
 
 function updateUploadButtonState(isUploading = false) {
-  uploadButton.disabled = isUploading || !periodSelect.value || !selectedUploadFolderId;
+  const hasSelectedFiles = (uploadInput.files || []).length > 0;
+  uploadButton.disabled = isUploading || !periodSelect.value || !selectedUploadFolderId || !hasSelectedFiles;
 }
 
 function readFileAsDataUrl(file) {
@@ -507,6 +508,10 @@ uploadForm.onsubmit = async (e) => {
 
 periodSelect.onchange = () => {
   updateSelectedUploadFolder();
+};
+
+uploadInput.onchange = () => {
+  updateUploadButtonState();
 };
 
 closeBtn.onclick = closeModal;
