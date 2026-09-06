@@ -909,6 +909,36 @@ app.get("/api/album/:id", async (req, res) => {
   }
 });
 
+app.get("/api/gallery-image", async (req, res) => {
+  const primaryUrl = String(req.query.url || "");
+  const fallbackUrl = String(req.query.fallback || "");
+  const urls = [...new Set([primaryUrl, fallbackUrl].filter(isAllowedImageUrl))];
+
+  if (!urls.length) {
+    return res.status(400).json({ error: "Invalid image URL" });
+  }
+
+  try {
+    for (const url of urls) {
+      const image = await fetchStoredImage(url);
+
+      if (!image) {
+        continue;
+      }
+
+      res.setHeader("Content-Type", image.headers["content-type"] || "image/jpeg");
+      res.setHeader("Cache-Control", "public, max-age=300");
+      image.data.pipe(res);
+      return;
+    }
+
+    return res.status(404).json({ error: "Image is unavailable" });
+  } catch (err) {
+    console.error("Failed to load gallery image:", err.message);
+    return res.status(502).json({ error: "Failed to load image" });
+  }
+});
+
 app.get("/api/download", async (req, res) => {
   const { url, filename } = req.query;
 
