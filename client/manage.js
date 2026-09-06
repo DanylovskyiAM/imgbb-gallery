@@ -370,7 +370,7 @@ function getDownloadUrl(url, filename) {
   return downloadUrl.toString();
 }
 
-function setStoredImageSource(img, file) {
+function getManagedImageUrl(file) {
   const validImageUrl = value => {
     try {
       const url = new URL(String(value || ""));
@@ -383,18 +383,26 @@ function setStoredImageSource(img, file) {
   const originalUrl = validImageUrl(file.originalUrl) || thumbnailUrl;
 
   if (!thumbnailUrl) {
+    return "";
+  }
+
+  const imageUrl = new URL("/api/managed-image", apiBase);
+  imageUrl.searchParams.set("url", thumbnailUrl);
+  imageUrl.searchParams.set("fallback", originalUrl);
+  return imageUrl.toString();
+}
+
+function setStoredImageSource(img, file) {
+  const imageUrl = getManagedImageUrl(file);
+
+  if (!imageUrl) {
     img.removeAttribute("src");
     img.closest(".card")?.classList.add("is-unavailable");
     return;
   }
 
-  img.onerror = thumbnailUrl !== originalUrl
-    ? () => {
-        img.onerror = null;
-        img.src = originalUrl;
-      }
-    : null;
-  img.src = thumbnailUrl;
+  img.onerror = null;
+  img.src = imageUrl;
 }
 
 function loadManagedThumbnail(img) {
