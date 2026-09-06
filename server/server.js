@@ -7,6 +7,7 @@ const path = require("path");
 const fs = require("fs");
 const zlib = require("zlib");
 const db = require("./lib/db");
+const notificationSettings = require("./lib/notification-settings").createNotificationSettings();
 const imgbbStorage = require("./storage/imgbbStorage");
 const {
   buildLowKeyAlert,
@@ -1459,6 +1460,19 @@ app.post("/api/upload/key-status/refresh", requireManageAuth, async (req, res) =
   }
 });
 
+app.get("/api/notifications/telegram/settings", requireManageAuth, (req, res) => {
+  res.json({ enabled: notificationSettings.isEnabled(), configured: Boolean(TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) });
+});
+
+app.patch("/api/notifications/telegram/settings", requireManageAuth, (req, res) => {
+  if (typeof req.body?.enabled !== "boolean") {
+    return res.status(400).json({ error: "enabled must be a boolean" });
+  }
+  notificationSettings.setEnabled(req.body.enabled);
+  logAction(req, "notification.telegram.settings", `Scheduled Telegram reports ${req.body.enabled ? "enabled" : "disabled"}`);
+  res.json({ enabled: req.body.enabled, configured: Boolean(TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) });
+});
+
 app.post("/api/notifications/telegram", async (req, res) => {
   if (!TELEGRAM_CRON_SECRET || !TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
     return res.status(503).json({ error: "Telegram notifications are not configured" });
@@ -1469,6 +1483,9 @@ app.post("/api/notifications/telegram", async (req, res) => {
   }
 
   try {
+    if (!notificationSettings.isEnabled()) {
+      return res.json({ ok: true, skipped: true, reason: "Scheduled Telegram reports are disabled" });
+    }
     const keyStatus = getImgBbKeyStatus();
     const folders = db.listFolders();
     const message = buildTelegramReport({
@@ -1477,11 +1494,16 @@ app.post("/api/notifications/telegram", async (req, res) => {
       manageUrl: PUBLIC_BASE_URL ? `${PUBLIC_BASE_URL}/manage.html` : "",
       timeZone: TELEGRAM_TIME_ZONE
     });
-    const result = await sendTelegramReport({
-      botToken: TELEGRAM_BOT_TOKEN,
+    const result = await notificationSettings.sendReportIfChanged({
+      message,
       chatId: TELEGRAM_CHAT_ID,
-      message
+      send: () => sendTelegramReport({
+        botToken: TELEGRAM_BOT_TOKEN,
+        chatId: TELEGRAM_CHAT_ID,
+        message
+      })
     });
+    if (result.skipped) return res.json({ ok: true, ...result });
     const sentAt = new Date().toISOString();
 
     logAction(req, "notification.telegram", "Sent scheduled Telegram status report", {

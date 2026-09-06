@@ -1735,3 +1735,36 @@ updateToTopButton();
 
 setBulkActionsVisible(false);
 loadFolders();
+
+
+const telegramReportsToggle = document.getElementById("telegramReportsToggle");
+const telegramReportsStatus = document.getElementById("telegramReportsStatus");
+let telegramReportsEnabled = true;
+
+function renderTelegramReports(settings) {
+  telegramReportsEnabled = settings.enabled;
+  telegramReportsToggle.checked = settings.enabled;
+  telegramReportsToggle.disabled = false;
+  telegramReportsStatus.textContent = settings.configured
+    ? (settings.enabled ? "Enabled" : "Disabled")
+    : "Telegram is not configured on the server.";
+}
+
+telegramReportsToggle.addEventListener("change", async () => {
+  telegramReportsToggle.disabled = true;
+  telegramReportsStatus.textContent = "Saving…";
+  try {
+    renderTelegramReports(await api("/api/notifications/telegram/settings", {
+      method: "PATCH",
+      body: JSON.stringify({ enabled: telegramReportsToggle.checked })
+    }));
+  } catch (error) {
+    telegramReportsToggle.checked = telegramReportsEnabled;
+    telegramReportsToggle.disabled = false;
+    telegramReportsStatus.textContent = `Could not save: ${error.message}`;
+  }
+});
+
+api("/api/notifications/telegram/settings").then(renderTelegramReports).catch((error) => {
+  telegramReportsStatus.textContent = `Could not load settings: ${error.message}. Reload to retry.`;
+});
