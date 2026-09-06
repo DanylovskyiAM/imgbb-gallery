@@ -59,7 +59,6 @@ let selectedFolder = null;
 let currentFiles = [];
 let currentFileIndex = 0;
 let lockedScrollY = 0;
-let imageObserver = null;
 let editingFolder = null;
 let addingParentId = null;
 const collapsedFolderIds = new Set();
@@ -371,14 +370,17 @@ function getDownloadUrl(url, filename) {
   return downloadUrl.toString();
 }
 
-function getManagedImageUrl(file) {
-  const imageUrl = new URL("/api/managed-image", apiBase);
+function setStoredImageSource(img, file) {
   const thumbnailUrl = file.mediumUrl || file.originalUrl;
   const originalUrl = file.originalUrl || thumbnailUrl;
 
-  imageUrl.searchParams.set("url", thumbnailUrl);
-  imageUrl.searchParams.set("fallback", originalUrl);
-  return imageUrl.toString();
+  img.onerror = thumbnailUrl !== originalUrl
+    ? () => {
+        img.onerror = null;
+        img.src = originalUrl;
+      }
+    : null;
+  img.src = thumbnailUrl;
 }
 
 function loadManagedThumbnail(img) {
@@ -389,12 +391,15 @@ function loadManagedThumbnail(img) {
   }
 
   img.onload = () => img.closest(".card")?.classList.add("is-loaded");
-  img.src = src;
+  setStoredImageSource(img, {
+    mediumUrl: src,
+    originalUrl: img.dataset.fallback || src
+  });
   img.removeAttribute("data-src");
+  img.removeAttribute("data-fallback");
 }
 
 function setupManagedLazyLoading(container) {
-  imageObserver?.disconnect();
   const images = container.querySelectorAll(".manage-lazy-image");
 
   if (!("IntersectionObserver" in window)) {
@@ -402,7 +407,7 @@ function setupManagedLazyLoading(container) {
     return;
   }
 
-  imageObserver = new IntersectionObserver((entries, observer) => {
+  const imageObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) {
         return;
@@ -1313,7 +1318,8 @@ function createFileCard(file, index) {
 
   const img = document.createElement("img");
   img.className = "manage-lazy-image";
-  img.dataset.src = getManagedImageUrl(file);
+  img.dataset.src = file.mediumUrl || file.originalUrl;
+  img.dataset.fallback = file.originalUrl || img.dataset.src;
   img.alt = file.title || file.filename || `File ${index + 1}`;
   img.onclick = () => openModal(index);
 
@@ -1353,7 +1359,7 @@ function updateModal() {
     return;
   }
 
-  modalImg.src = getManagedImageUrl(file);
+  setStoredImageSource(modalImg, file);
   modalImg.alt = file.title || file.filename || `File ${currentFileIndex + 1}`;
   counter.innerText = `${currentFileIndex + 1} / ${currentFiles.length}`;
   downloadBtn.href = getDownloadUrl(file.originalUrl, file.filename);
