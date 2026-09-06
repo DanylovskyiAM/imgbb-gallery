@@ -371,8 +371,22 @@ function getDownloadUrl(url, filename) {
 }
 
 function setStoredImageSource(img, file) {
-  const thumbnailUrl = file.mediumUrl || file.originalUrl;
-  const originalUrl = file.originalUrl || thumbnailUrl;
+  const validImageUrl = value => {
+    try {
+      const url = new URL(String(value || ""));
+      return url.protocol === "https:" && url.hostname === "i.ibb.co" ? url.toString() : "";
+    } catch (error) {
+      return "";
+    }
+  };
+  const thumbnailUrl = validImageUrl(file.mediumUrl) || validImageUrl(file.originalUrl);
+  const originalUrl = validImageUrl(file.originalUrl) || thumbnailUrl;
+
+  if (!thumbnailUrl) {
+    img.removeAttribute("src");
+    img.closest(".card")?.classList.add("is-unavailable");
+    return;
+  }
 
   img.onerror = thumbnailUrl !== originalUrl
     ? () => {
@@ -1318,8 +1332,8 @@ function createFileCard(file, index) {
 
   const img = document.createElement("img");
   img.className = "manage-lazy-image";
-  img.dataset.src = file.mediumUrl || file.originalUrl;
-  img.dataset.fallback = file.originalUrl || img.dataset.src;
+  img.dataset.src = String(file.mediumUrl || file.originalUrl || "");
+  img.dataset.fallback = String(file.originalUrl || img.dataset.src || "");
   img.alt = file.title || file.filename || `File ${index + 1}`;
   img.onclick = () => openModal(index);
 
@@ -1607,6 +1621,9 @@ checkAvailabilityBtn.onclick = async () => {
 
     renderFiles(data.files, invalidFileIds);
     updateBulkActionsForFiles(visibleFiles);
+    window.alert(invalidFileIds.length
+      ? `Check complete: ${invalidFileIds.length} of ${data.files.length} files are unavailable.`
+      : `Check complete: all ${data.files.length} files are available.`);
   } catch (err) {
     window.alert(err.message || "Failed to check file availability.");
     updateBulkActionsForFiles(currentFiles);

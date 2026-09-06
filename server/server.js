@@ -67,6 +67,7 @@ const PUBLIC_BASE_URL = String(process.env.PUBLIC_BASE_URL || "").trim().replace
 
 const cache = {};
 const imageAvailabilityCache = new Map();
+const imageAvailabilityChecks = new Map();
 const SESSION_COOKIE = "mya_admin_session";
 const IMGBB_UPLOADS_PER_KEY = 100;
 const IMGBB_KEY_COOLDOWN_MS = Math.max(
@@ -606,26 +607,39 @@ async function isImageUrlAvailable(url) {
     return cached.available;
   }
 
-  let available = false;
-
-  try {
-    const response = await axios.head(url, {
-      timeout: 10000,
-      maxRedirects: 3,
-      validateStatus: () => true,
-      headers: { "User-Agent": "Mozilla/5.0" }
-    });
-    const contentType = String(response.headers["content-type"] || "").toLowerCase();
-
-    available = response.status >= 200
-      && response.status < 300
-      && contentType.startsWith("image/");
-  } catch (err) {
-    available = false;
+  if (imageAvailabilityChecks.has(url)) {
+    return imageAvailabilityChecks.get(url);
   }
 
-  imageAvailabilityCache.set(url, { available, checkedAt: Date.now() });
-  return available;
+  const check = (async () => {
+    let available = false;
+
+    try {
+      const response = await axios.head(url, {
+        timeout: 5000,
+        maxRedirects: 3,
+        validateStatus: () => true,
+        headers: { "User-Agent": "Mozilla/5.0" }
+      });
+      const contentType = String(response.headers["content-type"] || "").toLowerCase();
+
+      available = response.status >= 200
+        && response.status < 300
+        && contentType.startsWith("image/");
+    } catch (err) {
+      available = false;
+    }
+
+    imageAvailabilityCache.set(url, { available, checkedAt: Date.now() });
+    return available;
+  })();
+
+  imageAvailabilityChecks.set(url, check);
+  try {
+    return await check;
+  } finally {
+    imageAvailabilityChecks.delete(url);
+  }
 }
 
 async function isStoredImageAvailable(file) {
@@ -650,7 +664,7 @@ async function partitionStoredImagesByAvailability(files) {
     }
   }
 
-  await Promise.all(Array.from({ length: Math.min(8, files.length) }, worker));
+  await Promise.all(Array.from({ length: Math.min(16, files.length) }, worker));
 
   return files.reduce((result, file, index) => {
     result[valid[index] ? "available" : "unavailable"].push(file);
