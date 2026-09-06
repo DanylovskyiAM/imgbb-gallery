@@ -690,20 +690,25 @@ async function removeStoredImgBbImage(deleteUrl) {
 }
 
 async function fetchStoredImage(url) {
-  const response = await axios.get(url, {
-    responseType: "stream",
-    timeout: 15000,
-    maxRedirects: 3,
-    validateStatus: () => true,
-    headers: { "User-Agent": "Mozilla/5.0" }
-  });
-  const contentType = String(response.headers["content-type"] || "").toLowerCase();
+  try {
+    const response = await axios.get(url, {
+      responseType: "stream",
+      timeout: 15000,
+      maxRedirects: 3,
+      validateStatus: () => true,
+      headers: { "User-Agent": "Mozilla/5.0" }
+    });
+    const contentType = String(response.headers["content-type"] || "").toLowerCase();
 
-  if (response.status >= 200 && response.status < 300 && contentType.startsWith("image/")) {
-    return response;
+    if (response.status >= 200 && response.status < 300 && contentType.startsWith("image/")) {
+      return response;
+    }
+
+    response.data.destroy();
+  } catch (err) {
+    // A transient ImgBB/CDN timeout must not prevent trying the original URL.
   }
 
-  response.data.destroy();
   return null;
 }
 
