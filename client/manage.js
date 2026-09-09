@@ -59,7 +59,9 @@ let selectedFolder = null;
 let currentFiles = [];
 let currentFileIndex = 0;
 let lockedScrollY = 0;
-let imageObserver = null;
+let managedImageObserver = null;
+let filesLoadAbortController = null;
+let filesLoadRequestId = 0;
 let editingFolder = null;
 let addingParentId = null;
 const collapsedFolderIds = new Set();
@@ -360,7 +362,7 @@ function setButtonBusy(button, label) {
   };
 }
 
-function getDownloadUrl(url, filename) {
+function getDownloadUrl(url, filename, fileId = "") {
   const downloadUrl = new URL("/api/download", apiBase);
   downloadUrl.searchParams.set("url", url);
 
@@ -368,17 +370,46 @@ function getDownloadUrl(url, filename) {
     downloadUrl.searchParams.set("filename", filename);
   }
 
+  if (fileId) {
+    downloadUrl.searchParams.set("fileId", fileId);
+  }
+
   return downloadUrl.toString();
 }
 
 function getManagedImageUrl(file) {
-  const imageUrl = new URL("/api/managed-image", apiBase);
-  const thumbnailUrl = file.mediumUrl || file.originalUrl;
-  const originalUrl = file.originalUrl || thumbnailUrl;
+  const validImageUrl = value => {
+    try {
+      const url = new URL(String(value || ""));
+      return url.protocol === "https:" && url.hostname === "i.ibb.co" ? url.toString() : "";
+    } catch (error) {
+      return "";
+    }
+  };
+  const thumbnailUrl = validImageUrl(file.mediumUrl) || validImageUrl(file.originalUrl);
+  const originalUrl = validImageUrl(file.originalUrl) || thumbnailUrl;
 
+  if (!thumbnailUrl) {
+    return "";
+  }
+
+  const imageUrl = new URL("/api/managed-image", apiBase);
   imageUrl.searchParams.set("url", thumbnailUrl);
   imageUrl.searchParams.set("fallback", originalUrl);
   return imageUrl.toString();
+}
+
+function setStoredImageSource(img, file) {
+  const imageUrl = getManagedImageUrl(file);
+
+  if (!imageUrl) {
+    img.removeAttribute("src");
+    img.closest(".card")?.classList.add("is-unavailable");
+    return;
+  }
+
+  img.onerror = null;
+  img.src = imageUrl;
 }
 
 function loadManagedThumbnail(img) {
@@ -389,12 +420,15 @@ function loadManagedThumbnail(img) {
   }
 
   img.onload = () => img.closest(".card")?.classList.add("is-loaded");
-  img.src = src;
+  setStoredImageSource(img, {
+    mediumUrl: src,
+    originalUrl: img.dataset.fallback || src
+  });
   img.removeAttribute("data-src");
+  img.removeAttribute("data-fallback");
 }
 
 function setupManagedLazyLoading(container) {
-  imageObserver?.disconnect();
   const images = container.querySelectorAll(".manage-lazy-image");
 
   if (!("IntersectionObserver" in window)) {
@@ -402,17 +436,29 @@ function setupManagedLazyLoading(container) {
     return;
   }
 
-  imageObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) {
-        return;
-      }
+  if (!managedImageObserver) {
+    managedImageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) {
+          return;
+        }
 
-      loadManagedThumbnail(entry.target);
-      observer.unobserve(entry.target);
-    });
-  }, { rootMargin: "300px 0px", threshold: 0.01 });
-  images.forEach(image => imageObserver.observe(image));
+        loadManagedThumbnail(entry.target);
+        observer.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px", threshold: 0.01 });
+  }
+
+  images.forEach(image => managedImageObserver.observe(image));
+}
+
+function stopManagedLazyLoading() {
+  managedImageObserver?.disconnect();
+  managedImageObserver = null;
+  fileList?.querySelectorAll(".manage-lazy-image").forEach(image => {
+    image.removeAttribute("src");
+    image.removeAttribute("data-src");
+  });
 }
 
 function hasDuplicateFolderName(name, parentId) {
@@ -1181,6 +1227,7 @@ function renderFolderOverview(parentFolder = null) {
 }
 
 function renderFiles(files, invalidFileIds = []) {
+  stopManagedLazyLoading();
   fileList.innerHTML = "";
   fileList.classList.remove("folder-overview-list");
   fileList.classList.remove("manage-file-grid");
@@ -1313,7 +1360,10 @@ function createFileCard(file, index) {
 
   const img = document.createElement("img");
   img.className = "manage-lazy-image";
-  img.dataset.src = getManagedImageUrl(file);
+  img.loading = "lazy";
+  img.decoding = "async";
+  img.dataset.src = String(file.mediumUrl || file.originalUrl || "");
+  img.dataset.fallback = String(file.originalUrl || img.dataset.src || "");
   img.alt = file.title || file.filename || `File ${index + 1}`;
   img.onclick = () => openModal(index);
 
@@ -1353,10 +1403,10 @@ function updateModal() {
     return;
   }
 
-  modalImg.src = getManagedImageUrl(file);
+  setStoredImageSource(modalImg, file);
   modalImg.alt = file.title || file.filename || `File ${currentFileIndex + 1}`;
   counter.innerText = `${currentFileIndex + 1} / ${currentFiles.length}`;
-  downloadBtn.href = getDownloadUrl(file.originalUrl, file.filename);
+  downloadBtn.href = getDownloadUrl(file.originalUrl, file.filename, file.id);
   downloadBtn.download = file.filename || `image_${currentFileIndex + 1}.jpg`;
   modalApproveBtn.disabled = file.status === "approved";
   modalApproveBtn.textContent = file.status === "approved" ? "Approved" : "Approve";
@@ -1425,8 +1475,12 @@ async function loadFolders() {
 }
 
 async function loadFiles(folder) {
+  const requestId = ++filesLoadRequestId;
+  filesLoadAbortController?.abort();
+  filesLoadAbortController = null;
   selectedFolder = folder;
   renderFolders();
+  stopManagedLazyLoading();
 
   if (hasChildFolders(folder)) {
     renderFolderOverview(folder);
@@ -1437,10 +1491,33 @@ async function loadFiles(folder) {
   renderFilesBreadcrumb(folder);
   setBulkActionsVisible(true);
   setBulkActionsEnabled(false);
+  fileList.innerHTML = '<p class="empty-state">Loading files…</p>';
 
-  const data = await api(`/api/folders/${folder.id}/files?status=all`);
-  renderFiles(data.files);
-  updateBulkActionsForFiles(data.files);
+  const controller = new AbortController();
+  filesLoadAbortController = controller;
+
+  try {
+    const data = await api(`/api/folders/${folder.id}/files?status=all`, { signal: controller.signal });
+
+    if (requestId !== filesLoadRequestId) {
+      return;
+    }
+
+  const invalidFileIds = data.invalidFileIds || [];
+  const visibleFiles = data.files.filter(file => !invalidFileIds.includes(file.id));
+  renderFiles(data.files, invalidFileIds);
+  updateBulkActionsForFiles(visibleFiles);
+  } catch (err) {
+    if (err.name === "AbortError" || requestId !== filesLoadRequestId) {
+      return;
+    }
+
+    fileList.innerHTML = `<p class="empty-state">${err.message || "Failed to load files."}</p>`;
+  } finally {
+    if (filesLoadAbortController === controller) {
+      filesLoadAbortController = null;
+    }
+  }
 }
 
 addFolderForm.onsubmit = async (e) => {
@@ -1601,6 +1678,9 @@ checkAvailabilityBtn.onclick = async () => {
 
     renderFiles(data.files, invalidFileIds);
     updateBulkActionsForFiles(visibleFiles);
+    window.alert(invalidFileIds.length
+      ? `Check complete: ${invalidFileIds.length} of ${data.files.length} files are unavailable.`
+      : `Check complete: all ${data.files.length} files are available.`);
   } catch (err) {
     window.alert(err.message || "Failed to check file availability.");
     updateBulkActionsForFiles(currentFiles);

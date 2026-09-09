@@ -177,6 +177,13 @@ function normalizeImage(image) {
   };
 }
 
+function getGalleryImageUrl(image) {
+  const url = new URL("/api/gallery-image", window.location.origin);
+  url.searchParams.set("url", image.medium);
+  url.searchParams.set("fallback", image.original);
+  return url.toString();
+}
+
 function loadThumbnail(img) {
   const src = img.dataset.src;
 
@@ -282,7 +289,7 @@ function renderGallery(data) {
 
     const img = document.createElement("img");
     img.className = "lazy-image";
-    img.dataset.src = image.medium;
+    img.dataset.src = getGalleryImageUrl(image);
     img.alt = image.title || image.filename || `Gallery image ${index + 1}`;
     img.onclick = () => openModal(index);
 
@@ -385,7 +392,7 @@ function closeModal() {
 function updateModal() {
   const image = images[currentIndex];
   resetModalZoom();
-  modalImg.src = image.medium;
+  modalImg.src = getGalleryImageUrl(image);
   modalImg.alt = image.title || image.filename || `Gallery image ${currentIndex + 1}`;
   downloadBtn.href = getDownloadUrl(image.original, image.filename);
   downloadBtn.download = image.filename || `image_${currentIndex + 1}.jpg`;

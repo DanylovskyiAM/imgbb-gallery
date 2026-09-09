@@ -16,6 +16,7 @@ const {
 } = require("./lib/telegram-notifier");
 const {
   getFilesAvailability,
+  isFileExpired,
   partitionFilesByAvailability
 } = require("./lib/file-availability");
 const {
@@ -67,6 +68,7 @@ const PUBLIC_BASE_URL = String(process.env.PUBLIC_BASE_URL || "").trim().replace
 
 const cache = {};
 const imageAvailabilityCache = new Map();
+const imageAvailabilityChecks = new Map();
 const SESSION_COOKIE = "mya_admin_session";
 const IMGBB_UPLOADS_PER_KEY = 100;
 const IMGBB_KEY_COOLDOWN_MS = Math.max(
@@ -606,26 +608,39 @@ async function isImageUrlAvailable(url) {
     return cached.available;
   }
 
-  let available = false;
-
-  try {
-    const response = await axios.head(url, {
-      timeout: 10000,
-      maxRedirects: 3,
-      validateStatus: () => true,
-      headers: { "User-Agent": "Mozilla/5.0" }
-    });
-    const contentType = String(response.headers["content-type"] || "").toLowerCase();
-
-    available = response.status >= 200
-      && response.status < 300
-      && contentType.startsWith("image/");
-  } catch (err) {
-    available = false;
+  if (imageAvailabilityChecks.has(url)) {
+    return imageAvailabilityChecks.get(url);
   }
 
-  imageAvailabilityCache.set(url, { available, checkedAt: Date.now() });
-  return available;
+  const check = (async () => {
+    let available = false;
+
+    try {
+      const response = await axios.head(url, {
+        timeout: 5000,
+        maxRedirects: 3,
+        validateStatus: () => true,
+        headers: { "User-Agent": "Mozilla/5.0" }
+      });
+      const contentType = String(response.headers["content-type"] || "").toLowerCase();
+
+      available = response.status >= 200
+        && response.status < 300
+        && contentType.startsWith("image/");
+    } catch (err) {
+      available = false;
+    }
+
+    imageAvailabilityCache.set(url, { available, checkedAt: Date.now() });
+    return available;
+  })();
+
+  imageAvailabilityChecks.set(url, check);
+  try {
+    return await check;
+  } finally {
+    imageAvailabilityChecks.delete(url);
+  }
 }
 
 async function isStoredImageAvailable(file) {
@@ -640,22 +655,25 @@ async function isStoredImageAvailable(file) {
 }
 
 async function partitionStoredImagesByAvailability(files) {
-  const valid = Array(files.length).fill(false);
+  const { available: candidates, expired } = partitionFilesByAvailability(files);
+  const valid = Array(candidates.length).fill(false);
   let nextIndex = 0;
 
   async function worker() {
-    while (nextIndex < files.length) {
+    while (nextIndex < candidates.length) {
       const index = nextIndex++;
-      valid[index] = await isStoredImageAvailable(files[index]);
+      valid[index] = await isStoredImageAvailable(candidates[index]);
     }
   }
 
-  await Promise.all(Array.from({ length: Math.min(8, files.length) }, worker));
+  await Promise.all(Array.from({ length: Math.min(16, candidates.length) }, worker));
 
-  return files.reduce((result, file, index) => {
+  const result = candidates.reduce((result, file, index) => {
     result[valid[index] ? "available" : "unavailable"].push(file);
     return result;
   }, { available: [], unavailable: [] });
+  result.unavailable.unshift(...expired);
+  return result;
 }
 
 async function removeStoredImgBbImage(deleteUrl) {
@@ -676,20 +694,25 @@ async function removeStoredImgBbImage(deleteUrl) {
 }
 
 async function fetchStoredImage(url) {
-  const response = await axios.get(url, {
-    responseType: "stream",
-    timeout: 15000,
-    maxRedirects: 3,
-    validateStatus: () => true,
-    headers: { "User-Agent": "Mozilla/5.0" }
-  });
-  const contentType = String(response.headers["content-type"] || "").toLowerCase();
+  try {
+    const response = await axios.get(url, {
+      responseType: "stream",
+      timeout: 15000,
+      maxRedirects: 3,
+      validateStatus: () => true,
+      headers: { "User-Agent": "Mozilla/5.0" }
+    });
+    const contentType = String(response.headers["content-type"] || "").toLowerCase();
 
-  if (response.status >= 200 && response.status < 300 && contentType.startsWith("image/")) {
-    return response;
+    if (response.status >= 200 && response.status < 300 && contentType.startsWith("image/")) {
+      return response;
+    }
+
+    response.data.destroy();
+  } catch (err) {
+    // A transient ImgBB/CDN timeout must not prevent trying the original URL.
   }
 
-  response.data.destroy();
   return null;
 }
 
@@ -895,8 +918,46 @@ app.get("/api/album/:id", async (req, res) => {
   }
 });
 
+app.get("/api/gallery-image", async (req, res) => {
+  const primaryUrl = String(req.query.url || "");
+  const fallbackUrl = String(req.query.fallback || "");
+  const urls = [...new Set([primaryUrl, fallbackUrl].filter(isAllowedImageUrl))];
+
+  if (!urls.length) {
+    return res.status(400).json({ error: "Invalid image URL" });
+  }
+
+  try {
+    for (const url of urls) {
+      const image = await fetchStoredImage(url);
+
+      if (!image) {
+        continue;
+      }
+
+      res.setHeader("Content-Type", image.headers["content-type"] || "image/jpeg");
+      res.setHeader("Cache-Control", "public, max-age=300");
+      image.data.pipe(res);
+      return;
+    }
+
+    return res.status(404).json({ error: "Image is unavailable" });
+  } catch (err) {
+    console.error("Failed to load gallery image:", err.message);
+    return res.status(502).json({ error: "Failed to load image" });
+  }
+});
+
 app.get("/api/download", async (req, res) => {
-  const { url, filename } = req.query;
+  const { url, filename, fileId } = req.query;
+
+  if (fileId) {
+    const file = db.findFile(String(fileId));
+
+    if (!file || isFileExpired(file)) {
+      return res.status(410).json({ error: "Image has expired and is unavailable" });
+    }
+  }
 
   if (!url || !isAllowedImageUrl(url)) {
     return res.status(400).json({ error: "Invalid image URL" });
@@ -1247,17 +1308,22 @@ app.get("/api/folders/:id/files", requireManageAuth, async (req, res) => {
   }
 
   const files = db.listFiles(folder.id, req.query.status || "all");
+  const { available: unexpiredFiles, expired: expiredFiles } = partitionFilesByAvailability(files);
 
   if (req.query.validate !== "1") {
-    return res.json({ folder, files });
+    return res.json({
+      folder,
+      files,
+      invalidFileIds: expiredFiles.map(file => file.id)
+    });
   }
 
-  const { unavailable } = await partitionStoredImagesByAvailability(files);
+  const { unavailable } = await partitionStoredImagesByAvailability(unexpiredFiles);
 
   res.json({
     folder,
     files,
-    invalidFileIds: unavailable.map(file => file.id)
+    invalidFileIds: [...expiredFiles, ...unavailable].map(file => file.id)
   });
 });
 
