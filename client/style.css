@@ -324,6 +324,12 @@ body.modal-open {
   background: #238de6;
 }
 
+.download-btn:disabled {
+  opacity: 1;
+  cursor: wait;
+  background: #8fc7f4;
+}
+
 /* MODAL */
 #modal {
   position: fixed;
@@ -1201,6 +1207,40 @@ body.modal-open {
   cursor: pointer;
 }
 
+.manage-file-placeholder-grid {
+  align-content: start;
+}
+
+.manage-file-placeholder {
+  min-height: 170px;
+  overflow: hidden;
+  border: 1px solid #dbe7f2;
+  border-radius: 10px;
+  background: #e4eef8;
+}
+
+.manage-file-placeholder::after {
+  display: block;
+  width: 45%;
+  height: 100%;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  transform: translateX(-120%);
+  animation: manage-placeholder-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes manage-placeholder-shimmer {
+  to {
+    transform: translateX(260%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .manage-file-placeholder::after {
+    animation: none;
+  }
+}
+
 .file-status {
   position: absolute;
   left: 8px;
@@ -1992,6 +2032,12 @@ body.start-mode .album-form {
 
 #downloadBtn:hover {
   background: #238de6;
+}
+
+#downloadBtn.is-disabled {
+  pointer-events: none;
+  opacity: 0.65;
+  cursor: wait;
 }
 
 .to-top-btn {

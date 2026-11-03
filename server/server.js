@@ -24,6 +24,7 @@ const {
   isImgBbInvalidKeyError,
   isImgBbRateLimitError
 } = require("./lib/imgbb-errors");
+const { getStoredImageAvailabilityUrls } = require("./lib/stored-image-urls");
 
 function loadLocalEnv() {
   const envPath = path.join(__dirname, "../.env");
@@ -644,14 +645,16 @@ async function isImageUrlAvailable(url) {
 }
 
 async function isStoredImageAvailable(file) {
-  const thumbnailUrl = file.mediumUrl || file.originalUrl;
-  const originalUrl = file.originalUrl || thumbnailUrl;
-
-  if (await isImageUrlAvailable(thumbnailUrl)) {
-    return true;
+  // ImgBB can take longer to publish its derived display image. The original
+  // is sufficient for approval, so check it first and use the display image
+  // only as a fallback for older/incomplete records.
+  for (const url of getStoredImageAvailabilityUrls(file)) {
+    if (await isImageUrlAvailable(url)) {
+      return true;
+    }
   }
 
-  return originalUrl !== thumbnailUrl && isImageUrlAvailable(originalUrl);
+  return false;
 }
 
 async function partitionStoredImagesByAvailability(files) {
@@ -963,21 +966,35 @@ app.get("/api/download", async (req, res) => {
     return res.status(400).json({ error: "Invalid image URL" });
   }
 
+  const safeFilename = (filename || url.split("/").pop() || "image").replace(/["\r\n]/g, "");
+
   try {
     const image = await axios.get(url, {
-      responseType: "stream",
+      responseType: "arraybuffer",
+      timeout: 15000,
+      maxRedirects: 3,
+      maxContentLength: 64 * 1024 * 1024,
+      validateStatus: status => status >= 200 && status < 300,
       headers: {
         "User-Agent": "Mozilla/5.0"
       }
     });
-    const safeFilename = (filename || url.split("/").pop() || "image").replace(/["\r\n]/g, "");
+    const contentType = String(image.headers["content-type"] || "").toLowerCase();
+    const content = Buffer.from(image.data || []);
 
-    res.setHeader("Content-Type", image.headers["content-type"] || "application/octet-stream");
+    if (!contentType.startsWith("image/") || content.length === 0) {
+      return res.status(502).json({ error: "The image provider returned an invalid file" });
+    }
+
+    res.status(200);
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Length", content.length);
     res.setHeader("Content-Disposition", `attachment; filename="${safeFilename}"`);
-
-    image.data.pipe(res);
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.end(content);
   } catch (err) {
-    res.status(500).json({ error: "Failed to download image" });
+    console.error("Failed to stream image download:", err.message);
+    res.status(502).json({ error: "Failed to download image from the image provider" });
   }
 });
 
@@ -1327,7 +1344,7 @@ app.get("/api/folders/:id/files", requireManageAuth, async (req, res) => {
   });
 });
 
-app.post("/api/folders/:id/files/approve-all", requireManageAuth, async (req, res) => {
+app.post("/api/folders/:id/files/approve-all", requireManageAuth, (req, res) => {
   const folder = db.findFolder(req.params.id);
 
   if (!folder) {
@@ -1335,28 +1352,19 @@ app.post("/api/folders/:id/files/approve-all", requireManageAuth, async (req, re
   }
 
   const recursive = req.query.recursive === "1";
-  const folders = recursive
-    ? db.listFolders().filter(item => item.id === folder.id || item.path.startsWith(`${folder.path}/`))
-    : [folder];
-  const pendingFiles = folders.flatMap(item => db.listFiles(item.id, "all"))
-    .filter(file => file.status !== "approved");
-  const { available, unavailable } = await partitionStoredImagesByAvailability(pendingFiles);
-
-  available.forEach(file => {
-    db.updateFile(file.id, { status: "approved", approvedBy: "admin" });
-  });
-  const count = available.length;
+  const count = recursive
+    ? db.approveFolderTreeFiles(folder.id)
+    : db.approveFolderFiles(folder.id);
 
   logAction(req, "files.approve_all", `Approved ${count} waiting file(s) in "${folder.name}"`, {
     ...folderLogDetails(folder),
     recursive,
-    count,
-    unavailableCount: unavailable.length
+    count
   });
   res.json({
     ok: true,
     count,
-    unavailableCount: unavailable.length
+    unavailableCount: 0
   });
 });
 

@@ -59,9 +59,12 @@ let selectedFolder = null;
 let currentFiles = [];
 let currentFileIndex = 0;
 let lockedScrollY = 0;
-let managedImageObserver = null;
+let managedImageQueue = [];
+let managedImageLoads = 0;
+let managedImageLoadGeneration = 0;
 let filesLoadAbortController = null;
 let filesLoadRequestId = 0;
+let singleDownloadLocked = false;
 let editingFolder = null;
 let addingParentId = null;
 const collapsedFolderIds = new Set();
@@ -72,6 +75,46 @@ let folderStatsCache = new Map();
 let folderDisplayPathCache = new Map();
 let preferredUploadPeriod = localStorage.getItem(preferredPeriodStorageKey) || "";
 let folderViewMode = "active";
+
+function resetSingleDownload() {
+  singleDownloadLocked = false;
+  downloadBtn.textContent = "Download";
+  downloadBtn.classList.remove("is-disabled");
+  downloadBtn.removeAttribute("aria-disabled");
+}
+
+downloadBtn.addEventListener("click", async event => {
+  event.preventDefault();
+
+  if (singleDownloadLocked) {
+    return;
+  }
+
+  singleDownloadLocked = true;
+  downloadBtn.textContent = "Preparing download…";
+  downloadBtn.classList.add("is-disabled");
+  downloadBtn.setAttribute("aria-disabled", "true");
+
+  try {
+    const response = await fetch(downloadBtn.href);
+
+    if (!response.ok) {
+      throw new Error("The image could not be downloaded.");
+    }
+
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = downloadBtn.download || "image";
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+  } catch (err) {
+    window.alert(err.message || "The image could not be downloaded.");
+  } finally {
+    resetSingleDownload();
+  }
+});
 
 function renderAdminNotice(status) {
   if (!adminNotice || !adminNoticeText) {
@@ -416,49 +459,84 @@ function loadManagedThumbnail(img) {
   const src = img.dataset.src;
 
   if (!src) {
-    return;
+    return Promise.resolve();
   }
 
-  img.onload = () => img.closest(".card")?.classList.add("is-loaded");
-  setStoredImageSource(img, {
-    mediumUrl: src,
-    originalUrl: img.dataset.fallback || src
+  return new Promise(resolve => {
+    const finish = () => {
+      img.onload = null;
+      img.onerror = null;
+      resolve();
+    };
+
+    img.onload = () => {
+      img.closest(".card")?.classList.add("is-loaded");
+      finish();
+    };
+    img.onerror = finish;
+
+    const imageUrl = getManagedImageUrl({
+      mediumUrl: src,
+      originalUrl: img.dataset.fallback || src
+    });
+
+    if (imageUrl) {
+      img.src = imageUrl;
+    } else {
+      finish();
+    }
+
+    img.removeAttribute("data-src");
+    img.removeAttribute("data-fallback");
   });
-  img.removeAttribute("data-src");
-  img.removeAttribute("data-fallback");
 }
 
-function setupManagedLazyLoading(container) {
-  const images = container.querySelectorAll(".manage-lazy-image");
-
-  if (!("IntersectionObserver" in window)) {
-    images.forEach(loadManagedThumbnail);
+function pumpManagedImageQueue(generation) {
+  if (generation !== managedImageLoadGeneration) {
     return;
   }
 
-  if (!managedImageObserver) {
-    managedImageObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) {
-          return;
-        }
-
-        loadManagedThumbnail(entry.target);
-        observer.unobserve(entry.target);
-      });
-    }, { rootMargin: "0px", threshold: 0.01 });
+  while (managedImageLoads < 4 && managedImageQueue.length) {
+    const image = managedImageQueue.shift();
+    managedImageLoads += 1;
+    loadManagedThumbnail(image).finally(() => {
+      managedImageLoads -= 1;
+      pumpManagedImageQueue(managedImageLoadGeneration);
+    });
   }
+}
 
-  images.forEach(image => managedImageObserver.observe(image));
+function queueManagedImages(images) {
+  managedImageQueue.push(...images);
+  pumpManagedImageQueue(managedImageLoadGeneration);
 }
 
 function stopManagedLazyLoading() {
-  managedImageObserver?.disconnect();
-  managedImageObserver = null;
+  managedImageLoadGeneration += 1;
+  managedImageQueue = [];
   fileList?.querySelectorAll(".manage-lazy-image").forEach(image => {
     image.removeAttribute("src");
     image.removeAttribute("data-src");
   });
+}
+
+function renderFilePlaceholders(fileCount) {
+  const count = Math.max(1, Number(fileCount) || 0);
+  const grid = document.createElement("div");
+  const fragment = document.createDocumentFragment();
+  grid.className = "manage-file-grid manage-file-placeholder-grid";
+  grid.setAttribute("aria-label", `Loading ${fileCount || "folder"} files`);
+  grid.setAttribute("aria-busy", "true");
+
+  for (let index = 0; index < count; index += 1) {
+    const placeholder = document.createElement("div");
+    placeholder.className = "manage-file-placeholder";
+    placeholder.setAttribute("aria-hidden", "true");
+    fragment.appendChild(placeholder);
+  }
+
+  grid.appendChild(fragment);
+  fileList.replaceChildren(grid);
 }
 
 function hasDuplicateFolderName(name, parentId) {
@@ -699,6 +777,12 @@ function clearFilesSubtitle() {
   filesSubtitle.innerHTML = "";
 }
 
+function cancelFilesLoad() {
+  filesLoadRequestId += 1;
+  filesLoadAbortController?.abort();
+  filesLoadAbortController = null;
+}
+
 function renderFilesBreadcrumb(folder) {
   filesSubtitle.innerHTML = "";
 
@@ -708,10 +792,11 @@ function renderFilesBreadcrumb(folder) {
 
   if (folder) {
     rootSegment.type = "button";
-    rootSegment.onclick = async () => {
+    rootSegment.onclick = () => {
+      cancelFilesLoad();
       selectedFolder = null;
       currentFiles = [];
-      await loadFolders();
+      renderFolders();
       renderFolderOverview();
     };
   }
@@ -735,9 +820,8 @@ function renderFilesBreadcrumb(folder) {
 
     if (!isLast) {
       segment.type = "button";
-      segment.onclick = async () => {
-        await loadFolders();
-        await loadFiles(folderById.get(item.id) || item);
+      segment.onclick = () => {
+        loadFiles(folderById.get(item.id) || item);
       };
     }
 
@@ -939,6 +1023,8 @@ async function handleFolderSelection(folder) {
   }
 
   if (selectedFolder?.id === folder.id) {
+    cancelFilesLoad();
+
     if (hasChildFolders(folder)) {
       collapsedFolderIds.add(folder.id);
     }
@@ -1173,13 +1259,22 @@ function renderFolderOverview(parentFolder = null) {
     const resetButton = setButtonBusy(approveAllWaiting, "Approving…");
 
     try {
-      for (const item of overviewItems) {
-        await api(`/api/folders/${item.folder.id}/files/approve-all`, { method: "POST" });
-      }
+      await Promise.all(overviewItems.map(item => (
+        api(`/api/folders/${item.folder.id}/files/approve-all`, { method: "POST" })
+      )));
 
-      await loadFolders();
-
+      overviewItems.forEach(({ folder, stats }) => {
+        folder.approvedCount = Number(folder.approvedCount || 0) + stats.pendingCount;
+        folder.pendingCount = 0;
+        folder.lastPendingUploadedAt = null;
+      });
+      folderStatsCache.clear();
+      renderFolders();
       renderFolderOverview(parentFolder ? folderById.get(parentFolder.id) || parentFolder : null);
+
+      loadFolders().catch(err => {
+        console.error("Failed to refresh folders after approval", err);
+      });
     } catch (err) {
       window.alert(err.message || "Failed to approve waiting files.");
     } finally {
@@ -1328,15 +1423,38 @@ function createFileSection({ title, files, open, lazy = false, emptyMessage = "N
 
     const grid = document.createElement("div");
     grid.className = "manage-file-grid";
-
-    files.forEach((file) => {
-      const index = currentFiles.indexOf(file);
-      grid.appendChild(createFileCard(file, index));
-    });
-
     section.appendChild(grid);
-    setupManagedLazyLoading(grid);
     hasRenderedFiles = true;
+
+    const filesAtRenderStart = currentFiles;
+    let nextFileIndex = 0;
+    const appendNextBatch = () => {
+      if (currentFiles !== filesAtRenderStart) {
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+      const batchImages = [];
+      const batchEnd = Math.min(nextFileIndex + 40, files.length);
+
+      while (nextFileIndex < batchEnd) {
+        const file = files[nextFileIndex];
+        const index = currentFiles.indexOf(file);
+        const card = createFileCard(file, index);
+        batchImages.push(card.querySelector(".manage-lazy-image"));
+        fragment.appendChild(card);
+        nextFileIndex += 1;
+      }
+
+      grid.appendChild(fragment);
+      queueManagedImages(batchImages);
+
+      if (nextFileIndex < files.length) {
+        window.requestAnimationFrame(appendNextBatch);
+      }
+    };
+
+    appendNextBatch();
   };
 
   section.addEventListener("toggle", () => {
@@ -1389,6 +1507,7 @@ function openModal(index) {
 }
 
 function closeModal() {
+  resetSingleDownload();
   modal.classList.remove("active");
   document.body.classList.remove("modal-open");
   document.body.style.top = "";
@@ -1403,6 +1522,7 @@ function updateModal() {
     return;
   }
 
+  resetSingleDownload();
   setStoredImageSource(modalImg, file);
   modalImg.alt = file.title || file.filename || `File ${currentFileIndex + 1}`;
   counter.innerText = `${currentFileIndex + 1} / ${currentFiles.length}`;
@@ -1491,7 +1611,7 @@ async function loadFiles(folder) {
   renderFilesBreadcrumb(folder);
   setBulkActionsVisible(true);
   setBulkActionsEnabled(false);
-  fileList.innerHTML = '<p class="empty-state">Loading files…</p>';
+  renderFilePlaceholders(folder.filesCount);
 
   const controller = new AbortController();
   filesLoadAbortController = controller;
@@ -1654,6 +1774,14 @@ approveAllBtn.onclick = async () => {
       const pendingFiles = currentFiles.filter(file => file.status !== "approved");
       await Promise.all(pendingFiles.map(file => api(`/api/files/${file.id}/approve`, { method: "POST" })));
     }
+
+    currentFiles = currentFiles.map(file => ({
+      ...file,
+      status: "approved",
+      approvedBy: "admin"
+    }));
+    renderFiles(currentFiles);
+    updateBulkActionsForFiles(currentFiles);
 
     await loadFolders();
     await loadFiles(selectedFolder);

@@ -39,6 +39,47 @@ let pinchStartDistance = 0;
 let pinchStartScale = 1;
 let isPinching = false;
 let isDownloadAllInProgress = false;
+let singleDownloadLocked = false;
+
+function resetSingleDownload() {
+  singleDownloadLocked = false;
+  downloadBtn.textContent = "Download";
+  downloadBtn.classList.remove("is-disabled");
+  downloadBtn.removeAttribute("aria-disabled");
+}
+
+downloadBtn.addEventListener("click", async event => {
+  event.preventDefault();
+
+  if (singleDownloadLocked) {
+    return;
+  }
+
+  singleDownloadLocked = true;
+  downloadBtn.textContent = "Preparing download…";
+  downloadBtn.classList.add("is-disabled");
+  downloadBtn.setAttribute("aria-disabled", "true");
+
+  try {
+    const response = await fetch(downloadBtn.href);
+
+    if (!response.ok) {
+      throw new Error("The image could not be downloaded.");
+    }
+
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = downloadBtn.download || "image";
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+  } catch (err) {
+    window.alert(err.message || "The image could not be downloaded.");
+  } finally {
+    resetSingleDownload();
+  }
+});
 
 const footerBrands = {
   actionsport: {
@@ -296,9 +337,9 @@ function renderGallery(data) {
     const btn = document.createElement("button");
     btn.textContent = "Download";
     btn.className = "download-btn";
-    btn.onclick = (e) => {
+    btn.onclick = async (e) => {
       e.stopPropagation();
-      downloadImage(image.original, index, image.filename);
+      await downloadImage(image.original, index, image.filename, btn);
     };
 
     const number = document.createElement("span");
@@ -383,6 +424,7 @@ function openModal(index) {
 }
 
 function closeModal() {
+  resetSingleDownload();
   modal.classList.remove("active");
   document.body.classList.remove("modal-open");
   document.body.style.top = "";
@@ -391,6 +433,7 @@ function closeModal() {
 
 function updateModal() {
   const image = images[currentIndex];
+  resetSingleDownload();
   resetModalZoom();
   modalImg.src = getGalleryImageUrl(image);
   modalImg.alt = image.title || image.filename || `Gallery image ${currentIndex + 1}`;
@@ -514,11 +557,37 @@ toTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: "smooth" });
 updateToTopButton();
 
 // DOWNLOAD SINGLE
-function downloadImage(url, index, filename) {
-  const a = document.createElement("a");
-  a.href = getDownloadUrl(url, filename);
-  a.download = filename || `image_${index + 1}.jpg`;
-  a.click();
+async function downloadImage(url, index, filename, button) {
+  if (button.disabled) {
+    return;
+  }
+
+  const originalLabel = button.textContent;
+  button.disabled = true;
+  button.textContent = "Preparing…";
+  button.setAttribute("aria-busy", "true");
+
+  try {
+    const response = await fetch(getDownloadUrl(url, filename));
+
+    if (!response.ok) {
+      throw new Error("The image could not be downloaded.");
+    }
+
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = filename || `image_${index + 1}.jpg`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+  } catch (err) {
+    window.alert(err.message || "The image could not be downloaded.");
+  } finally {
+    button.disabled = false;
+    button.textContent = originalLabel;
+    button.removeAttribute("aria-busy");
+  }
 }
 
 // DOWNLOAD ALL (ZIP)
